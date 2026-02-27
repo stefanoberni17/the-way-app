@@ -1,0 +1,38 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function middleware(req: NextRequest) {
+  const pathname = req.nextUrl.pathname;
+  
+  // ✅ Pagine pubbliche
+  const publicPaths = ['/login', '/register'];
+  const isPublicPath = publicPaths.some(path => pathname.startsWith(path));
+  
+  // ✅ Prendi il token dalla cookie
+  const token = req.cookies.get('sb-access-token')?.value || 
+                req.cookies.get('sb-' + process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0] + '-auth-token')?.value;
+  
+  console.log('🔍 Pathname:', pathname);
+  console.log('🔍 Has token:', !!token);
+  console.log('🔍 Is public path:', isPublicPath);
+  
+  // ✅ Se NON ha token e cerca pagina protetta → login
+  if (!token && !isPublicPath) {
+    console.log('❌ No token, redirecting to login');
+    return NextResponse.redirect(new URL('/login', req.url));
+  }
+  
+  // ✅ Se ha token e cerca login/register → homepage
+  if (token && isPublicPath) {
+    console.log('✅ Has token on public path, redirecting to home');
+    return NextResponse.redirect(new URL('/', req.url));
+  }
+  
+  console.log('✅ Allowing request');
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+};

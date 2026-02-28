@@ -1,19 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Client } from '@notionhq/client';
 import { createClient } from '@supabase/supabase-js';
 import { getWeekFromEpisode, isEpisodeInMVP } from '@/lib/episodeMapping';
-
-const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+const NOTION_HEADERS = {
+  'Authorization': `Bearer ${process.env.NOTION_TOKEN}`,
+  'Notion-Version': '2022-06-28',
+  'Content-Type': 'application/json',
+};
+
 // Ultimo episodio di ogni coppia di settimane (3 ep per coppia)
 const WEEK_PAIR_LAST_EPISODES: Record<number, number> = {
-  1: 3,   // Week 1-2 finisce con ep 3 → passa a Week 3
-  3: 6,   // Week 3-4 finisce con ep 6 → passa a Week 5
+  1: 3,   // Week 1-2 → passa a Week 3
+  3: 6,   // Week 3-4 → passa a Week 5
   5: 9,
   7: 12,
   9: 15,
@@ -26,16 +29,17 @@ const WEEK_PAIR_LAST_EPISODES: Record<number, number> = {
 
 async function fetchAllBlocks(pageId: string): Promise<any[]> {
   const blocks: any[] = [];
-  let cursor: string | undefined = undefined;
+  let cursor: string | null = null;
 
   do {
-    const response: any = await notion.blocks.children.list({
-      block_id: pageId,
-      page_size: 100,
-      ...(cursor ? { start_cursor: cursor } : {}),
-    });
-    blocks.push(...response.results);
-    cursor = response.has_more ? response.next_cursor : undefined;
+    const url: string = cursor
+      ? `https://api.notion.com/v1/blocks/${pageId}/children?start_cursor=${cursor}`
+      : `https://api.notion.com/v1/blocks/${pageId}/children`;
+
+    const res = await fetch(url, { headers: NOTION_HEADERS });
+    const data = await res.json();
+    blocks.push(...(data.results || []));
+    cursor = data.has_more ? data.next_cursor : null;
   } while (cursor);
 
   return blocks;
@@ -52,6 +56,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Episodio fuori scope MVP', locked: true }, { status: 400 });
     }
 
+    // Controlla se l'episodio precedente è completato
     if (userId && episodeNumber > 1) {
       const { data: prev } = await supabaseAdmin
         .from('user_episode_progress')
@@ -69,6 +74,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Controlla se già completato
     let isCompleted = false;
     if (userId) {
       const { data: curr } = await supabaseAdmin
@@ -80,22 +86,39 @@ export async function GET(request: NextRequest) {
       isCompleted = curr?.completed || false;
     }
 
-    // Query Notion per Numero (invece di pageId statico)
-    const queryResponse = await notion.databases.query({
-      database_id: process.env.NOTION_DATABASE_EPISODI!,
-      filter: {
-        property: 'Numero',
-        number: { equals: episodeNumber },
-      },
-    });
+    // Query Notion DB per Numero (fetch diretto)
+    const queryRes = await fetch(
+      `https://api.notion.com/v1/databases/${process.env.NOTION_DATABASE_EPISODI}/query`,
+      {
+        method: 'POST',
+        headers: NOTION_HEADERS,
+        body: JSON.stringify({
+          filter: {
+            property: 'Numero',
+            number: { equals: episodeNumber },
+          },
+        }),
+      }
+    );
 
-    if (!queryResponse.results || queryResponse.results.length === 0) {
-      return NextResponse.json({ error: 'Passo non trovato in Notion', episodeNumber }, { status: 404 });
+    const queryData = await queryRes.json();
+
+    if (!queryData.results || queryData.results.length === 0) {
+      return NextResponse.json(
+        { error: 'Passo non trovato in Notion', episodeNumber },
+        { status: 404 }
+      );
     }
 
-    const page = queryResponse.results[0] as any;
+    const page = queryData.results[0];
     const pageId = page.id;
     const properties = page.properties;
+
+    const getText = (prop: any) =>
+      prop?.rich_text?.[0]?.plain_text || prop?.text?.[0]?.plain_text || '';
+
+    const getTitle = (prop: any) =>
+      prop?.title?.[0]?.plain_text || '';
 
     let blocks: any[] = [];
     if (extended) {
@@ -105,16 +128,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       episode: {
         number: episodeNumber,
-        title: properties['Passo biblico']?.title?.[0]?.plain_text || `Passo ${episodeNumber}`,
-        riferimento: properties['Riferimento']?.rich_text?.[0]?.plain_text || '',
-        invitoApertura: properties['Invito apertura']?.rich_text?.[0]?.plain_text || '',
-        miniLesson: properties['Mini-lezione breve']?.rich_text?.[0]?.plain_text || '',
-        guidaOsservazione: properties['Guida osservazione']?.rich_text?.[0]?.plain_text || '',
-        reflectionQuestion: properties['Domanda riflessiva']?.rich_text?.[0]?.plain_text || '',
-        versettoPortare: properties['Versetto da portare']?.rich_text?.[0]?.plain_text || '',
-        mainTheme: properties['Tema principale']?.rich_text?.[0]?.plain_text || '',
-        concepts: properties['Concetti collegati']?.rich_text?.[0]?.plain_text || '',
-        salmoSupport: properties['Salmo/Proverbio di supporto']?.rich_text?.[0]?.plain_text || '',
+        title: getTitle(properties['Passo biblico']),
+        riferimento: getText(properties['Riferimento']),
+        invitoApertura: getText(properties['Invito apertura']),
+        miniLesson: getText(properties['Mini-lezione breve']),
+        guidaOsservazione: getText(properties['Guida osservazione']),
+        reflectionQuestion: getText(properties['Domanda riflessiva']),
+        versettoPortare: getText(properties['Versetto da portare']),
+        mainTheme: getText(properties['Tema principale']),
+        concepts: getText(properties['Concetti collegati']),
+        salmoSupport: getText(properties['Salmo/Proverbio di supporto']),
         durata: properties['Durata stimata']?.number || null,
         weekNumber: getWeekFromEpisode(episodeNumber),
         locked: false,
@@ -126,7 +149,10 @@ export async function GET(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Errore API episodio:', error);
-    return NextResponse.json({ error: 'Errore nel caricamento', details: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Errore nel caricamento', details: error.message },
+      { status: 500 }
+    );
   }
 }
 
@@ -135,7 +161,10 @@ export async function POST(request: NextRequest) {
     const { episodeNumber, userId } = await request.json();
 
     if (!userId || !episodeNumber) {
-      return NextResponse.json({ error: 'userId e episodeNumber richiesti' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'userId e episodeNumber richiesti' },
+        { status: 400 }
+      );
     }
 
     const { data, error } = await supabaseAdmin
@@ -152,7 +181,7 @@ export async function POST(request: NextRequest) {
 
     if (error) throw error;
 
-    // Auto-update current_week se necessario
+    // Auto-update current_week se l'episodio è l'ultimo della coppia
     for (const [weekPair, lastEp] of Object.entries(WEEK_PAIR_LAST_EPISODES)) {
       if (episodeNumber === lastEp) {
         const { data: profile } = await supabaseAdmin
@@ -170,22 +199,21 @@ export async function POST(request: NextRequest) {
             .from('profiles')
             .update({ current_week: nextWeek })
             .eq('user_id', userId);
-          console.log(`✅ Week auto-updated: ${currentWeek} → ${nextWeek}`);
         }
         break;
       }
     }
 
-    const maxEpisode = Math.max(...Object.keys(WEEK_PAIR_LAST_EPISODES).map(Number)) + 1;
-
     return NextResponse.json({
       success: true,
       progress: data,
       nextEpisode: episodeNumber + 1,
-      unlockedNext: episodeNumber < maxEpisode,
     });
 
   } catch (error: any) {
-    return NextResponse.json({ error: 'Errore nel salvataggio', details: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Errore nel salvataggio', details: error.message },
+      { status: 500 }
+    );
   }
 }

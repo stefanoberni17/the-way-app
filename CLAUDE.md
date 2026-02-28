@@ -1,12 +1,14 @@
-# Naruto Inner Path — Guida al Progetto
+# The Way — La Via del Cuore — Guida al Progetto
 
 ## Panoramica
 
-**Naruto Inner Path** è un'app di crescita personale a tema Naruto. Gli utenti compiono un percorso psicologico strutturato in settimane e episodi, guidati da un AI (il "Maestro") che funge da specchio consapevole — non terapeuta, non coach. Il contenuto (episodi, mantra, pratiche) è gestito su Notion come CMS.
+**The Way** è un'app di crescita personale basata sugli insegnamenti del Vangelo. Gli utenti compiono un percorso psicologico-spirituale strutturato in 33 settimane e passi biblici, guidati da un AI (la "Guida") che funge da specchio consapevole — non prete, non psicologo, non coach. Il contenuto (passi biblici, versetti, pratiche) è gestito su Notion come CMS.
 
-**Tagline:** *La via del Guerriero Gentile*
+**Tagline:** *La Via del Cuore*
 
-**Stato attuale:** MVP in Beta. Settimane 1-4 disponibili (episodi 1-12), settimane 5-6 bloccate.
+**Stato attuale:** MVP in Beta. Settimane 1-4 disponibili (passi 1-6), settimane 5+ bloccate.
+
+**Basato su:** Naruto Inner Path (stesso stack, struttura adattata per The Way)
 
 ---
 

@@ -7,10 +7,16 @@ import { supabase } from '@/lib/supabase';
 interface EpisodeData {
   number: number;
   title: string;
+  riferimento: string;
+  invitoApertura: string;
   miniLesson: string;
+  guidaOsservazione: string;
   reflectionQuestion: string;
+  versettoPortare: string;
   mainTheme: string;
   concepts: string;
+  salmoSupport: string;
+  durata: number | null;
   weekNumber: number;
   locked: boolean;
   completed: boolean;
@@ -56,7 +62,7 @@ function renderBlock(block: any): React.ReactNode {
       const content = texts.map((t: any) => t.plain_text).join('');
       return (
         <div key={id} className="flex gap-2 mb-1">
-          <span className="text-orange-400 mt-1 flex-shrink-0">•</span>
+          <span className="text-blue-400 mt-1 flex-shrink-0">•</span>
           <p className="text-gray-700 text-sm leading-relaxed">{content}</p>
         </div>
       );
@@ -67,7 +73,7 @@ function renderBlock(block: any): React.ReactNode {
       const content = texts.map((t: any) => t.plain_text).join('');
       return (
         <div key={id} className="flex gap-2 mb-1">
-          <span className="text-orange-500 font-bold text-sm flex-shrink-0">›</span>
+          <span className="text-blue-500 font-bold text-sm flex-shrink-0">›</span>
           <p className="text-gray-700 text-sm leading-relaxed">{content}</p>
         </div>
       );
@@ -77,7 +83,7 @@ function renderBlock(block: any): React.ReactNode {
       const texts = block.quote?.rich_text || [];
       const content = texts.map((t: any) => t.plain_text).join('');
       return (
-        <blockquote key={id} className="border-l-4 border-orange-400 bg-orange-50 px-4 py-3 my-3 rounded-r-lg">
+        <blockquote key={id} className="border-l-4 border-blue-400 bg-blue-50 px-4 py-3 my-3 rounded-r-lg">
           <p className="text-gray-700 italic text-sm leading-relaxed">{content}</p>
         </blockquote>
       );
@@ -85,10 +91,10 @@ function renderBlock(block: any): React.ReactNode {
 
     case 'callout': {
       const texts = block.callout?.rich_text || [];
-      const emoji = block.callout?.icon?.emoji || '💡';
+      const emoji = block.callout?.icon?.emoji || '✝️';
       const content = texts.map((t: any) => t.plain_text).join('');
       return (
-        <div key={id} className="bg-blue-50 border-l-4 border-blue-400 p-4 my-3 rounded flex items-start gap-3">
+        <div key={id} className="bg-amber-50 border-l-4 border-amber-400 p-4 my-3 rounded flex items-start gap-3">
           <span className="text-xl flex-shrink-0">{emoji}</span>
           <p className="text-gray-700 text-sm leading-relaxed">{content}</p>
         </div>
@@ -96,7 +102,7 @@ function renderBlock(block: any): React.ReactNode {
     }
 
     case 'divider':
-      return <hr key={id} className="border-orange-100 my-4" />;
+      return <hr key={id} className="border-blue-100 my-4" />;
 
     case 'toggle': {
       const texts = block.toggle?.rich_text || [];
@@ -104,7 +110,7 @@ function renderBlock(block: any): React.ReactNode {
       return (
         <details key={id} className="my-2 bg-gray-50 rounded-lg">
           <summary className="px-4 py-3 cursor-pointer font-semibold text-gray-700 text-sm list-none flex items-center gap-2">
-            <span className="text-orange-500">▶</span> {summary}
+            <span className="text-blue-500">▶</span> {summary}
           </summary>
           <div className="px-4 pb-3 pt-1 text-sm text-gray-500 italic">
             Apri in Notion per il contenuto completo
@@ -129,9 +135,9 @@ function StepProgress({ current, total }: { current: number; total: number }) {
           <div key={n} className="flex items-center flex-1 last:flex-none">
             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300 flex-shrink-0 ${
               isDone
-                ? 'bg-orange-500 border-orange-500 text-white'
+                ? 'bg-blue-600 border-blue-600 text-white'
                 : isActive
-                ? 'bg-orange-50 border-orange-500 text-orange-600'
+                ? 'bg-blue-50 border-blue-600 text-blue-600'
                 : 'bg-white border-gray-200 text-gray-400'
             }`}>
               {isDone ? '✓' : n}
@@ -139,7 +145,7 @@ function StepProgress({ current, total }: { current: number; total: number }) {
             {n < total && (
               <div className="flex-1 h-0.5 mx-1.5 bg-gray-200 overflow-hidden rounded">
                 <div
-                  className="h-full bg-orange-500 transition-all duration-500"
+                  className="h-full bg-blue-600 transition-all duration-500"
                   style={{ width: isDone ? '100%' : '0%' }}
                 />
               </div>
@@ -166,7 +172,6 @@ export default function EpisodioPage() {
   const [loadingExtended, setLoadingExtended] = useState(false);
   const [showExtended, setShowExtended] = useState(false);
 
-  // ✅ JOURNALING STATE
   const [reflectionText, setReflectionText] = useState('');
   const [savingReflection, setSavingReflection] = useState(false);
   const [reflectionSaved, setReflectionSaved] = useState(false);
@@ -205,7 +210,6 @@ export default function EpisodioPage() {
         setCompleted(data.episode.completed);
         setLoading(false);
 
-        // ✅ Carica riflessione esistente
         const reflectionRes = await fetch(`/api/reflection?userId=${userId}&episodeNumber=${episodeNumber}`);
         const reflectionData = await reflectionRes.json();
         if (reflectionData.reflection) {
@@ -213,14 +217,14 @@ export default function EpisodioPage() {
           setReflectionSaved(true);
         }
       } catch (error) {
-        console.error('Errore caricamento episodio:', error);
+        console.error('Errore caricamento passo:', error);
         router.back();
       }
     };
     fetchEpisode();
   }, [episodeNumber, userId, router]);
 
-  // ✅ Auto-save riflessione dopo 2 secondi di inattività
+  // Auto-save riflessione dopo 2 secondi di inattività
   useEffect(() => {
     if (!reflectionText.trim() || reflectionText.length > MAX_CHARS) return;
 
@@ -269,7 +273,6 @@ export default function EpisodioPage() {
   const handleComplete = async () => {
     if (completed || completing) return;
 
-    // ✅ Verifica riflessione salvata
     if (!reflectionSaved || !reflectionText.trim()) {
       alert('Devi completare la riflessione prima di procedere.');
       return;
@@ -295,10 +298,10 @@ export default function EpisodioPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 flex items-center justify-center">
+      <main className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">🍥</div>
-          <p className="text-xl text-gray-600">Caricamento episodio...</p>
+          <div className="text-6xl mb-4">✝️</div>
+          <p className="text-xl text-gray-600">Caricamento passo...</p>
         </div>
       </main>
     );
@@ -307,21 +310,29 @@ export default function EpisodioPage() {
   // Schermata di celebrazione completamento
   if (showCelebration) {
     return (
-      <div className="fixed inset-0 bg-gradient-to-br from-orange-500 via-orange-600 to-amber-500 flex items-center justify-center z-50 p-6">
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 flex items-center justify-center z-50 p-6">
         <div className="text-center text-white">
-          <div className="text-8xl mb-4 animate-bounce">🍥</div>
+          <div className="text-8xl mb-4 animate-bounce">✨</div>
           <h2 className="text-3xl font-extrabold mb-3">
-            Episodio completato!
+            Passo completato!
           </h2>
-          <p className="text-lg text-orange-100 mb-2 font-medium">
-            Episodio {episodeData?.number} · {episodeData?.title}
+          <p className="text-lg text-blue-100 mb-2 font-medium">
+            {episodeData?.riferimento && (
+              <span className="block text-sm text-blue-200 italic mb-1">{episodeData.riferimento}</span>
+            )}
+            {episodeData?.title}
           </p>
-          <p className="text-sm text-orange-200 italic mt-6">
-            "Ogni passo sul tuo percorso ti rende più intero."
+          {episodeData?.versettoPortare && (
+            <p className="text-sm text-blue-200 italic mt-4 max-w-xs mx-auto leading-relaxed">
+              "{episodeData.versettoPortare}"
+            </p>
+          )}
+          <p className="text-xs text-blue-300 mt-6">
+            Porta questo versetto con te oggi.
           </p>
           <button
             onClick={() => router.back()}
-            className="mt-10 bg-white text-orange-600 font-bold px-8 py-3 rounded-full shadow-lg hover:bg-orange-50 transition-all hover:scale-105 active:scale-95"
+            className="mt-10 bg-white text-blue-700 font-bold px-8 py-3 rounded-full shadow-lg hover:bg-blue-50 transition-all hover:scale-105 active:scale-95"
           >
             Continua il percorso →
           </button>
@@ -330,47 +341,49 @@ export default function EpisodioPage() {
     );
   }
 
-  // Se versione estesa attiva, mostra full page
+  // Vista versione estesa (passo biblico completo da Notion)
   if (showExtended) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 py-6 px-4 pb-28">
+      <main className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 py-6 px-4 pb-28">
         <div className="max-w-2xl mx-auto">
           <button
             onClick={() => setShowExtended(false)}
-            className="flex items-center gap-2 text-sm text-gray-500 font-medium mb-5 hover:text-orange-600 transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-500 font-medium mb-5 hover:text-blue-600 transition-colors"
           >
-            ← Torna all'episodio
+            ← Torna al passo
           </button>
 
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-4">
-            <span className="text-xs font-bold text-orange-600 bg-orange-100 px-3 py-1 rounded-full">
-              Episodio {episodeData?.number} · Versione estesa
+            <span className="text-xs font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
+              Passo {episodeData?.number} · Lettura completa
             </span>
-            <h1 className="text-xl font-extrabold text-gray-800 mt-3 mb-1">
+            {episodeData?.riferimento && (
+              <p className="text-xs text-gray-400 mt-2 italic">{episodeData.riferimento}</p>
+            )}
+            <h1 className="text-xl font-extrabold text-gray-800 mt-2 mb-1">
               {episodeData?.title}
             </h1>
-            <p className="text-orange-600 font-semibold text-sm">🎯 {episodeData?.mainTheme}</p>
           </div>
 
           <div className="bg-white rounded-2xl shadow-lg p-6">
             {extendedBlocks.length > 0
               ? extendedBlocks.map((block: any) => renderBlock(block))
-              : <p className="text-sm text-gray-400 italic">Nessun contenuto aggiuntivo.</p>
+              : <p className="text-sm text-gray-400 italic">Nessun contenuto aggiuntivo disponibile.</p>
             }
           </div>
 
           <div className="mt-6">
             {completed ? (
               <div className="w-full bg-green-50 border border-green-200 text-green-700 text-sm font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2">
-                ✅ Episodio completato
+                ✅ Passo completato
               </div>
             ) : reflectionSaved ? (
               <button
                 onClick={handleComplete}
                 disabled={completing}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-60 shadow-sm"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-60 shadow-sm"
               >
-                {completing ? <><span className="animate-spin">⏳</span> Salvataggio...</> : <>✓ Completa episodio</>}
+                {completing ? <><span className="animate-spin">⏳</span> Salvataggio...</> : <>✓ Completa passo</>}
               </button>
             ) : (
               <div className="w-full bg-amber-50 border border-amber-200 text-amber-700 text-sm font-medium py-3.5 px-4 rounded-xl flex items-center justify-center gap-2">
@@ -383,14 +396,14 @@ export default function EpisodioPage() {
     );
   }
 
-  // Vista normale con step card
+  // Vista principale con step
   return (
-    <main className="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 py-6 px-4 pb-28">
+    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 py-6 px-4 pb-28">
       <div className="max-w-lg mx-auto">
 
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-sm text-gray-500 font-medium mb-5 hover:text-orange-600 transition-colors"
+          className="flex items-center gap-2 text-sm text-gray-500 font-medium mb-5 hover:text-blue-600 transition-colors"
         >
           ← Torna indietro
         </button>
@@ -402,48 +415,64 @@ export default function EpisodioPage() {
           {/* STEP 1 — Intro */}
           {currentStep === 1 && (
             <div>
-              <div className="mb-4">
-                <span className="text-xs font-bold text-orange-600 bg-orange-100 px-3 py-1 rounded-full">
-                  Episodio {episodeData?.number} · Week {episodeData?.weekNumber}
+              <div className="mb-3 flex items-center gap-2">
+                <span className="text-xs font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
+                  Passo {episodeData?.number} · Week {episodeData?.weekNumber}
                 </span>
+                {episodeData?.durata && (
+                  <span className="text-xs text-gray-400">⏱ ~{episodeData.durata} min</span>
+                )}
               </div>
+              {episodeData?.riferimento && (
+                <p className="text-xs text-blue-500 font-semibold italic mb-2">{episodeData.riferimento}</p>
+              )}
               <h1 className="text-2xl font-extrabold text-gray-800 leading-tight mb-3">
                 {episodeData?.title}
               </h1>
               {episodeData?.mainTheme && (
-                <p className="text-orange-600 font-semibold text-sm mb-5">
+                <p className="text-blue-600 font-semibold text-sm mb-4">
                   🎯 {episodeData.mainTheme}
                 </p>
               )}
-              <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
-                <p className="text-xs text-orange-700 font-semibold uppercase tracking-wide mb-1">In questo episodio</p>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  Leggerai la mini-lezione, la domanda di riflessione e i concetti chiave. Prenditi il tempo che ti serve per ogni step.
-                </p>
-              </div>
+              {episodeData?.invitoApertura && (
+                <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                  <p className="text-xs text-blue-700 font-semibold uppercase tracking-wide mb-1">✨ Invito all'apertura</p>
+                  <p className="text-sm text-gray-600 leading-relaxed italic">
+                    {episodeData.invitoApertura}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
-          {/* STEP 2 — Mini-lezione */}
+          {/* STEP 2 — Mini-lezione + Guida osservazione */}
           {currentStep === 2 && (
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-xl flex-shrink-0">
+                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-xl flex-shrink-0">
                   📖
                 </div>
                 <div>
-                  <p className="font-bold text-gray-800 text-sm">Mini-lezione</p>
-                  <p className="text-xs text-gray-500">L'insegnamento di questo episodio</p>
+                  <p className="font-bold text-gray-800 text-sm">Insegnamento</p>
+                  <p className="text-xs text-gray-500">La lezione di questo passo</p>
                 </div>
               </div>
               <div className="w-full h-px bg-gray-100 mb-4" />
-              <p className="text-sm text-gray-700 leading-relaxed border-l-4 border-orange-400 pl-4">
+              <p className="text-sm text-gray-700 leading-relaxed border-l-4 border-blue-400 pl-4 mb-5">
                 {episodeData?.miniLesson || 'Contenuto non ancora disponibile.'}
               </p>
+              {episodeData?.guidaOsservazione && (
+                <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
+                  <p className="text-xs text-amber-700 font-semibold uppercase tracking-wide mb-2">👁️ Guida all'osservazione</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {episodeData.guidaOsservazione}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
-          {/* STEP 3 — Domanda riflessiva + JOURNALING */}
+          {/* STEP 3 — Domanda riflessiva + Journaling */}
           {currentStep === 3 && (
             <div>
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100 mb-4">
@@ -455,7 +484,6 @@ export default function EpisodioPage() {
                 </p>
               </div>
 
-              {/* ✅ TEXT AREA JOURNALING */}
               <div className="mb-3">
                 <label className="block text-xs font-bold text-gray-700 mb-2">
                   ✍️ La tua riflessione (obbligatoria)
@@ -469,13 +497,13 @@ export default function EpisodioPage() {
                     }
                   }}
                   placeholder="Scrivi qui la tua riflessione..."
-                  className="w-full h-32 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-200 resize-none text-sm text-gray-700 transition-all"
+                  className="w-full h-32 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 resize-none text-sm text-gray-700 transition-all"
                   maxLength={MAX_CHARS}
                 />
                 <div className="flex items-center justify-between mt-2">
                   <span className={`text-xs ${
-                    reflectionText.length >= MAX_CHARS 
-                      ? 'text-red-500 font-bold' 
+                    reflectionText.length >= MAX_CHARS
+                      ? 'text-red-500 font-bold'
                       : 'text-gray-500'
                   }`}>
                     {reflectionText.length}/{MAX_CHARS} caratteri
@@ -496,16 +524,32 @@ export default function EpisodioPage() {
               {!reflectionText.trim() && (
                 <div className="bg-amber-50 border-l-4 border-amber-400 p-3 rounded">
                   <p className="text-xs text-amber-800">
-                    💡 Devi scrivere una riflessione per completare questo episodio
+                    💡 Devi scrivere una riflessione per completare questo passo
                   </p>
                 </div>
               )}
             </div>
           )}
 
-          {/* STEP 4 — Concetti + versione estesa + completa */}
+          {/* STEP 4 — Versetto da portare + Concetti + Completa */}
           {currentStep === 4 && (
             <div>
+              {episodeData?.versettoPortare && (
+                <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-5 border border-indigo-100 mb-5">
+                  <p className="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2">
+                    🕊️ Versetto da portare con te
+                  </p>
+                  <p className="text-gray-800 text-sm leading-relaxed italic font-medium">
+                    "{episodeData.versettoPortare}"
+                  </p>
+                  {episodeData.salmoSupport && (
+                    <p className="text-xs text-gray-400 mt-3 italic">
+                      Salmo/Proverbio di supporto: {episodeData.salmoSupport}
+                    </p>
+                  )}
+                </div>
+              )}
+
               {conceptTags.length > 0 && (
                 <div className="mb-5">
                   <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
@@ -524,27 +568,27 @@ export default function EpisodioPage() {
               <button
                 onClick={handleLoadExtended}
                 disabled={loadingExtended}
-                className="w-full border-2 border-dashed border-orange-200 bg-orange-50 text-orange-700 text-sm font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 mb-4 hover:bg-orange-100 hover:border-orange-300 transition-all disabled:opacity-50"
+                className="w-full border-2 border-dashed border-blue-200 bg-blue-50 text-blue-700 text-sm font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 mb-4 hover:bg-blue-100 hover:border-blue-300 transition-all disabled:opacity-50"
               >
                 {loadingExtended
                   ? <><span className="animate-spin">⏳</span> Caricamento...</>
-                  : <>📚 Leggi la versione estesa</>
+                  : <>📖 Leggi il passo biblico completo</>
                 }
               </button>
 
               {completed ? (
                 <div className="w-full bg-green-50 border border-green-200 text-green-700 text-sm font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2">
-                  ✅ Episodio completato
+                  ✅ Passo completato
                 </div>
               ) : reflectionSaved && reflectionText.trim() ? (
                 <button
                   onClick={handleComplete}
                   disabled={completing}
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-60 shadow-sm"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-60 shadow-sm"
                 >
                   {completing
                     ? <><span className="animate-spin">⏳</span> Salvataggio...</>
-                    : <>✓ Completa episodio</>
+                    : <>✓ Completa passo</>
                   }
                 </button>
               ) : (
@@ -570,7 +614,7 @@ export default function EpisodioPage() {
           {currentStep < TOTAL_STEPS && (
             <button
               onClick={() => setCurrentStep(s => s + 1)}
-              className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm py-3.5 px-6 rounded-xl transition-all shadow-sm"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm py-3.5 px-6 rounded-xl transition-all shadow-sm"
             >
               Continua →
             </button>

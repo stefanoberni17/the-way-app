@@ -1,14 +1,31 @@
-// Logica unlock settimane basata su completamento episodi
+// The Way — Logica unlock settimane basata su completamento episodi
+// 33 settimane totali, organizzate in coppie (1-2, 3-4, ..., 31-32) + week 33
 
-// Mapping settimane → range episodi
+// Mapping settimane → range episodi (3 episodi per coppia di settimane)
 const WEEK_EPISODES: Record<number, { start: number; end: number }> = {
-  1: { start: 1, end: 5 },
-  2: { start: 1, end: 5 },   // Week 1-2 condividono episodi 1-5
-  3: { start: 6, end: 12 },
-  4: { start: 6, end: 12 },  // Week 3-4 condividono episodi 6-12
-  5: { start: 13, end: 19 },
-  6: { start: 13, end: 19 }, // Week 5-6 condividono episodi 13-19
+  1:  { start: 1,  end: 3  },   // Week 1-2 condividono ep 1-3
+  2:  { start: 1,  end: 3  },
+  3:  { start: 4,  end: 6  },   // Week 3-4 condividono ep 4-6
+  4:  { start: 4,  end: 6  },
+  5:  { start: 7,  end: 9  },
+  6:  { start: 7,  end: 9  },
+  7:  { start: 10, end: 12 },
+  8:  { start: 10, end: 12 },
+  9:  { start: 13, end: 15 },
+  10: { start: 13, end: 15 },
+  11: { start: 16, end: 18 },
+  12: { start: 16, end: 18 },
+  13: { start: 19, end: 21 },
+  14: { start: 19, end: 21 },
+  15: { start: 22, end: 24 },
+  16: { start: 22, end: 24 },
+  17: { start: 25, end: 27 },
+  18: { start: 25, end: 27 },
+  19: { start: 28, end: 30 },
+  20: { start: 28, end: 30 },
 };
+
+const TOTAL_WEEKS = 33;
 
 interface EpisodeProgress {
   episode_number: number;
@@ -17,8 +34,6 @@ interface EpisodeProgress {
 
 /**
  * Determina quali settimane sono sbloccate per un utente
- * @param completedEpisodes - Array di episodi completati
- * @returns Array di numeri settimana sbloccate
  */
 export function getUnlockedWeeks(completedEpisodes: EpisodeProgress[]): number[] {
   const completedNumbers = completedEpisodes
@@ -27,20 +42,19 @@ export function getUnlockedWeeks(completedEpisodes: EpisodeProgress[]): number[]
 
   const unlockedWeeks: number[] = [];
 
-  for (let week = 1; week <= 6; week++) {
+  for (let week = 1; week <= TOTAL_WEEKS; week++) {
     if (week === 1) {
-      // Week 1 sempre sbloccata
       unlockedWeeks.push(1);
       continue;
     }
 
     const previousWeek = week - 1;
-    const { start, end } = WEEK_EPISODES[previousWeek];
+    const range = WEEK_EPISODES[previousWeek];
+    if (!range) break; // Episodi non ancora mappati
 
-    // Week N sbloccata se TUTTI gli episodi della week N-1 sono completati
     const allPreviousCompleted = Array.from(
-      { length: end - start + 1 }, 
-      (_, i) => start + i
+      { length: range.end - range.start + 1 },
+      (_, i) => range.start + i
     ).every(epNum => completedNumbers.includes(epNum));
 
     if (allPreviousCompleted) {
@@ -55,8 +69,7 @@ export function getUnlockedWeeks(completedEpisodes: EpisodeProgress[]): number[]
  * Controlla se una settimana specifica è sbloccata
  */
 export function isWeekUnlocked(weekNumber: number, completedEpisodes: EpisodeProgress[]): boolean {
-  const unlocked = getUnlockedWeeks(completedEpisodes);
-  return unlocked.includes(weekNumber);
+  return getUnlockedWeeks(completedEpisodes).includes(weekNumber);
 }
 
 /**
@@ -65,38 +78,30 @@ export function isWeekUnlocked(weekNumber: number, completedEpisodes: EpisodePro
 export function getNextWeekToUnlock(completedEpisodes: EpisodeProgress[]): number | null {
   const unlocked = getUnlockedWeeks(completedEpisodes);
   const nextWeek = Math.max(...unlocked) + 1;
-  return nextWeek <= 6 ? nextWeek : null;
+  return nextWeek <= TOTAL_WEEKS ? nextWeek : null;
 }
+
 // ========================================
 // BETA RESTRICTIONS
 // ========================================
 
 /**
- * MVP Beta: solo Week 1-4 accessibili (episodi 1-12)
+ * MVP Beta: solo Week 1-4 accessibili (episodi 1-6)
  */
 export const BETA_MAX_WEEK = 4;
-export const BETA_MAX_EPISODE = 12;
+export const BETA_MAX_EPISODE = 6;
 
-/**
- * Controlla se una settimana è accessibile nella versione Beta
- */
 export function isWeekUnlockedInBeta(weekNumber: number): boolean {
   return weekNumber <= BETA_MAX_WEEK;
 }
 
-/**
- * Restituisce messaggio di lock per settimane non disponibili in Beta
- */
 export function getWeekLockMessage(weekNumber: number): string {
   if (weekNumber > BETA_MAX_WEEK) {
-    return "Questa settimana sarà disponibile nella versione completa del percorso. Stay tuned! 🍥";
+    return 'Questa settimana sarà disponibile nella versione completa del percorso. Stay tuned! ✝️';
   }
-  return "";
+  return '';
 }
 
-/**
- * Controlla se un episodio è accessibile nella versione Beta
- */
 export function isEpisodeUnlockedInBeta(episodeNumber: number): boolean {
   return episodeNumber <= BETA_MAX_EPISODE;
 }

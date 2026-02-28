@@ -10,7 +10,7 @@ export default function ProfiloPage() {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
-  
+
   const [userId, setUserId] = useState('');
   const [email, setEmail] = useState('');
   const [nome, setNome] = useState('');
@@ -25,7 +25,7 @@ export default function ProfiloPage() {
   useEffect(() => {
     const loadProfile = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (!session) {
         router.push('/login');
         return;
@@ -99,9 +99,9 @@ export default function ProfiloPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 flex items-center justify-center">
+      <main className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">🍥</div>
+          <div className="text-6xl mb-4">✝️</div>
           <p className="text-xl text-gray-600">Caricamento...</p>
         </div>
       </main>
@@ -110,26 +110,26 @@ export default function ProfiloPage() {
 
   const getWeekName = (week: string) => {
     const weekNames: Record<string, string> = {
-      '1': 'Week 1 - La ferita del rifiuto',
-      '2': 'Week 2 - La ferita del rifiuto',
-      '3': 'Week 3 - Presenza e ascolto',
-      '4': 'Week 4 - Presenza e ascolto',
-      '5': 'Week 5 - Valore e appartenenza',
-      '6': 'Week 6 - Valore e appartenenza',
+      '1': 'Week 1 - La voce nel deserto',
+      '2': 'Week 2 - La voce nel deserto',
+      '3': 'Week 3 - Le tentazioni',
+      '4': 'Week 4 - Le tentazioni',
+      '5': 'Week 5 - La chiamata',
+      '6': 'Week 6 - La chiamata',
     };
     return weekNames[week] || `Week ${week}`;
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 py-8 px-4 pb-24">
+    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 py-8 px-4 pb-24">
       {/* Header */}
       <div className="max-w-3xl mx-auto mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-md relative">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-700 to-indigo-700 flex items-center justify-center shadow-md relative">
             <span className="text-white font-bold text-xl">
-              {nome ? nome.charAt(0).toUpperCase() : '🍥'}
+              {nome ? nome.charAt(0).toUpperCase() : '✝️'}
             </span>
-            <span className="absolute -bottom-0.5 -right-0.5 text-lg">🍥</span>
+            <span className="absolute -bottom-0.5 -right-0.5 text-lg">🙏</span>
           </div>
           <div>
             <h1 className="text-3xl font-bold text-gray-800">
@@ -158,7 +158,7 @@ export default function ProfiloPage() {
           {/* Info Personali */}
           <div className="space-y-6 pb-6 border-b mb-6">
             <h3 className="font-semibold text-gray-700 text-lg">Informazioni personali</h3>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Nome *
@@ -167,7 +167,7 @@ export default function ProfiloPage() {
                 type="text"
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Come ti chiami?"
                 required
               />
@@ -181,7 +181,7 @@ export default function ProfiloPage() {
                 type="number"
                 value={eta}
                 onChange={(e) => setEta(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Es. 25"
                 min="13"
                 max="120"
@@ -192,13 +192,13 @@ export default function ProfiloPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Settimana corrente
               </label>
-              <div className="bg-gradient-to-r from-orange-50 to-amber-50 border-l-4 border-orange-500 rounded-lg p-4">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-600 rounded-lg p-4">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">🎯</span>
                   <div>
                     <p className="font-bold text-gray-800">{getWeekName(currentWeek)}</p>
                     <p className="text-xs text-gray-600 mt-1">
-                      La settimana si aggiorna automaticamente quando completi tutti gli episodi
+                      La settimana si aggiorna automaticamente quando completi tutti i passi
                     </p>
                   </div>
                 </div>
@@ -209,7 +209,7 @@ export default function ProfiloPage() {
           {/* Collega Telegram */}
             <div className="space-y-4 pb-6 border-b mb-6">
               <h3 className="font-semibold text-gray-700 text-lg">🤖 Collega Telegram</h3>
-              
+
               <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 text-sm text-blue-800">
                 <p className="font-medium mb-2">Come trovare il tuo ID Telegram:</p>
                 <ol className="list-decimal list-inside space-y-1 text-blue-700">
@@ -228,28 +228,28 @@ export default function ProfiloPage() {
                   value={telegramId}
                   onChange={(e) => setTelegramId(e.target.value)}
                   autoComplete="off"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Es. 766672351"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Una volta salvato potrai parlare con il Maestro AI su <strong>@Sensei_naruto_bot</strong>
+                  Una volta salvato potrai parlare con La Guida direttamente su Telegram
                 </p>
               </div>
             </div>
 
           {/* Il tuo percorso */}
           <div className="space-y-6">
-            <h3 className="font-semibold text-gray-700 text-lg">Il tuo percorso</h3>
+            <h3 className="font-semibold text-gray-700 text-lg">Il tuo cammino</h3>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Obiettivi
+                Intenzione di percorso
               </label>
               <textarea
                 value={obiettivi}
                 onChange={(e) => setObiettivi(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                placeholder="Cosa vuoi ottenere da questo percorso?"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Cosa cerchi in questo cammino?"
                 rows={3}
               />
             </div>
@@ -262,7 +262,7 @@ export default function ProfiloPage() {
                 type="text"
                 value={passioni}
                 onChange={(e) => setPassioni(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Cosa ti appassiona?"
               />
             </div>
@@ -275,7 +275,7 @@ export default function ProfiloPage() {
                 type="text"
                 value={sogno}
                 onChange={(e) => setSogno(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Qual è il tuo sogno più grande?"
               />
             </div>
@@ -287,7 +287,7 @@ export default function ProfiloPage() {
               <textarea
                 value={situazioneAttuale}
                 onChange={(e) => setSituazioneAttuale(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Dove ti trovi ora nella vita?"
                 rows={3}
               />
@@ -302,7 +302,7 @@ export default function ProfiloPage() {
               className={`w-full font-bold py-3 px-6 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed text-white ${
                 success
                   ? 'bg-green-500 hover:bg-green-600'
-                  : 'bg-orange-500 hover:bg-orange-600'
+                  : 'bg-blue-700 hover:bg-blue-800'
               }`}
             >
               {saving ? 'Salvataggio…' : success ? '✅ Salvato!' : '💾 Salva Modifiche'}
@@ -324,7 +324,7 @@ export default function ProfiloPage() {
               className="w-full flex items-center justify-center gap-2 py-3 px-6 text-sm text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all border border-red-100 hover:border-red-200"
             >
               <span>🚪</span>
-              <span>Esci dall'account</span>
+              <span>Esci dall&apos;account</span>
             </button>
           </div>
 

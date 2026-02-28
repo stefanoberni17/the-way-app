@@ -15,7 +15,7 @@ interface WeekCarouselProps {
 const SLIDES = [
   { id: 'domanda',   label: 'Domanda Guida',  emoji: '💭' },
   { id: 'essenza',   label: 'Essenza',         emoji: '✨' },
-  { id: 'mantra',    label: 'Mantra',           emoji: '🍥' },
+  { id: 'mantra',    label: 'Versetto',         emoji: '✝️' },
   { id: 'pratiche',  label: 'Pratiche',         emoji: '🌿' },
   { id: 'scoperta',  label: 'Scoperta Chiave',  emoji: '🔑' },
 ];
@@ -96,7 +96,7 @@ export default function WeekCarousel({
           </div>
 
           {/* SLIDE 2 — Essenza */}
-          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-gradient-to-br from-amber-50 to-orange-50">
+          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-gradient-to-br from-amber-50 to-yellow-50">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-lg flex-shrink-0">
                 ✨
@@ -112,10 +112,10 @@ export default function WeekCarousel({
             </p>
           </div>
 
-          {/* SLIDE 3 — Mantra */}
-          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-gradient-to-br from-orange-500 to-amber-500 flex flex-col justify-center">
-            <p className="text-orange-200 text-xs font-bold uppercase tracking-widest text-center mb-3">
-              🍥 Mantra della settimana
+          {/* SLIDE 3 — Versetto della settimana */}
+          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-gradient-to-br from-blue-800 to-indigo-700 flex flex-col justify-center">
+            <p className="text-blue-200 text-xs font-bold uppercase tracking-widest text-center mb-3">
+              ✝️ Versetto della settimana
             </p>
             <div className="text-white text-5xl leading-none text-center mb-2 opacity-30 font-serif select-none">❝</div>
             <p className="text-white text-base font-semibold leading-relaxed text-center px-2">
@@ -123,7 +123,7 @@ export default function WeekCarousel({
                 ? mantra.split('\n').map((line, i, arr) => (
                     <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
                   ))
-                : <span className="opacity-60 text-sm font-normal">Mantra non ancora disponibile.</span>
+                : <span className="opacity-60 text-sm font-normal">Versetto non ancora disponibile.</span>
               }
             </p>
             <div className="text-white text-5xl leading-none text-center mt-2 opacity-30 font-serif select-none">❞</div>
@@ -192,7 +192,7 @@ export default function WeekCarousel({
         <button
           onClick={() => goTo(current - 1)}
           disabled={current === 0}
-          className="w-8 h-8 flex items-center justify-center rounded-full text-xl text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+          className="w-8 h-8 flex items-center justify-center rounded-full text-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
           aria-label="Precedente"
         >
           ‹
@@ -205,7 +205,7 @@ export default function WeekCarousel({
               onClick={() => goTo(i)}
               className={`rounded-full transition-all duration-300 ${
                 i === current
-                  ? 'w-5 h-2 bg-orange-500'
+                  ? 'w-5 h-2 bg-blue-600'
                   : 'w-2 h-2 bg-gray-200 hover:bg-gray-300'
               }`}
             />
@@ -215,7 +215,7 @@ export default function WeekCarousel({
         <button
           onClick={() => goTo(current + 1)}
           disabled={current === SLIDES.length - 1}
-          className="w-8 h-8 flex items-center justify-center rounded-full text-xl text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+          className="w-8 h-8 flex items-center justify-center rounded-full text-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
           aria-label="Successivo"
         >
           ›

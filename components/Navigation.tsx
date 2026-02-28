@@ -18,7 +18,7 @@ export default function Navigation() {
 
   const navItems = [
     { href: '/', label: 'Home', icon: Home },
-    { href: '/chat', label: 'Maestro AI', icon: MessageCircle },
+    { href: '/chat', label: 'La Guida', icon: MessageCircle },
     { href: '/profilo', label: 'Profilo', icon: User },
   ];
 
@@ -28,11 +28,11 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">N</span>
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-800 to-indigo-700 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">✝</span>
             </div>
             <span className="font-bold text-gray-800 hidden sm:block">
-              Naruto Inner Path
+              The Way
             </span>
           </Link>
 
@@ -41,14 +41,14 @@ export default function Navigation() {
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
-              
+
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
                     isActive
-                      ? 'bg-orange-50 text-orange-600'
+                      ? 'bg-blue-50 text-blue-700'
                       : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >

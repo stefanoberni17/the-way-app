@@ -7,18 +7,19 @@ import MeditationPopup from './MeditationPopup';
 import { MeditationContext } from './MeditationContext';
 
 const WEEK_NAMES: Record<number, string> = {
-  1: 'Week 1-2 - La ferita del rifiuto',
-  3: 'Week 3-4 - Presenza e ascolto',
-  5: 'Week 5-6 - Valore e appartenenza',
+  1: 'Week 1-2 - La voce nel deserto',
+  3: 'Week 3-4 - Le tentazioni',
+  5: 'Week 5-6 - La chiamata',
 };
 
+// The Way — Notion page IDs per ogni coppia di settimane
 const WEEK_IDS: Record<number, string> = {
-  1: '2b1655f7-26c7-8025-8afe-df0ed131d708',
-  2: '2b1655f7-26c7-8025-8afe-df0ed131d708',
-  3: '2b1655f7-26c7-8054-a0d4-c4a48c509852',
-  4: '2b1655f7-26c7-8054-a0d4-c4a48c509852',
-  5: '2b1655f7-26c7-8038-bd91-c3fa9e5b31cb',
-  6: '2b1655f7-26c7-8038-bd91-c3fa9e5b31cb',
+  1: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',  // Week 1-2 — La voce nel deserto
+  2: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
+  3: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',  // placeholder — da aggiornare quando Week 3-4 è pronta
+  4: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
+  5: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',  // placeholder
+  6: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
 };
 
 export default function GlobalMeditationWrapper({ children }: { children: React.ReactNode }) {

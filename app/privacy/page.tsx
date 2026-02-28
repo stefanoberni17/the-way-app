@@ -1,13 +1,13 @@
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 py-10 px-5">
+    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 py-10 px-5">
       <div className="w-full max-w-2xl mx-auto">
 
         {/* Header */}
         <div className="text-center mb-8">
           <div className="text-4xl mb-2">🔒</div>
           <h1 className="text-2xl font-bold text-gray-800">Privacy Policy</h1>
-          <p className="text-gray-500 text-sm mt-1">Naruto Inner Path — ultimo aggiornamento: febbraio 2025</p>
+          <p className="text-gray-500 text-sm mt-1">The Way — La Via del Cuore — ultimo aggiornamento: febbraio 2026</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-7 space-y-8 text-sm text-gray-700 leading-relaxed">
@@ -15,8 +15,8 @@ export default function PrivacyPage() {
           {/* Intro */}
           <section>
             <p>
-              Naruto Inner Path è un'app di crescita personale. Rispettiamo la tua privacy e vogliamo essere
-              trasparenti su come raccogliamo e utilizziamo i tuoi dati.
+              The Way — La Via del Cuore è un&apos;app di crescita personale ispirata agli insegnamenti del Vangelo.
+              Rispettiamo la tua privacy e vogliamo essere trasparenti su come raccogliamo e utilizziamo i tuoi dati.
             </p>
           </section>
 
@@ -24,21 +24,21 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-base font-bold text-gray-800 mb-3">1. Dati che raccogliamo</h2>
             <div className="space-y-3">
-              <div className="bg-orange-50 border border-orange-100 rounded-xl p-4">
+              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
                 <p className="font-semibold text-gray-800 mb-1">👤 Profilo personale</p>
-                <p className="text-gray-600">Nome, età, email, obiettivi, passioni, sogno e situazione attuale. Forniti volontariamente durante la registrazione o dal profilo.</p>
+                <p className="text-gray-600">Nome, età, email, intenzione di percorso, passioni, sogno e situazione attuale. Forniti volontariamente durante la registrazione o dal profilo.</p>
               </div>
-              <div className="bg-orange-50 border border-orange-100 rounded-xl p-4">
-                <p className="font-semibold text-gray-800 mb-1">📺 Progressi nel percorso</p>
-                <p className="text-gray-600">Episodi completati, settimana corrente e tracker delle pratiche settimanali.</p>
+              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+                <p className="font-semibold text-gray-800 mb-1">📖 Progressi nel cammino</p>
+                <p className="text-gray-600">Passi completati, settimana corrente e tracker delle pratiche settimanali.</p>
               </div>
-              <div className="bg-orange-50 border border-orange-100 rounded-xl p-4">
+              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
                 <p className="font-semibold text-gray-800 mb-1">✍️ Riflessioni</p>
-                <p className="text-gray-600">Le risposte alle domande riflessive degli episodi (max 500 caratteri ciascuna).</p>
+                <p className="text-gray-600">Le risposte alle domande riflessive dei passi (max 500 caratteri ciascuna).</p>
               </div>
-              <div className="bg-orange-50 border border-orange-100 rounded-xl p-4">
+              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
                 <p className="font-semibold text-gray-800 mb-1">💬 Conversazioni Telegram</p>
-                <p className="text-gray-600">I messaggi scambiati con il Maestro AI tramite il bot Telegram, necessari per mantenere il contesto della conversazione.</p>
+                <p className="text-gray-600">I messaggi scambiati con La Guida tramite il bot Telegram, necessari per mantenere il contesto della conversazione.</p>
               </div>
             </div>
           </section>
@@ -48,16 +48,16 @@ export default function PrivacyPage() {
             <h2 className="text-base font-bold text-gray-800 mb-3">2. Come utilizziamo i tuoi dati</h2>
             <ul className="space-y-2">
               <li className="flex items-start gap-2">
-                <span className="text-orange-500 mt-0.5">•</span>
-                <span>Personalizzare le risposte del Maestro AI in base al tuo percorso e alla tua storia</span>
+                <span className="text-blue-500 mt-0.5">•</span>
+                <span>Personalizzare le risposte de La Guida in base al tuo percorso e alla tua storia</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-orange-500 mt-0.5">•</span>
+                <span className="text-blue-500 mt-0.5">•</span>
                 <span>Tenere traccia dei tuoi progressi e sbloccare i contenuti in sequenza</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-orange-500 mt-0.5">•</span>
-                <span>Migliorare l'esperienza nel tempo tramite pattern anonimi (mai dati personali identificabili)</span>
+                <span className="text-blue-500 mt-0.5">•</span>
+                <span>Migliorare l&apos;esperienza nel tempo tramite pattern anonimi (mai dati personali identificabili)</span>
               </li>
             </ul>
             <div className="mt-4 bg-green-50 border border-green-100 rounded-xl p-4">
@@ -102,14 +102,14 @@ export default function PrivacyPage() {
                 <span className="text-lg">🤖</span>
                 <div>
                   <p className="font-semibold text-gray-800">Anthropic (Claude AI)</p>
-                  <p className="text-gray-600">I tuoi messaggi vengono inviati ad Anthropic per generare le risposte del Maestro AI. Anthropic non conserva i dati oltre l'elaborazione della richiesta.</p>
+                  <p className="text-gray-600">I tuoi messaggi vengono inviati ad Anthropic per generare le risposte de La Guida. Anthropic non conserva i dati oltre l&apos;elaborazione della richiesta.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <span className="text-lg">✈️</span>
                 <div>
                   <p className="font-semibold text-gray-800">Telegram</p>
-                  <p className="text-gray-600">Usato come canale opzionale per interagire con il Maestro AI. L'ID Telegram è l'unico dato condiviso con Telegram.</p>
+                  <p className="text-gray-600">Usato come canale opzionale per interagire con La Guida. L&apos;ID Telegram è l&apos;unico dato condiviso con Telegram.</p>
                 </div>
               </div>
             </div>
@@ -121,15 +121,15 @@ export default function PrivacyPage() {
             <p className="mb-3">Hai il diritto di:</p>
             <ul className="space-y-2 mb-4">
               <li className="flex items-start gap-2">
-                <span className="text-orange-500 mt-0.5">•</span>
+                <span className="text-blue-500 mt-0.5">•</span>
                 <span>Accedere ai dati che conserviamo su di te</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-orange-500 mt-0.5">•</span>
+                <span className="text-blue-500 mt-0.5">•</span>
                 <span>Richiedere la correzione di dati errati</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-orange-500 mt-0.5">•</span>
+                <span className="text-blue-500 mt-0.5">•</span>
                 <span>Richiedere la cancellazione del tuo account e di tutti i dati associati</span>
               </li>
             </ul>
@@ -145,15 +145,14 @@ export default function PrivacyPage() {
 
           {/* Footer */}
           <section className="border-t border-gray-100 pt-6 text-center text-xs text-gray-400">
-            <p>Naruto Inner Path è un progetto indipendente.</p>
-            <p className="mt-1">Non è affiliato con Masashi Kishimoto, TV Tokyo o Viz Media.</p>
+            <p>The Way — La Via del Cuore è un progetto indipendente.</p>
           </section>
 
         </div>
 
         {/* Back link */}
         <div className="text-center mt-6">
-          <a href="/login" className="text-sm text-orange-500 hover:text-orange-600 font-medium">
+          <a href="/login" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
             ← Torna al login
           </a>
         </div>

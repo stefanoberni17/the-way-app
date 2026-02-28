@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     if (isFirstMessage) {
       await sendTelegramMessage(
         chatId,
-        '🔒 Privacy: le nostre conversazioni vengono salvate per personalizzare il tuo percorso e cancellate automaticamente dopo 90 giorni.\n\nPer info o cancellazione: foryou.innerpath@gmail.com\nPolicy completa: naruto-inner-path.vercel.app/privacy'
+        '🔒 Privacy: le nostre conversazioni vengono salvate per personalizzare il tuo percorso e cancellate automaticamente dopo 90 giorni.\n\nPer info o cancellazione: foryou.innerpath@gmail.com\nPolicy completa: the-way-app-eight.vercel.app/privacy'
       );
     }
 

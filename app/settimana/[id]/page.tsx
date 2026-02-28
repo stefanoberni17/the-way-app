@@ -68,7 +68,7 @@ function renderBlock(block: any) {
       const texts = block.bulleted_list_item?.rich_text || [];
       return (
         <div className="flex gap-2 mb-1">
-          <span className="text-orange-400 mt-1 flex-shrink-0">•</span>
+          <span className="text-blue-500 mt-1 flex-shrink-0">•</span>
           <p className="text-gray-700 text-sm leading-relaxed">{texts.map((t: any) => t.plain_text).join('')}</p>
         </div>
       );
@@ -77,7 +77,7 @@ function renderBlock(block: any) {
       const texts = block.numbered_list_item?.rich_text || [];
       return (
         <div className="flex gap-2 mb-1">
-          <span className="text-orange-500 font-bold text-sm flex-shrink-0">›</span>
+          <span className="text-blue-600 font-bold text-sm flex-shrink-0">›</span>
           <p className="text-gray-700 text-sm leading-relaxed">{texts.map((t: any) => t.plain_text).join('')}</p>
         </div>
       );
@@ -85,7 +85,7 @@ function renderBlock(block: any) {
     case 'quote': {
       const texts = block.quote?.rich_text || [];
       return (
-        <blockquote className="border-l-4 border-orange-400 bg-orange-50 px-4 py-3 my-3 rounded-r-lg">
+        <blockquote className="border-l-4 border-blue-400 bg-blue-50 px-4 py-3 my-3 rounded-r-lg">
           <p className="text-gray-700 italic text-sm leading-relaxed">{texts.map((t: any) => t.plain_text).join('')}</p>
         </blockquote>
       );
@@ -101,7 +101,7 @@ function renderBlock(block: any) {
       );
     }
     case 'divider':
-      return <hr className="border-orange-100 my-4" />;
+      return <hr className="border-blue-100 my-4" />;
     default:
       return null;
   }
@@ -151,8 +151,6 @@ export default function SettimanaPage() {
     const allDone = weekEps.every(ep => completed.includes(ep));
     if (allDone) {
       setIsWeekComplete(true);
-      // Usa la mappa diretta invece di cercare nella lista Notion
-      // (weeks 1-2, 3-4, 5-6 condividono la stessa pagina)
       const nextWn = wn + 1;
       const nextId = WEEK_IDS_MAP[nextWn] || null;
       setNextWeekNumber(nextWn);
@@ -170,7 +168,6 @@ export default function SettimanaPage() {
     }
     setLoadingExtended(true);
     try {
-      // I blocchi sono già in data.blocks, li usiamo direttamente
       setExtendedBlocks(data?.blocks || []);
       setShowExtended(true);
     } finally {
@@ -199,7 +196,6 @@ export default function SettimanaPage() {
       const settimanaText = settimanaData.page?.properties?.Settimana?.title?.[0]?.plain_text || '';
       const match = settimanaText.match(/Week (\d+)/);
       const parsedWn = match ? parseInt(match[1]) : 1;
-      // weekParam from URL takes priority — needed because weeks 1-2, 3-4, 5-6 share the same Notion page ID
       const wn = weekParam ? parseInt(weekParam) : parsedWn;
       setWeekNumber(wn);
 
@@ -217,9 +213,9 @@ export default function SettimanaPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 flex items-center justify-center">
+      <main className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">🍥</div>
+          <div className="text-6xl mb-4">✝️</div>
           <p className="text-xl text-gray-600">Caricamento settimana...</p>
         </div>
       </main>
@@ -228,10 +224,10 @@ export default function SettimanaPage() {
 
   if (!data || data.error) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 flex items-center justify-center">
+      <main className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-xl text-red-600">Errore nel caricamento</p>
-          <button onClick={() => router.push('/')} className="mt-4 bg-orange-500 text-white px-6 py-2 rounded-full">
+          <button onClick={() => router.push('/')} className="mt-4 bg-blue-700 text-white px-6 py-2 rounded-full">
             Torna alla home
           </button>
         </div>
@@ -266,21 +262,21 @@ export default function SettimanaPage() {
   // — VISTA VERSIONE ESTESA —
   if (showExtended) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 py-6 px-4 pb-28">
+      <main className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 py-6 px-4 pb-28">
         <div className="max-w-2xl mx-auto">
           <button
             onClick={() => setShowExtended(false)}
-            className="flex items-center gap-2 text-sm text-gray-500 font-medium mb-5 hover:text-orange-600 transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-500 font-medium mb-5 hover:text-blue-600 transition-colors"
           >
             ← Torna alla settimana
           </button>
 
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-4">
-            <span className="text-xs font-bold text-orange-600 bg-orange-100 px-3 py-1 rounded-full">
+            <span className="text-xs font-bold text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
               {settimana} · Approfondimento completo
             </span>
             <h1 className="text-xl font-extrabold text-gray-800 mt-3 mb-1">{titolo}</h1>
-            <p className="text-orange-600 font-semibold text-sm">🎯 {tema}</p>
+            <p className="text-blue-700 font-semibold text-sm">🎯 {tema}</p>
           </div>
 
           <div className="bg-white rounded-2xl shadow-lg p-6">
@@ -298,25 +294,25 @@ export default function SettimanaPage() {
 
   // — VISTA PRINCIPALE —
   return (
-    <main className="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 py-8 px-4 pb-24">
+    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 py-8 px-4 pb-24">
 
       {/* Popup settimana completata */}
       {showWeekCompletePopup && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl animate-scaleIn">
+          <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl animate-scaleIn">
             <div className="text-7xl mb-4 animate-bounce">🏆</div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">Settimana completata!</h2>
-            <p className="text-orange-700 font-semibold text-sm mb-1">{settimana}</p>
+            <p className="text-blue-700 font-semibold text-sm mb-1">{settimana}</p>
             <p className="text-gray-600 text-sm mb-6 leading-relaxed">
-              Hai completato tutti gli episodi. Il tuo chakra cresce, shinobi! 🍥
+              Hai completato tutti i passi. Porta con te la Parola di questa settimana. 🙏
             </p>
             {nextWeekId && nextWeekInBeta ? (
               <>
                 <button
                   onClick={() => { setShowWeekCompletePopup(false); router.push(`/settimana/${nextWeekId}?week=${nextWeekNumber}`); }}
-                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 rounded-2xl mb-3 transition-all shadow-md"
+                  className="w-full bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 text-white font-bold py-3 rounded-2xl mb-3 transition-all shadow-md"
                 >
-                  Passa alla settimana successiva 🍥
+                  Passa alla settimana successiva →
                 </button>
                 <button
                   onClick={() => setShowWeekCompletePopup(false)}
@@ -332,7 +328,7 @@ export default function SettimanaPage() {
                 </div>
                 <button
                   onClick={() => setShowWeekCompletePopup(false)}
-                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold py-3 rounded-2xl transition-all"
+                  className="w-full bg-gradient-to-r from-blue-700 to-indigo-700 text-white font-bold py-3 rounded-2xl transition-all"
                 >
                   Continua 🌅
                 </button>
@@ -340,7 +336,7 @@ export default function SettimanaPage() {
             ) : (
               <button
                 onClick={() => setShowWeekCompletePopup(false)}
-                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold py-3 rounded-2xl transition-all"
+                className="w-full bg-gradient-to-r from-blue-700 to-indigo-700 text-white font-bold py-3 rounded-2xl transition-all"
               >
                 Continua il percorso 🌅
               </button>
@@ -351,9 +347,9 @@ export default function SettimanaPage() {
 
       {/* Header */}
       <div className="max-w-4xl mx-auto mb-6">
-        <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-orange-500">
+        <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-blue-600">
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="text-sm font-semibold text-orange-600 bg-orange-100 px-3 py-1 rounded-full">
+            <span className="text-sm font-semibold text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
               {settimana}
             </span>
             {isWeekComplete && (
@@ -366,9 +362,9 @@ export default function SettimanaPage() {
           <p className="text-gray-500 text-sm mb-4">{tema}</p>
           <button
             onClick={scrollToEpisodes}
-            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-4 py-2 rounded-full transition-all shadow-md"
+            className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold px-4 py-2 rounded-full transition-all shadow-md"
           >
-            📺 Vai agli episodi ↓
+            📖 Vai ai passi ↓
           </button>
         </div>
       </div>
@@ -389,7 +385,7 @@ export default function SettimanaPage() {
       {/* Episodi */}
       <div className="max-w-4xl mx-auto mb-6" ref={episodesRef}>
         <div className="bg-white rounded-2xl shadow-lg p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">📺 Episodi della settimana</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">📖 Passi della settimana</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {weekEpisodes.map((epNum) => {
               const isCompleted = completedEpisodes.includes(epNum);
@@ -398,7 +394,7 @@ export default function SettimanaPage() {
                 <EpisodeCard
                   key={epNum}
                   episodeNumber={epNum}
-                  title={EPISODE_TITLES[epNum] || `Episodio ${epNum}`}
+                  title={EPISODE_TITLES[epNum] || `Passo ${epNum}`}
                   isCompleted={isCompleted}
                   isLocked={isLocked}
                   weekNumber={weekNumber}
@@ -412,23 +408,22 @@ export default function SettimanaPage() {
       </div>
 
       {/* Bottone prossima settimana */}
-      {/* Bottone "prossima settimana": visibile solo se esiste la pagina Notion e non è beta-locked */}
       {isWeekComplete && nextWeekId && nextWeekInBeta && (
         <div className="max-w-4xl mx-auto mb-6">
           <button
             onClick={() => router.push(`/settimana/${nextWeekId}?week=${nextWeekNumber}`)}
-            className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-lg"
+            className="w-full bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-lg"
           >
-            🍥 Passa alla settimana successiva →
+            ✝️ Passa alla settimana successiva →
           </button>
         </div>
       )}
-      {/* Messaggio beta: solo quando la prossima settimana supera davvero il limite Beta */}
+      {/* Messaggio beta: solo quando la prossima settimana supera il limite Beta */}
       {isWeekComplete && nextWeekNumber !== null && !nextWeekInBeta && (
         <div className="max-w-4xl mx-auto mb-6">
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
             <p className="text-amber-800 font-semibold text-sm">
-              🔒 Hai completato tutte le settimane disponibili in Beta! La versione completa arriva presto. 🍥
+              🔒 Hai completato tutte le settimane disponibili in Beta! La versione completa arriva presto. 🙏
             </p>
           </div>
         </div>

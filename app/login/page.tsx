@@ -65,30 +65,30 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 flex flex-col items-center justify-center p-5">
+    <main className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-900 to-blue-900 flex flex-col items-center justify-center p-5">
 
       {/* ── Hero brand ── */}
       <div className="text-center mb-7 w-full max-w-sm">
-        <div className="text-5xl mb-3">🍥</div>
-        <h1 className="text-2xl font-bold text-gray-800 tracking-tight">
-          Naruto Inner Path
+        <div className="text-5xl mb-3">✝️</div>
+        <h1 className="text-2xl font-bold text-white tracking-tight">
+          The Way
         </h1>
-        <p className="text-orange-500 font-semibold text-xs mt-1 uppercase tracking-widest">
-          La via del Guerriero Gentile
+        <p className="text-amber-400 font-semibold text-xs mt-1 uppercase tracking-widest">
+          La Via del Cuore
         </p>
 
-        {/* Quote dalla Visione */}
-        <div className="mt-4 bg-white/70 backdrop-blur-sm rounded-2xl px-5 py-3 border border-orange-100 shadow-sm">
-          <p className="text-gray-600 text-sm leading-relaxed italic">
-            "La crescita non è diventare qualcuno di diverso.
+        {/* Quote spirituale */}
+        <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl px-5 py-3 border border-white/20">
+          <p className="text-blue-100 text-sm leading-relaxed italic">
+            "Io sono la Via, la Verità e la Vita."
             <br />
-            È tornare a casa."
+            <span className="text-amber-400 text-xs not-italic">— Giovanni 14,6</span>
           </p>
         </div>
       </div>
 
       {/* ── Form card ── */}
-      <div className="bg-white rounded-2xl shadow-xl p-7 w-full max-w-sm">
+      <div className="bg-white rounded-2xl shadow-2xl p-7 w-full max-w-sm">
         <h2 className="text-xl font-bold text-gray-800 mb-0.5">Bentornato!</h2>
         <p className="text-gray-500 text-sm mb-6">Il tuo percorso ti aspetta.</p>
 
@@ -107,7 +107,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none transition-all text-sm"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-sm"
               placeholder="tua@email.com"
               required
             />
@@ -121,7 +121,7 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none transition-all text-sm"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-sm"
               placeholder="••••••••"
               required
             />
@@ -130,7 +130,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white font-bold py-3 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+            className="w-full bg-blue-700 hover:bg-blue-800 active:bg-blue-900 text-white font-bold py-3 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           >
             {loading ? 'Accesso in corso…' : 'Accedi'}
           </button>
@@ -141,7 +141,7 @@ export default function LoginPage() {
           Non hai un account?{' '}
           <button
             onClick={() => router.push('/register')}
-            className="text-orange-500 hover:text-orange-600 font-semibold"
+            className="text-blue-600 hover:text-blue-700 font-semibold"
           >
             Registrati
           </button>

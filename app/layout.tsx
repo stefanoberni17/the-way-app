@@ -11,8 +11,8 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Naruto Inner Path",
-  description: "La via del Guerriero Gentile",
+  title: "The Way — La Via del Cuore",
+  description: "Un percorso di crescita personale ispirato agli insegnamenti del Vangelo",
 };
 
 export default function RootLayout({

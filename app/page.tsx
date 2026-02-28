@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-// lucide-react not needed here anymore
 import { useMeditation } from '@/components/MeditationContext';
 
 const WEEK_NAMES: Record<number, string> = {
@@ -48,7 +47,7 @@ export default function HomePage() {
   useEffect(() => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (!session) {
         router.push('/login');
         return;
@@ -80,7 +79,7 @@ export default function HomePage() {
 
       const currentWeek = profileData?.current_week || 1;
       const weekId = WEEK_IDS[currentWeek];
-      
+
       if (weekId) {
         const response = await fetch(`/api/settimana?id=${weekId}`);
         const data = await response.json();
@@ -114,7 +113,7 @@ export default function HomePage() {
     const currentValue = practice.completed_days[day];
     const newValue = !currentValue;
 
-    setPractices(prev => prev.map(p => 
+    setPractices(prev => prev.map(p =>
       p.practice_number === practiceNumber
         ? { ...p, completed_days: { ...p.completed_days, [day]: newValue } }
         : p
@@ -134,7 +133,7 @@ export default function HomePage() {
       });
     } catch (error) {
       console.error('Errore salvataggio pratica:', error);
-      setPractices(prev => prev.map(p => 
+      setPractices(prev => prev.map(p =>
         p.practice_number === practiceNumber
           ? { ...p, completed_days: { ...p.completed_days, [day]: currentValue } }
           : p
@@ -144,18 +143,19 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 flex items-center justify-center">
+      <main className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-900 to-blue-800 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">🍥</div>
-          <p className="text-xl text-gray-600">Caricamento...</p>
+          <div className="text-6xl mb-4">✝️</div>
+          <p className="text-xl text-blue-100">Caricamento...</p>
         </div>
       </main>
     );
   }
 
   const currentWeek = profile?.current_week || 1;
-  const progressPercentage = Math.round((completedEpisodes / 19) * 100);
-  
+  const BETA_MAX_EPISODE = 4;
+  const progressPercentage = Math.round((completedEpisodes / BETA_MAX_EPISODE) * 100);
+
   const properties = weekData?.page?.properties || {};
   const pratiche = (properties.Pratiche?.rich_text?.[0]?.plain_text || '')
     .replace(/<br>/g, '\n');
@@ -165,86 +165,90 @@ export default function HomePage() {
   const practicheArray = pratiche.split('\n').filter((p: string) => p.trim().length > 0);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 py-8 px-4 pb-24">
+    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 py-8 px-4 pb-24">
+      {/* ── Header ── */}
       <div className="max-w-6xl mx-auto mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">
-          Ciao, {profile?.name || 'Guerriero'}! 👋
-        </h1>
-        <p className="text-gray-600 mt-1">
-          Bentornato nel tuo percorso 🍥
+        <div className="flex items-center gap-3 mb-1">
+          <span className="text-2xl">✝️</span>
+          <h1 className="text-2xl font-bold text-gray-800">
+            Ciao, {profile?.name || 'pellegrino'}!
+          </h1>
+        </div>
+        <p className="text-gray-500 text-sm ml-10">
+          Bentornato nel tuo percorso — The Way
         </p>
       </div>
 
       <div className="max-w-6xl mx-auto">
+        {/* ── Banner prossimo passo ── */}
         {(() => {
           const nextEpisode = completedEpisodes + 1;
-          const hasNextEpisode = nextEpisode <= 12; // BETA_MAX_EPISODE
-          const isAllDone = completedEpisodes >= 12;
+          const isAllDone = completedEpisodes >= BETA_MAX_EPISODE;
           return (
-            <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-lg p-6 mb-6 text-white">
+            <div className="bg-gradient-to-r from-blue-800 to-indigo-700 rounded-2xl shadow-lg p-6 mb-6 text-white">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-orange-100 text-sm mb-1">📍 Sei qui</p>
-                  <h2 className="text-2xl font-bold">
+                  <p className="text-blue-200 text-xs font-medium mb-1 uppercase tracking-wide">📍 Sei qui</p>
+                  <h2 className="text-xl font-bold leading-snug">
                     {WEEK_NAMES[currentWeek] || `Week ${currentWeek}`}
                   </h2>
                 </div>
-                <div className="text-5xl">🍥</div>
+                <div className="text-4xl opacity-90">✝️</div>
               </div>
               {isAllDone ? (
-                <div className="bg-white/20 rounded-lg px-4 py-2 text-sm font-medium text-white text-center">
-                  🏆 Hai completato tutti gli episodi della Beta!
+                <div className="bg-white/20 rounded-xl px-4 py-3 text-sm font-medium text-white text-center">
+                  🏆 Hai completato tutti i passi della Beta! Stay tuned ✝️
                 </div>
               ) : (
                 <button
                   onClick={() => {
-                    // Episodi 1, 6, 13 = primo di ogni gruppo settimane
-                    // → mostra prima la pagina della settimana per introdurre il tema
-                    const WEEK_GROUP_STARTERS = new Set([1, 6, 13]);
-                    if (WEEK_GROUP_STARTERS.has(nextEpisode)) {
+                    // Primo passo: mostra prima la settimana per introdurre il tema
+                    if (nextEpisode === 1) {
                       router.push(`/settimana/${WEEK_IDS[currentWeek]}`);
                     } else {
                       router.push(`/episodio/${nextEpisode}`);
                     }
                   }}
-                  className="w-full sm:w-auto bg-white text-orange-600 font-bold py-2.5 px-5 rounded-lg hover:bg-orange-50 transition-all text-sm flex items-center justify-center gap-2 shadow-sm"
+                  className="w-full sm:w-auto bg-white text-blue-800 font-bold py-2.5 px-5 rounded-xl hover:bg-blue-50 transition-all text-sm flex items-center justify-center gap-2 shadow-sm"
                 >
                   <span>▶</span>
-                  <span>{completedEpisodes === 0 ? 'Inizia: Episodio 1' : `Continua: Episodio ${nextEpisode}`}</span>
+                  <span>{completedEpisodes === 0 ? 'Inizia: Passo 1' : `Continua: Passo ${nextEpisode}`}</span>
                 </button>
               )}
             </div>
           );
         })()}
 
+        {/* ── Versetto / Mantra della settimana ── */}
         {mantra && (
-          <div className="bg-white rounded-lg shadow-lg p-5 mb-6">
-            <div className="bg-gradient-to-r from-purple-50 to-blue-50 border-l-4 border-purple-500 p-4 rounded-lg mb-3">
-              <h3 className="text-base font-bold text-purple-800 flex items-center gap-2 mb-2">
-                <span>🔮</span>
-                <span>Mantra della Settimana</span>
+          <div className="bg-white rounded-2xl shadow-sm border border-blue-100 p-5 mb-6">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-4 rounded-xl mb-3">
+              <h3 className="text-sm font-bold text-blue-800 flex items-center gap-2 mb-2">
+                <span>📖</span>
+                <span>Versetto della Settimana</span>
               </h3>
-              <p className="text-purple-900 text-base italic font-medium whitespace-pre-line">
-                "{mantra}"
+              <p className="text-blue-900 text-base italic font-medium whitespace-pre-line leading-relaxed">
+                &ldquo;{mantra}&rdquo;
               </p>
             </div>
             <button
               onClick={openMeditation}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all transform hover:scale-[1.02] shadow-md"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-blue-700 to-indigo-600 hover:from-blue-800 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-xl transition-all shadow-md"
             >
-              <span>🧘‍♂️</span>
-              <span>Fai la pratica di respiro</span>
+              <span>🙏</span>
+              <span>Momento di preghiera e respiro</span>
             </button>
           </div>
         )}
 
+        {/* ── Pratiche della settimana ── */}
         {practicheArray.length > 0 && (
           <div className="mb-6">
             <button
               className="flex items-center justify-between w-full mb-3"
               onClick={() => setPracticesVisible(v => !v)}
             >
-              <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+              <h2 className="text-base font-bold text-gray-800 flex items-center gap-2">
                 🌿 Pratiche della settimana
               </h2>
               <div className="flex items-center gap-2">
@@ -269,10 +273,9 @@ export default function HomePage() {
                         isComplete ? 'border-green-200' : 'border-gray-100'
                       }`}
                     >
-                      {/* Header pratica */}
                       <div className="flex items-start gap-3 p-4 pb-3">
                         <span className={`w-7 h-7 rounded-full text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                          isComplete ? 'bg-green-500' : 'bg-gray-300'
+                          isComplete ? 'bg-green-500' : 'bg-blue-600'
                         }`}>
                           {isComplete ? '✓' : index + 1}
                         </span>
@@ -281,7 +284,7 @@ export default function HomePage() {
                           <div className="flex items-center gap-2 mt-2">
                             <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-500"
+                                className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-500"
                                 style={{ width: `${percentage}%` }}
                               />
                             </div>
@@ -294,7 +297,6 @@ export default function HomePage() {
                         </div>
                       </div>
 
-                      {/* Day dots */}
                       <div className="px-4 pb-4 space-y-1.5">
                         {[DAY_KEYS.slice(0, 7), DAY_KEYS.slice(7, 14)].map((week, wi) => (
                           <div key={wi} className="flex items-center gap-1">
@@ -309,8 +311,8 @@ export default function HomePage() {
                                   disabled={loadingPractices}
                                   className={`flex-1 h-7 rounded-lg text-xs font-bold transition-all active:scale-95 ${
                                     completedDays[day]
-                                      ? 'bg-green-500 text-white shadow-sm'
-                                      : 'bg-gray-50 text-gray-400 border border-gray-200 hover:border-green-300 hover:bg-green-50'
+                                      ? 'bg-blue-600 text-white shadow-sm'
+                                      : 'bg-gray-50 text-gray-400 border border-gray-200 hover:border-blue-300 hover:bg-blue-50'
                                   } disabled:opacity-50`}
                                 >
                                   {completedDays[day] ? '✓' : DAY_LABELS[day]}
@@ -332,39 +334,40 @@ export default function HomePage() {
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            🎯 Il Tuo Percorso
+        {/* ── Progresso ── */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <h2 className="text-lg font-bold text-gray-800 mb-1 flex items-center gap-2">
+            🗺️ Il Tuo Cammino
           </h2>
-          <p className="text-gray-600 mb-6">
-            Traccia i tuoi progressi attraverso il percorso MVP (19 episodi)
+          <p className="text-gray-500 text-sm mb-5">
+            Traccia i tuoi progressi attraverso i Passi del percorso Beta
           </p>
 
-          <div className="grid grid-cols-3 gap-3 mb-6">
-            <div className="bg-orange-50 border-l-4 border-orange-500 p-3 rounded">
-              <div className="text-2xl font-bold text-orange-600">{completedEpisodes}</div>
-              <div className="text-xs text-gray-600">Completati</div>
+          <div className="grid grid-cols-3 gap-3 mb-5">
+            <div className="bg-blue-50 border-l-4 border-blue-600 p-3 rounded-xl">
+              <div className="text-2xl font-bold text-blue-700">{completedEpisodes}</div>
+              <div className="text-xs text-gray-500">Completati</div>
             </div>
 
-            <div className="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
-              <div className="text-2xl font-bold text-blue-600">19</div>
-              <div className="text-xs text-gray-600">Totali MVP</div>
+            <div className="bg-indigo-50 border-l-4 border-indigo-500 p-3 rounded-xl">
+              <div className="text-2xl font-bold text-indigo-600">{BETA_MAX_EPISODE}</div>
+              <div className="text-xs text-gray-500">Passi Beta</div>
             </div>
 
-            <div className="bg-green-50 border-l-4 border-green-500 p-3 rounded">
+            <div className="bg-green-50 border-l-4 border-green-500 p-3 rounded-xl">
               <div className="text-2xl font-bold text-green-600">{progressPercentage}%</div>
-              <div className="text-xs text-gray-600">Progresso</div>
+              <div className="text-xs text-gray-500">Progresso</div>
             </div>
           </div>
 
-          <div className="mb-6">
-            <div className="flex justify-between text-sm text-gray-600 mb-2">
-              <span>Progresso MVP</span>
-              <span>{completedEpisodes}/19 episodi</span>
+          <div className="mb-5">
+            <div className="flex justify-between text-sm text-gray-500 mb-2">
+              <span>Avanzamento Beta</span>
+              <span>{completedEpisodes}/{BETA_MAX_EPISODE} passi</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
-              <div 
-                className="bg-gradient-to-r from-orange-500 to-orange-600 h-3 rounded-full transition-all duration-500"
+            <div className="w-full bg-gray-100 rounded-full h-2.5">
+              <div
+                className="bg-gradient-to-r from-blue-600 to-indigo-500 h-2.5 rounded-full transition-all duration-500"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
@@ -372,9 +375,9 @@ export default function HomePage() {
 
           <button
             onClick={() => router.push('/settimane')}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-full transition-all transform hover:scale-105 w-full sm:w-auto"
+            className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-xl transition-all w-full sm:w-auto"
           >
-            🚀 Esplora le Settimane
+            📖 Esplora le Settimane
           </button>
         </div>
       </div>

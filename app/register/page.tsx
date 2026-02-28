@@ -97,8 +97,8 @@ export default function RegisterPage() {
   // ── Schermata successo ──
   if (success) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 flex flex-col items-center justify-center p-5">
-        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm text-center">
+      <main className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-900 to-blue-900 flex flex-col items-center justify-center p-5">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center">
           <div className="text-5xl mb-4">📬</div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
             Controlla la tua email!
@@ -124,7 +124,7 @@ export default function RegisterPage() {
 
           <button
             onClick={() => router.push('/login')}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-sm"
+            className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-sm"
           >
             Vai al Login
           </button>
@@ -134,15 +134,15 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 py-10 px-5">
+    <main className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-900 to-blue-900 py-10 px-5">
       <div className="w-full max-w-sm mx-auto">
 
         {/* ── Header brand ── */}
         <div className="text-center mb-6">
-          <div className="text-4xl mb-2">🍥</div>
-          <h1 className="text-xl font-bold text-gray-800">Naruto Inner Path</h1>
-          <p className="text-orange-500 font-semibold text-xs mt-0.5 uppercase tracking-widest">
-            La via del Guerriero Gentile
+          <div className="text-4xl mb-2">✝️</div>
+          <h1 className="text-xl font-bold text-white">The Way</h1>
+          <p className="text-amber-400 font-semibold text-xs mt-0.5 uppercase tracking-widest">
+            La Via del Cuore
           </p>
         </div>
 
@@ -153,15 +153,15 @@ export default function RegisterPage() {
             <div
               className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all ${
                 step >= 1
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-gray-200 text-gray-400'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white/20 text-white/50'
               }`}
             >
               {step > 1 ? '✓' : '1'}
             </div>
             <span
               className={`text-xs font-medium truncate ${
-                step === 1 ? 'text-gray-800' : 'text-gray-400'
+                step === 1 ? 'text-white' : 'text-white/50'
               }`}
             >
               Il tuo account
@@ -171,7 +171,7 @@ export default function RegisterPage() {
           {/* Linea */}
           <div
             className={`h-0.5 w-8 shrink-0 rounded-full transition-all ${
-              step > 1 ? 'bg-orange-400' : 'bg-gray-200'
+              step > 1 ? 'bg-blue-400' : 'bg-white/20'
             }`}
           />
 
@@ -180,15 +180,15 @@ export default function RegisterPage() {
             <div
               className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all ${
                 step >= 2
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-gray-200 text-gray-400'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white/20 text-white/50'
               }`}
             >
               2
             </div>
             <span
               className={`text-xs font-medium truncate ${
-                step === 2 ? 'text-gray-800' : 'text-gray-400'
+                step === 2 ? 'text-white' : 'text-white/50'
               }`}
             >
               Il tuo percorso
@@ -197,7 +197,7 @@ export default function RegisterPage() {
         </div>
 
         {/* ── Card ── */}
-        <div className="bg-white rounded-2xl shadow-xl p-7">
+        <div className="bg-white rounded-2xl shadow-2xl p-7">
 
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm mb-5">
@@ -221,7 +221,7 @@ export default function RegisterPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none text-sm"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
                   placeholder="tua@email.com"
                   required
                 />
@@ -235,7 +235,7 @@ export default function RegisterPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none text-sm"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
                   placeholder="Minimo 6 caratteri"
                   required
                 />
@@ -249,7 +249,7 @@ export default function RegisterPage() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none text-sm"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
                   placeholder="Ripeti la password"
                   required
                 />
@@ -263,7 +263,7 @@ export default function RegisterPage() {
                   type="text"
                   value={nome}
                   onChange={(e) => setNome(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none text-sm"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
                   placeholder="Il tuo nome"
                   required
                 />
@@ -278,8 +278,8 @@ export default function RegisterPage() {
                   type="number"
                   value={eta}
                   onChange={(e) => setEta(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none text-sm"
-                  placeholder="Es. 25"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+                  placeholder="Es. 30"
                   min="13"
                   max="120"
                 />
@@ -291,7 +291,7 @@ export default function RegisterPage() {
                   type="checkbox"
                   id="privacy-consent"
                   required
-                  className="mt-0.5 w-4 h-4 accent-orange-500 shrink-0 cursor-pointer"
+                  className="mt-0.5 w-4 h-4 accent-blue-600 shrink-0 cursor-pointer"
                 />
                 <label htmlFor="privacy-consent" className="text-xs text-gray-500 leading-relaxed cursor-pointer">
                   Ho letto e accetto la{' '}
@@ -299,7 +299,7 @@ export default function RegisterPage() {
                     href="/privacy"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-orange-500 hover:text-orange-600 underline"
+                    className="text-blue-600 hover:text-blue-700 underline"
                   >
                     Privacy Policy
                   </a>
@@ -309,7 +309,7 @@ export default function RegisterPage() {
 
               <button
                 type="submit"
-                className="w-full bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm"
+                className="w-full bg-blue-700 hover:bg-blue-800 active:bg-blue-900 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm"
               >
                 Continua →
               </button>
@@ -322,21 +322,21 @@ export default function RegisterPage() {
               <div>
                 <h2 className="text-lg font-bold text-gray-800">Il tuo percorso</h2>
                 <p className="text-gray-500 text-sm mt-0.5 leading-relaxed">
-                  Queste info aiutano il Maestro AI a personalizzare la tua esperienza.
+                  Queste info aiutano La Guida a personalizzare la tua esperienza.
                   Puoi saltarle e aggiungerle dopo dal profilo.
                 </p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Quali sono i tuoi obiettivi?{' '}
+                  Cosa stai cercando in questo percorso?{' '}
                   <span className="text-gray-400 font-normal">(opzionale)</span>
                 </label>
                 <textarea
                   value={obiettivi}
                   onChange={(e) => setObiettivi(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none text-sm resize-none"
-                  placeholder="Es. Lavorare sull'autostima, gestire meglio le emozioni…"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm resize-none"
+                  placeholder="Es. Ritrovare la fede, trovare pace interiore, capire il Vangelo…"
                   rows={3}
                 />
               </div>
@@ -350,8 +350,8 @@ export default function RegisterPage() {
                   type="text"
                   value={passioni}
                   onChange={(e) => setPassioni(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none text-sm"
-                  placeholder="Es. Anime, crescita personale, sport…"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+                  placeholder="Es. Meditazione, famiglia, musica, natura…"
                 />
               </div>
 
@@ -364,8 +364,8 @@ export default function RegisterPage() {
                   type="text"
                   value={sogno}
                   onChange={(e) => setSogno(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none text-sm"
-                  placeholder="Es. Diventare la versione migliore di me…"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+                  placeholder="Es. Vivere con più pace, essere un punto di riferimento…"
                 />
               </div>
 
@@ -377,8 +377,8 @@ export default function RegisterPage() {
                 <textarea
                   value={situazioneAttuale}
                   onChange={(e) => setSituazioneAttuale(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none text-sm resize-none"
-                  placeholder="Es. Periodo difficile, cerco direzione…"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm resize-none"
+                  placeholder="Es. Momento di cambiamento, cerco senso e direzione…"
                   rows={2}
                 />
               </div>
@@ -394,9 +394,9 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white font-bold py-3 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                  className="flex-1 bg-blue-700 hover:bg-blue-800 active:bg-blue-900 text-white font-bold py-3 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                 >
-                  {loading ? 'Creazione…' : 'Inizia 🍥'}
+                  {loading ? 'Creazione…' : 'Inizia ✝️'}
                 </button>
               </div>
             </form>
@@ -404,11 +404,11 @@ export default function RegisterPage() {
         </div>
 
         {/* Link login */}
-        <p className="mt-5 text-center text-sm text-gray-500">
+        <p className="mt-5 text-center text-sm text-white/70">
           Hai già un account?{' '}
           <button
             onClick={() => router.push('/login')}
-            className="text-orange-500 hover:text-orange-600 font-semibold"
+            className="text-amber-400 hover:text-amber-300 font-semibold"
           >
             Accedi
           </button>

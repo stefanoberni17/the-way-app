@@ -13,9 +13,9 @@ export default function BottomTabBar() {
   }
 
   const tabs = [
-    { href: '/', label: 'Dashboard', icon: Home },
+    { href: '/', label: 'Home', icon: Home },
     { href: '/settimane', label: 'Percorso', icon: LayoutDashboard },
-    { href: '/chat', label: 'Maestro AI', icon: MessageCircle },
+    { href: '/chat', label: 'La Guida', icon: MessageCircle },
     { href: '/profilo', label: 'Profilo', icon: User },
   ];
 
@@ -33,7 +33,7 @@ export default function BottomTabBar() {
                 href={tab.href}
                 className={`flex flex-col items-center justify-center flex-1 h-12 rounded-xl transition-all ${
                   isActive
-                    ? 'text-orange-600 bg-orange-50'
+                    ? 'text-blue-700 bg-blue-50'
                     : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
                 }`}
               >

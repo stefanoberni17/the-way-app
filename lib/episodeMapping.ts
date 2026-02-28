@@ -12,10 +12,10 @@
 //   MVP Beta: Week 1-4 → episodi 1-6
 
 export const EPISODE_TO_WEEK: Record<number, number> = {
-  // Week 1-2 — La voce nel deserto
-  1: 1, 2: 1, 3: 1,
-  // Week 3-4 — Le tentazioni
-  4: 3, 5: 3, 6: 3,
+  // Week 1-2 — La voce nel deserto (4 passi disponibili)
+  1: 1, 2: 1, 3: 1, 4: 1,
+  // Week 3-4 — Le tentazioni (placeholder)
+  5: 3, 6: 3,
   // Week 5-6 — La chiamata
   7: 5, 8: 5, 9: 5,
   // Week 7-8 — Le Beatitudini

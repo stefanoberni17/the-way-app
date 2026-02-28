@@ -7,45 +7,30 @@ import EpisodeCard from '@/components/EpisodeCard';
 import WeekCarousel from '@/components/WeekCarousel';
 import { isWeekUnlockedInBeta } from '@/lib/weekUnlockLogic';
 
-// Mappa week number → Notion page ID (fonte unica di verità)
+// The Way — Notion page IDs per ogni coppia di settimane
 const WEEK_IDS_MAP: Record<number, string> = {
-  1: '2b1655f7-26c7-8025-8afe-df0ed131d708',
-  2: '2b1655f7-26c7-8025-8afe-df0ed131d708',
-  3: '2b1655f7-26c7-8054-a0d4-c4a48c509852',
-  4: '2b1655f7-26c7-8054-a0d4-c4a48c509852',
-  5: '2b1655f7-26c7-8038-bd91-c3fa9e5b31cb',
-  6: '2b1655f7-26c7-8038-bd91-c3fa9e5b31cb',
+  1: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',  // Week 1-2 — La voce nel deserto
+  2: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
+  3: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',  // placeholder — da aggiornare
+  4: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
+  5: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
+  6: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
 };
 
 const WEEK_EPISODES: Record<string, number[]> = {
-  '1': [1, 2, 3, 4, 5],
-  '2': [1, 2, 3, 4, 5],
-  '3': [6, 7, 8, 9, 10, 11, 12],
-  '4': [6, 7, 8, 9, 10, 11, 12],
-  '5': [13, 14, 15, 16, 17, 18, 19],
-  '6': [13, 14, 15, 16, 17, 18, 19],
+  '1': [1, 2, 3, 4],
+  '2': [1, 2, 3, 4],
+  '3': [5, 6, 7],    // placeholder — da aggiornare quando Week 3-4 è pronta
+  '4': [5, 6, 7],
+  '5': [8, 9, 10],
+  '6': [8, 9, 10],
 };
 
 const EPISODE_TITLES: Record<number, string> = {
-  1: 'Enter: Naruto Uzumaki!',
-  2: 'My Name is Konohamaru!',
-  3: 'Sasuke and Sakura: Friends or Foes?',
-  4: 'Pass or Fail: Survival Test',
-  5: 'You Failed! Kakashi\'s Final Decision',
-  6: 'A Dangerous Mission! Journey to the Land of Waves!',
-  7: 'The Assassin of the Mist!',
-  8: 'The Oath of Pain',
-  9: 'Kakashi: Sharingan Warrior!',
-  10: 'The Forest of Chakra',
-  11: 'The Land Where a Hero Once Lived',
-  12: 'Battle on the Bridge! Zabuza Returns!',
-  13: 'Haku\'s Secret Jutsu: Crystal Ice Mirrors',
-  14: 'The Number One Hyperactive, Knucklehead Ninja Joins the Fight!',
-  15: 'Zero Visibility: The Sharingan Shatters',
-  16: 'The Broken Seal',
-  17: 'White Past: Hidden Ambition',
-  18: 'The Weapons Known as Shinobi',
-  19: 'The Demon in the Snow',
+  1: 'L\'Annunciazione — Il sì che cambia tutto',
+  2: 'La Nascita — Dio sceglie la fragilità',
+  3: 'Il Battesimo — Tu sei il mio figlio amato',
+  4: 'Conosciuto da sempre — Lo sguardo di Dio su di te',
 };
 
 function renderBlock(block: any) {

@@ -15,8 +15,8 @@ const NOTION_HEADERS = {
 
 // Ultimo episodio di ogni coppia di settimane (3 ep per coppia)
 const WEEK_PAIR_LAST_EPISODES: Record<number, number> = {
-  1: 3,   // Week 1-2 → passa a Week 3
-  3: 6,   // Week 3-4 → passa a Week 5
+  1: 4,   // Week 1-2 → passa a Week 3 (4 passi disponibili)
+  3: 7,   // Week 3-4 → passa a Week 5 (placeholder)
   5: 9,
   7: 12,
   9: 15,

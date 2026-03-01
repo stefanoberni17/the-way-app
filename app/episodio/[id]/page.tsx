@@ -299,21 +299,50 @@ export default function EpisodioPage() {
   }, [reflectionText, userId, episodeNumber]);
 
   // --- Web Speech API ---
-  const startSpeech = () => {
-    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+
+  // Cerca una voce maschile italiana (Luca su Apple, Cosimo su Windows)
+  const getMaleItalianVoice = (): SpeechSynthesisVoice | null => {
+    const voices = window.speechSynthesis.getVoices();
+    const italianVoices = voices.filter(v => v.lang.startsWith('it'));
+    const maleNames = ['Luca', 'Cosimo', 'Giorgio'];
+    return (
+      italianVoices.find(v => maleNames.some(n => v.name.includes(n))) ||
+      italianVoices[0] ||
+      null
+    );
+  };
+
+  // Avvia effettivamente la sintesi vocale con la voce trovata
+  const launchSpeech = (voice: SpeechSynthesisVoice | null) => {
     const text = getBlocksPlainText(readingBlocks);
     if (!text) return;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'it-IT';
-    utterance.rate = 0.85;
-    utterance.pitch = 1.0;
+    utterance.rate = 0.82;
+    // Voce maschile trovata → pitch leggermente basso e solenne
+    // Nessuna voce italiana → pitch basso per simulare tono grave
+    utterance.pitch = voice ? 0.9 : 0.8;
+    if (voice) utterance.voice = voice;
     utterance.onend = () => { setIsSpeaking(false); setIsPaused(false); };
     utterance.onerror = () => { setIsSpeaking(false); setIsPaused(false); };
     speechRef.current = utterance;
     window.speechSynthesis.speak(utterance);
     setIsSpeaking(true);
     setIsPaused(false);
+  };
+
+  const startSpeech = () => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+
+    const tryStart = () => launchSpeech(getMaleItalianVoice());
+
+    // Su Chrome/Edge le voci si caricano in modo asincrono al primo accesso
+    if (window.speechSynthesis.getVoices().length > 0) {
+      tryStart();
+    } else {
+      window.speechSynthesis.addEventListener('voiceschanged', tryStart, { once: true });
+    }
   };
 
   const pauseSpeech = () => {

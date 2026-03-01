@@ -112,7 +112,7 @@ export default function MeditationPopup({
     const audioSrc =
       audioMode === 'nature'
         ? '/audio/nature-meditation.mp3'
-        : '/audio/naruto-meditation.mp3'; // riutilizzato come musica ambient gospel
+        : '/audio/Canti-gregoriani.mp3';
 
     if (audioRef.current) {
       audioRef.current.src = audioSrc;

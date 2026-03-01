@@ -213,10 +213,10 @@ export default function SettimanaPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 flex items-center justify-center">
+      <main className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">✝️</div>
-          <p className="text-xl text-gray-600">Caricamento settimana...</p>
+          <p className="text-xl text-slate-300 font-serif">Caricamento settimana...</p>
         </div>
       </main>
     );
@@ -224,10 +224,10 @@ export default function SettimanaPage() {
 
   if (!data || data.error) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 flex items-center justify-center">
+      <main className="min-h-screen bg-stone-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-xl text-red-600">Errore nel caricamento</p>
-          <button onClick={() => router.push('/')} className="mt-4 bg-blue-700 text-white px-6 py-2 rounded-full">
+          <button onClick={() => router.push('/')} className="mt-4 bg-slate-900 text-white px-6 py-2 rounded-full">
             Torna alla home
           </button>
         </div>
@@ -262,29 +262,29 @@ export default function SettimanaPage() {
   // — VISTA VERSIONE ESTESA —
   if (showExtended) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 py-6 px-4 pb-28">
+      <main className="min-h-screen bg-stone-50 py-6 px-4 pb-28">
         <div className="max-w-2xl mx-auto">
           <button
             onClick={() => setShowExtended(false)}
-            className="flex items-center gap-2 text-sm text-gray-500 font-medium mb-5 hover:text-blue-600 transition-colors"
+            className="flex items-center gap-2 text-sm text-stone-500 font-medium mb-5 hover:text-amber-700 transition-colors"
           >
             ← Torna alla settimana
           </button>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-4">
-            <span className="text-xs font-bold text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
+          <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 mb-4">
+            <span className="text-xs font-bold text-amber-800 bg-amber-100 px-3 py-1 rounded-full">
               {settimana} · Approfondimento completo
             </span>
-            <h1 className="text-xl font-extrabold text-gray-800 mt-3 mb-1">{titolo}</h1>
-            <p className="text-blue-700 font-semibold text-sm">🎯 {tema}</p>
+            <h1 className="text-xl font-serif font-extrabold text-gray-800 mt-3 mb-1">{titolo}</h1>
+            <p className="text-amber-700 font-semibold text-sm">🎯 {tema}</p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6">
             {extendedBlocks.length > 0
               ? extendedBlocks.map((block: any, i: number) => (
                   <div key={block.id || i}>{renderBlock(block)}</div>
                 ))
-              : <p className="text-sm text-gray-400 italic">Nessun contenuto aggiuntivo disponibile.</p>
+              : <p className="text-sm text-stone-400 italic">Nessun contenuto aggiuntivo disponibile.</p>
             }
           </div>
         </div>
@@ -294,29 +294,29 @@ export default function SettimanaPage() {
 
   // — VISTA PRINCIPALE —
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 py-8 px-4 pb-24">
+    <main className="min-h-screen bg-stone-50 pb-24">
 
       {/* Popup settimana completata */}
       {showWeekCompletePopup && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl animate-scaleIn">
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl animate-scaleIn border-t-4 border-amber-500">
             <div className="text-7xl mb-4 animate-bounce">🏆</div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Settimana completata!</h2>
-            <p className="text-blue-700 font-semibold text-sm mb-1">{settimana}</p>
-            <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+            <h2 className="text-2xl font-serif font-bold text-gray-800 mb-2">Settimana completata!</h2>
+            <p className="text-amber-700 font-semibold text-sm mb-1">{settimana}</p>
+            <p className="text-stone-600 text-sm mb-6 leading-relaxed">
               Hai completato tutti i passi. Porta con te la Parola di questa settimana. 🙏
             </p>
             {nextWeekId && nextWeekInBeta ? (
               <>
                 <button
                   onClick={() => { setShowWeekCompletePopup(false); router.push(`/settimana/${nextWeekId}?week=${nextWeekNumber}`); }}
-                  className="w-full bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 text-white font-bold py-3 rounded-2xl mb-3 transition-all shadow-md"
+                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-2xl mb-3 transition-all shadow-md"
                 >
                   Passa alla settimana successiva →
                 </button>
                 <button
                   onClick={() => setShowWeekCompletePopup(false)}
-                  className="w-full text-gray-400 hover:text-gray-600 text-sm py-2 transition-colors"
+                  className="w-full text-stone-400 hover:text-stone-600 text-sm py-2 transition-colors"
                 >
                   Rimani qui
                 </button>
@@ -328,7 +328,7 @@ export default function SettimanaPage() {
                 </div>
                 <button
                   onClick={() => setShowWeekCompletePopup(false)}
-                  className="w-full bg-gradient-to-r from-blue-700 to-indigo-700 text-white font-bold py-3 rounded-2xl transition-all"
+                  className="w-full bg-slate-900 text-white font-bold py-3 rounded-2xl transition-all"
                 >
                   Continua 🌅
                 </button>
@@ -336,7 +336,7 @@ export default function SettimanaPage() {
             ) : (
               <button
                 onClick={() => setShowWeekCompletePopup(false)}
-                className="w-full bg-gradient-to-r from-blue-700 to-indigo-700 text-white font-bold py-3 rounded-2xl transition-all"
+                className="w-full bg-slate-900 text-white font-bold py-3 rounded-2xl transition-all"
               >
                 Continua il percorso 🌅
               </button>
@@ -345,89 +345,99 @@ export default function SettimanaPage() {
         </div>
       )}
 
-      {/* Header */}
-      <div className="max-w-4xl mx-auto mb-6">
-        <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-blue-600">
+      {/* Header navy */}
+      <div className="bg-slate-900 px-5 pt-10 pb-8">
+        <div className="max-w-4xl mx-auto">
+          <button
+            onClick={() => router.back()}
+            className="text-slate-400 hover:text-white text-sm mb-4 flex items-center gap-1 transition-colors"
+          >
+            ← Indietro
+          </button>
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="text-sm font-semibold text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
+            <span className="text-xs font-bold text-amber-400 bg-amber-400/20 px-3 py-1 rounded-full">
               {settimana}
             </span>
             {isWeekComplete && (
-              <span className="text-sm font-semibold text-green-600 bg-green-100 px-3 py-1 rounded-full">
+              <span className="text-xs font-bold text-green-400 bg-green-400/20 px-3 py-1 rounded-full">
                 ✅ Completata
               </span>
             )}
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-1">{titolo}</h1>
-          <p className="text-gray-500 text-sm mb-4">{tema}</p>
+          <h1 className="text-3xl font-serif font-bold text-white mb-1">{titolo}</h1>
+          <p className="text-slate-400 text-sm mb-4">{tema}</p>
           <button
             onClick={scrollToEpisodes}
-            className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold px-4 py-2 rounded-full transition-all shadow-md"
+            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-white text-sm font-bold px-5 py-2.5 rounded-full transition-all shadow-md"
           >
             📖 Vai ai passi ↓
           </button>
         </div>
       </div>
 
-      {/* Carousel insegnamento */}
-      <div className="max-w-4xl mx-auto mb-6">
-        <WeekCarousel
-          domandaGuida={domandaGuida}
-          essenza={essenza}
-          mantra={mantra}
-          pratiche={pratiche}
-          scopertaChiave={scopertaChiave}
-          onLoadExtended={handleLoadExtended}
-          loadingExtended={loadingExtended}
-        />
-      </div>
+      <div className="max-w-4xl mx-auto px-4 -mt-3">
 
-      {/* Episodi */}
-      <div className="max-w-4xl mx-auto mb-6" ref={episodesRef}>
-        <div className="bg-white rounded-2xl shadow-lg p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">📖 Passi della settimana</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {weekEpisodes.map((epNum) => {
-              const isCompleted = completedEpisodes.includes(epNum);
-              const isLocked = epNum > 1 && !completedEpisodes.includes(epNum - 1);
-              return (
-                <EpisodeCard
-                  key={epNum}
-                  episodeNumber={epNum}
-                  title={EPISODE_TITLES[epNum] || `Passo ${epNum}`}
-                  isCompleted={isCompleted}
-                  isLocked={isLocked}
-                  weekNumber={weekNumber}
-                  userId={userId}
-                  onComplete={handleEpisodeComplete}
-                />
-              );
-            })}
+        {/* Carousel insegnamento */}
+        <div className="mb-6">
+          <WeekCarousel
+            domandaGuida={domandaGuida}
+            essenza={essenza}
+            mantra={mantra}
+            pratiche={pratiche}
+            scopertaChiave={scopertaChiave}
+            onLoadExtended={handleLoadExtended}
+            loadingExtended={loadingExtended}
+          />
+        </div>
+
+        {/* Episodi */}
+        <div className="mb-6" ref={episodesRef}>
+          <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6">
+            <div className="h-0.5 w-8 bg-amber-400 rounded-full mb-3" />
+            <h2 className="text-xl font-serif font-bold text-gray-800 mb-4">Passi della settimana</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {weekEpisodes.map((epNum) => {
+                const isCompleted = completedEpisodes.includes(epNum);
+                const isLocked = epNum > 1 && !completedEpisodes.includes(epNum - 1);
+                return (
+                  <EpisodeCard
+                    key={epNum}
+                    episodeNumber={epNum}
+                    title={EPISODE_TITLES[epNum] || `Passo ${epNum}`}
+                    isCompleted={isCompleted}
+                    isLocked={isLocked}
+                    weekNumber={weekNumber}
+                    userId={userId}
+                    onComplete={handleEpisodeComplete}
+                  />
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Bottone prossima settimana */}
-      {isWeekComplete && nextWeekId && nextWeekInBeta && (
-        <div className="max-w-4xl mx-auto mb-6">
-          <button
-            onClick={() => router.push(`/settimana/${nextWeekId}?week=${nextWeekNumber}`)}
-            className="w-full bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-lg"
-          >
-            ✝️ Passa alla settimana successiva →
-          </button>
-        </div>
-      )}
-      {/* Messaggio beta: solo quando la prossima settimana supera il limite Beta */}
-      {isWeekComplete && nextWeekNumber !== null && !nextWeekInBeta && (
-        <div className="max-w-4xl mx-auto mb-6">
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-            <p className="text-amber-800 font-semibold text-sm">
-              🔒 Hai completato tutte le settimane disponibili in Beta! La versione completa arriva presto. 🙏
-            </p>
+        {/* Bottone prossima settimana */}
+        {isWeekComplete && nextWeekId && nextWeekInBeta && (
+          <div className="mb-6">
+            <button
+              onClick={() => router.push(`/settimana/${nextWeekId}?week=${nextWeekNumber}`)}
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 text-sm"
+            >
+              ✝️ Passa alla settimana successiva →
+            </button>
           </div>
-        </div>
-      )}
+        )}
+        {isWeekComplete && nextWeekNumber !== null && !nextWeekInBeta && (
+          <div className="mb-6">
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
+              <p className="text-amber-800 font-semibold text-sm">
+                🔒 Hai completato tutte le settimane disponibili in Beta! La versione completa arriva presto. 🙏
+              </p>
+            </div>
+          </div>
+        )}
+
+      </div>{/* end max-w-4xl */}
 
       <style jsx global>{`
         @keyframes scaleIn {

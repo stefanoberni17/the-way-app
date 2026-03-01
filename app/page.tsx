@@ -6,31 +6,33 @@ import { supabase } from '@/lib/supabase';
 import { useMeditation } from '@/components/MeditationContext';
 
 const WEEK_NAMES: Record<number, string> = {
-  1: 'Week 1-2 - La voce nel deserto',
-  2: 'Week 1-2 - La voce nel deserto',
-  3: 'Week 3-4 - Le tentazioni',
-  4: 'Week 3-4 - Le tentazioni',
-  5: 'Week 5-6 - La chiamata',
-  6: 'Week 5-6 - La chiamata',
+  1: 'La voce nel deserto',
+  2: 'La voce nel deserto',
+  3: 'Le tentazioni',
+  4: 'Le tentazioni',
+  5: 'La chiamata',
+  6: 'La chiamata',
 };
 
-// The Way — Notion page IDs per ogni coppia di settimane
 const WEEK_IDS: Record<number, string> = {
-  1: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',  // Week 1-2 — La voce nel deserto
+  1: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
   2: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
-  3: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',  // placeholder — da aggiornare quando Week 3-4 è pronta
+  3: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
   4: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
-  5: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',  // placeholder
+  5: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
   6: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
 };
 
-const DAY_LABELS: Record<string, string> = {
-  day1: '1', day2: '2', day3: '3', day4: '4', day5: '5', day6: '6', day7: '7',
-  day8: '8', day9: '9', day10: '10', day11: '11', day12: '12', day13: '13', day14: '14',
-};
-
-const DAY_KEYS = ['day1', 'day2', 'day3', 'day4', 'day5', 'day6', 'day7', 'day8', 'day9', 'day10', 'day11', 'day12', 'day13', 'day14'] as const;
+const DAY_KEYS = [
+  'day1','day2','day3','day4','day5','day6','day7',
+  'day8','day9','day10','day11','day12','day13','day14',
+] as const;
 type DayKey = typeof DAY_KEYS[number];
+
+const DAY_LABELS: Record<string, string> = {
+  day1:'1', day2:'2', day3:'3', day4:'4', day5:'5', day6:'6', day7:'7',
+  day8:'8', day9:'9', day10:'10', day11:'11', day12:'12', day13:'13', day14:'14',
+};
 
 export default function HomePage() {
   const router = useRouter();
@@ -47,26 +49,13 @@ export default function HomePage() {
   useEffect(() => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-
-      if (!session) {
-        router.push('/login');
-        return;
-      }
-
+      if (!session) { router.push('/login'); return; }
       setUser(session.user);
 
       const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .single();
+        .from('profiles').select('*').eq('user_id', session.user.id).single();
 
-      // Redirect onboarding se non completato
-      if (!profileData?.onboarding_completed) {
-        router.push('/onboarding');
-        return;
-      }
-
+      if (!profileData?.onboarding_completed) { router.push('/onboarding'); return; }
       setProfile(profileData);
 
       const { count } = await supabase
@@ -74,22 +63,18 @@ export default function HomePage() {
         .select('*', { count: 'exact', head: true })
         .eq('user_id', session.user.id)
         .eq('completed', true);
-
       setCompletedEpisodes(count || 0);
 
       const currentWeek = profileData?.current_week || 1;
       const weekId = WEEK_IDS[currentWeek];
-
       if (weekId) {
         const response = await fetch(`/api/settimana?id=${weekId}`);
         const data = await response.json();
         setWeekData(data);
       }
-
       loadPractices(session.user.id, currentWeek);
       setLoading(false);
     };
-
     checkUser();
   }, [router]);
 
@@ -109,7 +94,6 @@ export default function HomePage() {
   const togglePracticeDay = async (practiceNumber: number, day: DayKey) => {
     const practice = practices.find(p => p.practice_number === practiceNumber);
     if (!practice) return;
-
     const currentValue = practice.completed_days[day];
     const newValue = !currentValue;
 
@@ -143,10 +127,10 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-900 to-blue-800 flex items-center justify-center">
+      <main className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">✝️</div>
-          <p className="text-xl text-blue-100">Caricamento...</p>
+          <p className="text-xl text-slate-300 font-serif">Caricamento...</p>
         </div>
       </main>
     );
@@ -157,103 +141,102 @@ export default function HomePage() {
   const progressPercentage = Math.round((completedEpisodes / BETA_MAX_EPISODE) * 100);
 
   const properties = weekData?.page?.properties || {};
-  const pratiche = (properties.Pratiche?.rich_text?.[0]?.plain_text || '')
-    .replace(/<br>/g, '\n');
-  const mantra = (properties.Mantra?.rich_text?.[0]?.plain_text || '')
-    .replace(/<br>/g, '\n');
-
+  const pratiche = (properties.Pratiche?.rich_text?.[0]?.plain_text || '').replace(/<br>/g, '\n');
+  const mantra = (properties.Mantra?.rich_text?.[0]?.plain_text || '').replace(/<br>/g, '\n');
   const practicheArray = pratiche.split('\n').filter((p: string) => p.trim().length > 0);
 
+  const nextEpisode = completedEpisodes + 1;
+  const isAllDone = completedEpisodes >= BETA_MAX_EPISODE;
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 py-8 px-4 pb-24">
-      {/* ── Header ── */}
-      <div className="max-w-6xl mx-auto mb-6">
-        <div className="flex items-center gap-3 mb-1">
-          <span className="text-2xl">✝️</span>
-          <h1 className="text-2xl font-bold text-gray-800">
-            Ciao, {profile?.name || 'pellegrino'}!
+    <main className="min-h-screen bg-stone-50 pb-24">
+
+      {/* ── Top header ── */}
+      <div className="bg-slate-900 px-5 pt-10 pb-8">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-1">✝ The Way</p>
+          <h1 className="text-2xl font-bold text-white mb-0.5">
+            Ciao, {profile?.name || 'pellegrino'} 🙏
           </h1>
+          <p className="text-slate-400 text-sm">
+            Week {currentWeek} · {WEEK_NAMES[currentWeek] || `Week ${currentWeek}`}
+          </p>
         </div>
-        <p className="text-gray-500 text-sm ml-10">
-          Bentornato nel tuo percorso — The Way
-        </p>
       </div>
 
-      <div className="max-w-6xl mx-auto">
-        {/* ── Banner prossimo passo ── */}
-        {(() => {
-          const nextEpisode = completedEpisodes + 1;
-          const isAllDone = completedEpisodes >= BETA_MAX_EPISODE;
-          return (
-            <div className="bg-gradient-to-r from-blue-800 to-indigo-700 rounded-2xl shadow-lg p-6 mb-6 text-white">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <p className="text-blue-200 text-xs font-medium mb-1 uppercase tracking-wide">📍 Sei qui</p>
-                  <h2 className="text-xl font-bold leading-snug">
-                    {WEEK_NAMES[currentWeek] || `Week ${currentWeek}`}
-                  </h2>
-                </div>
-                <div className="text-4xl opacity-90">✝️</div>
-              </div>
+      <div className="max-w-2xl mx-auto px-4 -mt-3">
+
+        {/* ── Versetto hero ── */}
+        {mantra ? (
+          <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden mb-5">
+            {/* Decorazione top amber */}
+            <div className="h-1 bg-gradient-to-r from-amber-500 to-amber-400" />
+            <div className="p-6">
+              <p className="text-xs font-bold text-amber-700 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <span>📖</span> Versetto della Settimana
+              </p>
+              <blockquote className="text-gray-800 text-lg font-serif leading-relaxed italic mb-4 whitespace-pre-line">
+                &ldquo;{mantra}&rdquo;
+              </blockquote>
+
+              {/* CTA Passo */}
               {isAllDone ? (
-                <div className="bg-white/20 rounded-xl px-4 py-3 text-sm font-medium text-white text-center">
-                  🏆 Hai completato tutti i passi della Beta! Stay tuned ✝️
+                <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm font-medium text-amber-800 text-center">
+                  🏆 Hai completato tutti i passi della Beta — stay tuned ✝️
                 </div>
               ) : (
                 <button
                   onClick={() => {
-                    // Primo passo: mostra prima la settimana per introdurre il tema
                     if (nextEpisode === 1) {
                       router.push(`/settimana/${WEEK_IDS[currentWeek]}`);
                     } else {
                       router.push(`/episodio/${nextEpisode}`);
                     }
                   }}
-                  className="w-full sm:w-auto bg-white text-blue-800 font-bold py-2.5 px-5 rounded-xl hover:bg-blue-50 transition-all text-sm flex items-center justify-center gap-2 shadow-sm"
+                  className="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-white font-bold py-3 px-5 rounded-xl transition-all text-sm flex items-center justify-center gap-2 shadow-sm mb-3"
                 >
                   <span>▶</span>
                   <span>{completedEpisodes === 0 ? 'Inizia: Passo 1' : `Continua: Passo ${nextEpisode}`}</span>
                 </button>
               )}
-            </div>
-          );
-        })()}
 
-        {/* ── Versetto / Mantra della settimana ── */}
-        {mantra && (
-          <div className="bg-white rounded-2xl shadow-sm border border-blue-100 p-5 mb-6">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-4 rounded-xl mb-3">
-              <h3 className="text-sm font-bold text-blue-800 flex items-center gap-2 mb-2">
-                <span>📖</span>
-                <span>Versetto della Settimana</span>
-              </h3>
-              <p className="text-blue-900 text-base italic font-medium whitespace-pre-line leading-relaxed">
-                &ldquo;{mantra}&rdquo;
-              </p>
+              <button
+                onClick={openMeditation}
+                className="w-full flex items-center justify-center gap-2 border-2 border-amber-300 text-amber-700 hover:bg-amber-50 font-semibold py-2.5 px-5 rounded-xl transition-all text-sm"
+              >
+                <span>🙏</span>
+                <span>Momento di preghiera e respiro</span>
+              </button>
             </div>
-            <button
-              onClick={openMeditation}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-blue-700 to-indigo-600 hover:from-blue-800 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-xl transition-all shadow-md"
-            >
-              <span>🙏</span>
-              <span>Momento di preghiera e respiro</span>
-            </button>
           </div>
+        ) : (
+          /* Fallback se non c'è versetto */
+          !isAllDone && (
+            <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-5 mb-5">
+              <button
+                onClick={() => router.push(`/episodio/${nextEpisode}`)}
+                className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-5 rounded-xl transition-all text-sm flex items-center justify-center gap-2"
+              >
+                <span>▶</span>
+                <span>{completedEpisodes === 0 ? 'Inizia: Passo 1' : `Continua: Passo ${nextEpisode}`}</span>
+              </button>
+            </div>
+          )
         )}
 
         {/* ── Pratiche della settimana ── */}
         {practicheArray.length > 0 && (
-          <div className="mb-6">
+          <div className="mb-5">
             <button
-              className="flex items-center justify-between w-full mb-3"
+              className="flex items-center justify-between w-full mb-3 px-1"
               onClick={() => setPracticesVisible(v => !v)}
             >
-              <h2 className="text-base font-bold text-gray-800 flex items-center gap-2">
-                🌿 Pratiche della settimana
+              <h2 className="text-sm font-bold text-stone-700 uppercase tracking-wide flex items-center gap-2">
+                🌿 Pratiche della Settimana
               </h2>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400">tracker 14 giorni</span>
-                <span className="text-gray-400 text-sm">{practicesVisible ? '▲' : '▼'}</span>
+                <span className="text-xs text-stone-400">14 giorni</span>
+                <span className="text-stone-400 text-sm">{practicesVisible ? '▲' : '▼'}</span>
               </div>
             </button>
 
@@ -270,26 +253,26 @@ export default function HomePage() {
                     <div
                       key={index}
                       className={`bg-white rounded-2xl shadow-sm border transition-all ${
-                        isComplete ? 'border-green-200' : 'border-gray-100'
+                        isComplete ? 'border-green-200' : 'border-stone-200'
                       }`}
                     >
                       <div className="flex items-start gap-3 p-4 pb-3">
                         <span className={`w-7 h-7 rounded-full text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                          isComplete ? 'bg-green-500' : 'bg-blue-600'
+                          isComplete ? 'bg-green-500' : 'bg-amber-600'
                         }`}>
                           {isComplete ? '✓' : index + 1}
                         </span>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-gray-800 leading-snug">{praticaText}</p>
                           <div className="flex items-center gap-2 mt-2">
-                            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="flex-1 h-1.5 bg-stone-100 rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-500"
+                                className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-500"
                                 style={{ width: `${percentage}%` }}
                               />
                             </div>
                             <span className={`text-xs font-semibold flex-shrink-0 ${
-                              isComplete ? 'text-green-600' : 'text-gray-400'
+                              isComplete ? 'text-green-600' : 'text-stone-400'
                             }`}>
                               {completedCount}/14
                             </span>
@@ -300,9 +283,7 @@ export default function HomePage() {
                       <div className="px-4 pb-4 space-y-1.5">
                         {[DAY_KEYS.slice(0, 7), DAY_KEYS.slice(7, 14)].map((week, wi) => (
                           <div key={wi} className="flex items-center gap-1">
-                            <span className="text-xs text-gray-300 w-8 flex-shrink-0">
-                              S{wi + 1}
-                            </span>
+                            <span className="text-xs text-stone-300 w-8 flex-shrink-0">S{wi + 1}</span>
                             <div className="flex gap-1 flex-1">
                               {week.map(day => (
                                 <button
@@ -311,8 +292,8 @@ export default function HomePage() {
                                   disabled={loadingPractices}
                                   className={`flex-1 h-7 rounded-lg text-xs font-bold transition-all active:scale-95 ${
                                     completedDays[day]
-                                      ? 'bg-blue-600 text-white shadow-sm'
-                                      : 'bg-gray-50 text-gray-400 border border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                                      ? 'bg-amber-500 text-white shadow-sm'
+                                      : 'bg-stone-50 text-stone-400 border border-stone-200 hover:border-amber-300 hover:bg-amber-50'
                                   } disabled:opacity-50`}
                                 >
                                   {completedDays[day] ? '✓' : DAY_LABELS[day]}
@@ -325,8 +306,7 @@ export default function HomePage() {
                     </div>
                   );
                 })}
-
-                <p className="text-xs text-gray-400 mt-2 text-center">
+                <p className="text-xs text-stone-400 mt-2 text-center">
                   💡 Il tracker è solo per te — non influenza il percorso
                 </p>
               </div>
@@ -335,39 +315,38 @@ export default function HomePage() {
         )}
 
         {/* ── Progresso ── */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-          <h2 className="text-lg font-bold text-gray-800 mb-1 flex items-center gap-2">
-            🗺️ Il Tuo Cammino
+        <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 mb-6">
+          <div className="h-0.5 w-8 bg-amber-400 rounded-full mb-3" />
+          <h2 className="text-lg font-serif font-bold text-gray-800 mb-1">
+            Il Tuo Cammino
           </h2>
-          <p className="text-gray-500 text-sm mb-5">
-            Traccia i tuoi progressi attraverso i Passi del percorso Beta
+          <p className="text-stone-500 text-sm mb-5">
+            Progresso nel percorso Beta
           </p>
 
           <div className="grid grid-cols-3 gap-3 mb-5">
-            <div className="bg-blue-50 border-l-4 border-blue-600 p-3 rounded-xl">
-              <div className="text-2xl font-bold text-blue-700">{completedEpisodes}</div>
-              <div className="text-xs text-gray-500">Completati</div>
+            <div className="bg-stone-50 border border-stone-200 border-l-4 border-l-amber-500 p-3 rounded-xl">
+              <div className="text-2xl font-bold text-gray-800">{completedEpisodes}</div>
+              <div className="text-xs text-stone-500">Completati</div>
             </div>
-
-            <div className="bg-indigo-50 border-l-4 border-indigo-500 p-3 rounded-xl">
-              <div className="text-2xl font-bold text-indigo-600">{BETA_MAX_EPISODE}</div>
-              <div className="text-xs text-gray-500">Passi Beta</div>
+            <div className="bg-stone-50 border border-stone-200 border-l-4 border-l-slate-500 p-3 rounded-xl">
+              <div className="text-2xl font-bold text-gray-800">{BETA_MAX_EPISODE}</div>
+              <div className="text-xs text-stone-500">Passi Beta</div>
             </div>
-
-            <div className="bg-green-50 border-l-4 border-green-500 p-3 rounded-xl">
-              <div className="text-2xl font-bold text-green-600">{progressPercentage}%</div>
-              <div className="text-xs text-gray-500">Progresso</div>
+            <div className="bg-stone-50 border border-stone-200 border-l-4 border-l-green-500 p-3 rounded-xl">
+              <div className="text-2xl font-bold text-gray-800">{progressPercentage}%</div>
+              <div className="text-xs text-stone-500">Progresso</div>
             </div>
           </div>
 
           <div className="mb-5">
-            <div className="flex justify-between text-sm text-gray-500 mb-2">
+            <div className="flex justify-between text-sm text-stone-500 mb-2">
               <span>Avanzamento Beta</span>
               <span>{completedEpisodes}/{BETA_MAX_EPISODE} passi</span>
             </div>
-            <div className="w-full bg-gray-100 rounded-full h-2.5">
+            <div className="w-full bg-stone-100 rounded-full h-2">
               <div
-                className="bg-gradient-to-r from-blue-600 to-indigo-500 h-2.5 rounded-full transition-all duration-500"
+                className="bg-gradient-to-r from-amber-500 to-amber-400 h-2 rounded-full transition-all duration-500"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
@@ -375,11 +354,12 @@ export default function HomePage() {
 
           <button
             onClick={() => router.push('/settimane')}
-            className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-xl transition-all w-full sm:w-auto"
+            className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-xl transition-all text-sm"
           >
             📖 Esplora le Settimane
           </button>
         </div>
+
       </div>
     </main>
   );

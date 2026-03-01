@@ -13,11 +13,11 @@ interface WeekCarouselProps {
 }
 
 const SLIDES = [
-  { id: 'domanda',   label: 'Domanda Guida',  emoji: '💭' },
-  { id: 'essenza',   label: 'Essenza',         emoji: '✨' },
-  { id: 'mantra',    label: 'Versetto',         emoji: '✝️' },
-  { id: 'pratiche',  label: 'Pratiche',         emoji: '🌿' },
-  { id: 'scoperta',  label: 'Scoperta Chiave',  emoji: '🔑' },
+  { id: 'domanda',  label: 'Domanda Guida',  emoji: '💭' },
+  { id: 'essenza',  label: 'Essenza',         emoji: '✨' },
+  { id: 'mantra',   label: 'Versetto',         emoji: '✝️' },
+  { id: 'pratiche', label: 'Pratiche',         emoji: '🌿' },
+  { id: 'scoperta', label: 'Scoperta Chiave',  emoji: '🔑' },
 ];
 
 export default function WeekCarousel({
@@ -61,7 +61,7 @@ export default function WeekCarousel({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
 
       {/* Track scorrevole */}
       <div
@@ -76,31 +76,27 @@ export default function WeekCarousel({
         >
 
           {/* SLIDE 1 — Domanda Guida */}
-          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-gradient-to-br from-indigo-50 to-blue-50">
+          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-gradient-to-br from-stone-50 to-blue-50">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-indigo-100 flex items-center justify-center text-lg flex-shrink-0">
-                💭
-              </div>
+              <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center text-lg flex-shrink-0">💭</div>
               <div>
-                <p className="text-xs font-bold text-indigo-700 uppercase tracking-wider">Domanda Guida</p>
-                <p className="text-xs text-indigo-500">Tienila con te questa settimana</p>
+                <p className="text-xs font-bold text-blue-700 uppercase tracking-wider">Domanda Guida</p>
+                <p className="text-xs text-blue-500">Tienila con te questa settimana</p>
               </div>
             </div>
-            <div className="w-full h-px bg-indigo-100 mb-5" />
-            <p className="text-gray-800 text-base font-medium leading-relaxed italic text-center px-2">
+            <div className="w-full h-px bg-blue-100 mb-5" />
+            <p className="text-gray-800 text-base font-serif leading-relaxed italic text-center px-2">
               {domandaGuida
                 ? `"${domandaGuida}"`
-                : <span className="text-gray-400 not-italic text-sm">Contenuto non ancora disponibile.</span>
+                : <span className="text-gray-400 not-italic text-sm font-sans">Contenuto non ancora disponibile.</span>
               }
             </p>
           </div>
 
           {/* SLIDE 2 — Essenza */}
-          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-gradient-to-br from-amber-50 to-yellow-50">
+          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-gradient-to-br from-amber-50 to-stone-50">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-lg flex-shrink-0">
-                ✨
-              </div>
+              <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-lg flex-shrink-0">✨</div>
               <div>
                 <p className="text-xs font-bold text-amber-700 uppercase tracking-wider">Essenza</p>
                 <p className="text-xs text-amber-600">Il cuore di questa settimana</p>
@@ -112,29 +108,27 @@ export default function WeekCarousel({
             </p>
           </div>
 
-          {/* SLIDE 3 — Versetto della settimana */}
-          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-gradient-to-br from-blue-800 to-indigo-700 flex flex-col justify-center">
-            <p className="text-blue-200 text-xs font-bold uppercase tracking-widest text-center mb-3">
+          {/* SLIDE 3 — Versetto (dark navy, gold accents) */}
+          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-slate-900 flex flex-col justify-center">
+            <p className="text-amber-400 text-xs font-bold uppercase tracking-widest text-center mb-3">
               ✝️ Versetto della settimana
             </p>
-            <div className="text-white text-5xl leading-none text-center mb-2 opacity-30 font-serif select-none">❝</div>
-            <p className="text-white text-base font-semibold leading-relaxed text-center px-2">
+            <div className="text-white text-5xl leading-none text-center mb-2 opacity-20 font-serif select-none">❝</div>
+            <p className="text-white text-base font-serif font-medium leading-relaxed text-center px-2">
               {mantra
                 ? mantra.split('\n').map((line, i, arr) => (
                     <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
                   ))
-                : <span className="opacity-60 text-sm font-normal">Versetto non ancora disponibile.</span>
+                : <span className="opacity-60 text-sm font-normal font-sans">Versetto non ancora disponibile.</span>
               }
             </p>
-            <div className="text-white text-5xl leading-none text-center mt-2 opacity-30 font-serif select-none">❞</div>
+            <div className="text-white text-5xl leading-none text-center mt-2 opacity-20 font-serif select-none">❞</div>
           </div>
 
           {/* SLIDE 4 — Pratiche */}
-          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-gradient-to-br from-green-50 to-emerald-50">
+          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-gradient-to-br from-green-50 to-stone-50">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-green-100 flex items-center justify-center text-lg flex-shrink-0">
-                🌿
-              </div>
+              <div className="w-9 h-9 rounded-xl bg-green-100 flex items-center justify-center text-lg flex-shrink-0">🌿</div>
               <div>
                 <p className="text-xs font-bold text-green-700 uppercase tracking-wider">Le Tue Pratiche</p>
                 <p className="text-xs text-green-600">Da portare con te questa settimana</p>
@@ -145,7 +139,7 @@ export default function WeekCarousel({
               <ol className="space-y-3">
                 {pratiche.map((p, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-green-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="w-6 h-6 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
                       {i + 1}
                     </span>
                     <p className="text-gray-700 text-sm leading-relaxed">{p}</p>
@@ -153,29 +147,27 @@ export default function WeekCarousel({
                 ))}
               </ol>
             ) : (
-              <p className="text-gray-400 text-sm italic">Pratiche non ancora disponibili.</p>
+              <p className="text-stone-400 text-sm italic">Pratiche non ancora disponibili.</p>
             )}
           </div>
 
           {/* SLIDE 5 — Scoperta Chiave */}
-          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-gradient-to-br from-violet-50 to-purple-50">
+          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-gradient-to-br from-stone-50 to-amber-50">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-violet-100 flex items-center justify-center text-lg flex-shrink-0">
-                🔑
-              </div>
+              <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-lg flex-shrink-0">🔑</div>
               <div>
-                <p className="text-xs font-bold text-violet-700 uppercase tracking-wider">Scoperta Chiave</p>
-                <p className="text-xs text-violet-500">Cosa porterai con te</p>
+                <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">Scoperta Chiave</p>
+                <p className="text-xs text-amber-600">Cosa porterai con te</p>
               </div>
             </div>
-            <div className="w-full h-px bg-violet-100 mb-4" />
+            <div className="w-full h-px bg-amber-100 mb-4" />
             <p className="text-gray-700 text-sm leading-relaxed mb-5">
-              {scopertaChiave || <span className="text-gray-400 italic">Contenuto non ancora disponibile.</span>}
+              {scopertaChiave || <span className="text-stone-400 italic">Contenuto non ancora disponibile.</span>}
             </p>
             <button
               onClick={onLoadExtended}
               disabled={loadingExtended}
-              className="w-full border-2 border-dashed border-violet-200 bg-violet-50 hover:bg-violet-100 text-violet-700 text-sm font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+              className="w-full border-2 border-dashed border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-50"
             >
               {loadingExtended
                 ? <><span className="animate-spin inline-block">⏳</span> Caricamento...</>
@@ -188,11 +180,11 @@ export default function WeekCarousel({
       </div>
 
       {/* Barra navigazione */}
-      <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100">
+      <div className="flex items-center justify-between px-5 py-3 border-t border-stone-100">
         <button
           onClick={() => goTo(current - 1)}
           disabled={current === 0}
-          className="w-8 h-8 flex items-center justify-center rounded-full text-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+          className="w-8 h-8 flex items-center justify-center rounded-full text-xl text-stone-400 hover:text-amber-600 hover:bg-amber-50 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
           aria-label="Precedente"
         >
           ‹
@@ -205,8 +197,8 @@ export default function WeekCarousel({
               onClick={() => goTo(i)}
               className={`rounded-full transition-all duration-300 ${
                 i === current
-                  ? 'w-5 h-2 bg-blue-600'
-                  : 'w-2 h-2 bg-gray-200 hover:bg-gray-300'
+                  ? 'w-5 h-2 bg-amber-500'
+                  : 'w-2 h-2 bg-stone-200 hover:bg-stone-300'
               }`}
             />
           ))}
@@ -215,7 +207,7 @@ export default function WeekCarousel({
         <button
           onClick={() => goTo(current + 1)}
           disabled={current === SLIDES.length - 1}
-          className="w-8 h-8 flex items-center justify-center rounded-full text-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+          className="w-8 h-8 flex items-center justify-center rounded-full text-xl text-stone-400 hover:text-amber-600 hover:bg-amber-50 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
           aria-label="Successivo"
         >
           ›
@@ -223,7 +215,7 @@ export default function WeekCarousel({
       </div>
 
       <div className="text-center pb-3">
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-stone-400">
           {SLIDES[current].emoji} {SLIDES[current].label} · {current + 1} di {SLIDES.length}
         </span>
       </div>

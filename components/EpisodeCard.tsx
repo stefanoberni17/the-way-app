@@ -9,6 +9,7 @@ interface EpisodeCardProps {
   isLocked: boolean;
   weekNumber: number;
   userId: string;
+  settimanaId: string;
   onComplete: () => void;
 }
 
@@ -19,13 +20,16 @@ export default function EpisodeCard({
   isLocked,
   weekNumber,
   userId,
+  settimanaId,
   onComplete
 }: EpisodeCardProps) {
   const router = useRouter();
 
   const handleClick = () => {
     if (isLocked) return;
-    router.push(`/episodio/${episodeNumber}?userId=${userId}`);
+    // Passiamo from e week per garantire un fresh mount della settimana
+    // quando l'utente torna indietro dopo il completamento
+    router.push(`/episodio/${episodeNumber}?userId=${userId}&from=${settimanaId}&week=${weekNumber}`);
   };
 
   return (

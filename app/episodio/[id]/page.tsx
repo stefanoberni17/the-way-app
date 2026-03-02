@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
 interface EpisodeData {
@@ -198,6 +198,10 @@ export default function EpisodioPage() {
   const [savingReflection, setSavingReflection] = useState(false);
   const [reflectionSaved, setReflectionSaved] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+
+  const searchParams = useSearchParams();
+  const fromSettimana = searchParams.get('from');   // Notion page ID della settimana
+  const fromWeek = searchParams.get('week');         // numero settimana
 
   const episodeNumber = parseInt(params.id as string);
   const TOTAL_STEPS = 5;
@@ -434,7 +438,15 @@ export default function EpisodioPage() {
             Porta questo versetto con te oggi.
           </p>
           <button
-            onClick={() => router.back()}
+            onClick={() => {
+              // router.push garantisce un fresh mount della settimana
+              // così i progressi (lock/unlock) vengono ricaricati correttamente
+              if (fromSettimana && fromWeek) {
+                router.push(`/settimana/${fromSettimana}?week=${fromWeek}`);
+              } else {
+                router.back();
+              }
+            }}
             className="mt-10 bg-white text-blue-700 font-bold px-8 py-3 rounded-full shadow-lg hover:bg-blue-50 transition-all hover:scale-105 active:scale-95"
           >
             Continua il percorso →

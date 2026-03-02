@@ -408,6 +408,7 @@ export default function SettimanaPage() {
                     isLocked={isLocked}
                     weekNumber={weekNumber}
                     userId={userId}
+                    settimanaId={params.id as string}
                     onComplete={handleEpisodeComplete}
                   />
                 );

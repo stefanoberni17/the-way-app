@@ -27,6 +27,30 @@ const WEEK_PAIR_LAST_EPISODES: Record<number, number> = {
   19: 30,
 };
 
+// Decodifica sequenze unicode letterali (es. u00f2 → ò) prodotte da copia-incolla errata in Notion
+function decodeUnicodeEscapes(text: string): string {
+  return text.replace(/u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+}
+
+// Applica la decodifica ai rich_text di un singolo blocco
+function decodeBlockRichText(block: any): any {
+  const type = block.type;
+  if (!block[type]?.rich_text) return block;
+  return {
+    ...block,
+    [type]: {
+      ...block[type],
+      rich_text: block[type].rich_text.map((rt: any) => ({
+        ...rt,
+        plain_text: decodeUnicodeEscapes(rt.plain_text || ''),
+        text: rt.text
+          ? { ...rt.text, content: decodeUnicodeEscapes(rt.text.content || '') }
+          : rt.text,
+      })),
+    },
+  };
+}
+
 async function fetchAllBlocks(pageId: string): Promise<any[]> {
   const blocks: any[] = [];
   let cursor: string | null = null;
@@ -42,7 +66,8 @@ async function fetchAllBlocks(pageId: string): Promise<any[]> {
     cursor = data.has_more ? data.next_cursor : null;
   } while (cursor);
 
-  return blocks;
+  // Decodifica gli escape unicode letterali prima di restituire i blocchi
+  return blocks.map(decodeBlockRichText);
 }
 
 export async function GET(request: NextRequest) {

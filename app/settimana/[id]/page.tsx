@@ -11,26 +11,31 @@ import { isWeekUnlockedInBeta } from '@/lib/weekUnlockLogic';
 const WEEK_IDS_MAP: Record<number, string> = {
   1: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',  // Week 1-2 — La voce nel deserto
   2: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
-  3: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',  // placeholder — da aggiornare
-  4: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
-  5: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
-  6: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
+  3: '316655f7-26c7-8148-b5f4-f58ca267545a',  // Week 3-4 — Il silenzio di Nazaret
+  4: '316655f7-26c7-8148-b5f4-f58ca267545a',
+  5: '316655f7-26c7-8131-b21d-ff3daa9eee74',  // Week 5-6 — La voce che chiama (future)
+  6: '316655f7-26c7-8131-b21d-ff3daa9eee74',
 };
 
 const WEEK_EPISODES: Record<string, number[]> = {
   '1': [1, 2, 3, 4],
   '2': [1, 2, 3, 4],
-  '3': [5, 6, 7],    // placeholder — da aggiornare quando Week 3-4 è pronta
+  '3': [5, 6, 7],   // Week 3-4 — Il silenzio di Nazaret
   '4': [5, 6, 7],
-  '5': [8, 9, 10],
+  '5': [8, 9, 10],  // future
   '6': [8, 9, 10],
 };
 
 const EPISODE_TITLES: Record<number, string> = {
+  // Week 1-2 — La voce nel deserto
   1: 'L\'Annunciazione — Il sì che cambia tutto',
   2: 'La Nascita — Dio sceglie la fragilità',
   3: 'Il Battesimo — Tu sei il mio figlio amato',
   4: 'Conosciuto da sempre — Lo sguardo di Dio su di te',
+  // Week 3-4 — Il silenzio di Nazaret
+  5: 'C\'è un tempo per ogni cosa — Il ritmo della vita',
+  6: 'Fermatevi e sappiate — Il comando più difficile',
+  7: 'Conosciuto da sempre — Lo sguardo di Dio su di te',
 };
 
 function renderBlock(block: any) {

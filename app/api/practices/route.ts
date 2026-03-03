@@ -79,7 +79,6 @@ export async function POST(request: NextRequest) {
 
     const currentDays = existing?.completed_days || {
       day1: false, day2: false, day3: false, day4: false, day5: false, day6: false, day7: false,
-      day8: false, day9: false, day10: false, day11: false, day12: false, day13: false, day14: false,
     };
 
     // Aggiorna il giorno specifico

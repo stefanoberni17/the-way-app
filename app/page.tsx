@@ -8,30 +8,28 @@ import { useMeditation } from '@/components/MeditationContext';
 const WEEK_NAMES: Record<number, string> = {
   1: 'La voce nel deserto',
   2: 'La voce nel deserto',
-  3: 'Le tentazioni',
-  4: 'Le tentazioni',
-  5: 'La chiamata',
-  6: 'La chiamata',
+  3: 'Il silenzio di Nazaret',
+  4: 'Il silenzio di Nazaret',
+  5: 'La voce che chiama',
+  6: 'La voce che chiama',
 };
 
 const WEEK_IDS: Record<number, string> = {
-  1: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
+  1: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',  // Week 1-2
   2: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
-  3: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
-  4: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
-  5: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
-  6: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
+  3: '316655f7-26c7-8148-b5f4-f58ca267545a',  // Week 3-4
+  4: '316655f7-26c7-8148-b5f4-f58ca267545a',
+  5: '316655f7-26c7-8131-b21d-ff3daa9eee74',  // Week 5-6
+  6: '316655f7-26c7-8131-b21d-ff3daa9eee74',
 };
 
 const DAY_KEYS = [
   'day1','day2','day3','day4','day5','day6','day7',
-  'day8','day9','day10','day11','day12','day13','day14',
 ] as const;
 type DayKey = typeof DAY_KEYS[number];
 
 const DAY_LABELS: Record<string, string> = {
-  day1:'1', day2:'2', day3:'3', day4:'4', day5:'5', day6:'6', day7:'7',
-  day8:'8', day9:'9', day10:'10', day11:'11', day12:'12', day13:'13', day14:'14',
+  day1:'Lun', day2:'Mar', day3:'Mer', day4:'Gio', day5:'Ven', day6:'Sab', day7:'Dom',
 };
 
 export default function HomePage() {
@@ -137,7 +135,7 @@ export default function HomePage() {
   }
 
   const currentWeek = profile?.current_week || 1;
-  const BETA_MAX_EPISODE = 4;
+  const BETA_MAX_EPISODE = 7;
   const progressPercentage = Math.round((completedEpisodes / BETA_MAX_EPISODE) * 100);
 
   const properties = weekData?.page?.properties || {};
@@ -235,7 +233,7 @@ export default function HomePage() {
                 🌿 Pratiche della Settimana
               </h2>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-stone-400">14 giorni</span>
+                <span className="text-xs text-stone-400">7 giorni</span>
                 <span className="text-stone-400 text-sm">{practicesVisible ? '▲' : '▼'}</span>
               </div>
             </button>
@@ -274,34 +272,30 @@ export default function HomePage() {
                             <span className={`text-xs font-semibold flex-shrink-0 ${
                               isComplete ? 'text-green-600' : 'text-stone-400'
                             }`}>
-                              {completedCount}/14
+                              {completedCount}/7
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="px-4 pb-4 space-y-1.5">
-                        {[DAY_KEYS.slice(0, 7), DAY_KEYS.slice(7, 14)].map((week, wi) => (
-                          <div key={wi} className="flex items-center gap-1">
-                            <span className="text-xs text-stone-300 w-8 flex-shrink-0">S{wi + 1}</span>
-                            <div className="flex gap-1 flex-1">
-                              {week.map(day => (
-                                <button
-                                  key={day}
-                                  onClick={() => togglePracticeDay(index + 1, day)}
-                                  disabled={loadingPractices}
-                                  className={`flex-1 h-7 rounded-lg text-xs font-bold transition-all active:scale-95 ${
-                                    completedDays[day]
-                                      ? 'bg-amber-500 text-white shadow-sm'
-                                      : 'bg-stone-50 text-stone-400 border border-stone-200 hover:border-amber-300 hover:bg-amber-50'
-                                  } disabled:opacity-50`}
-                                >
-                                  {completedDays[day] ? '✓' : DAY_LABELS[day]}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
+                      <div className="px-4 pb-4">
+                        <div className="flex gap-1">
+                          {DAY_KEYS.map(day => (
+                            <button
+                              key={day}
+                              onClick={() => togglePracticeDay(index + 1, day)}
+                              disabled={loadingPractices}
+                              className={`flex-1 flex flex-col items-center gap-0.5 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-95 ${
+                                completedDays[day]
+                                  ? 'bg-amber-500 text-white shadow-sm'
+                                  : 'bg-stone-50 text-stone-400 border border-stone-200 hover:border-amber-300 hover:bg-amber-50'
+                              } disabled:opacity-50`}
+                            >
+                              <span className="text-[9px] font-medium opacity-70">{DAY_LABELS[day]}</span>
+                              <span>{completedDays[day] ? '✓' : ''}</span>
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   );

@@ -86,10 +86,10 @@ export function getNextWeekToUnlock(completedEpisodes: EpisodeProgress[]): numbe
 // ========================================
 
 /**
- * MVP Beta: solo Week 1-4 accessibili (episodi 1-6)
+ * MVP Beta: Week 1-4 accessibili (episodi 1-7)
  */
-export const BETA_MAX_WEEK = 2;
-export const BETA_MAX_EPISODE = 4;
+export const BETA_MAX_WEEK = 4;
+export const BETA_MAX_EPISODE = 7;
 
 export function isWeekUnlockedInBeta(weekNumber: number): boolean {
   return weekNumber <= BETA_MAX_WEEK;

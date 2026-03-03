@@ -27,15 +27,15 @@ const WEEK_EPISODES: Record<string, number[]> = {
 };
 
 const EPISODE_TITLES: Record<number, string> = {
-  // Week 1-2 — La voce nel deserto
+  // Week 1-2 — La voce nel deserto (Num 1-4, Settimana="Week 1-2")
   1: 'L\'Annunciazione — Il sì che cambia tutto',
-  2: 'La Nascita — Dio sceglie la fragilità',
-  3: 'Il Battesimo — Tu sei il mio figlio amato',
-  4: 'Conosciuto da sempre — Lo sguardo di Dio su di te',
-  // Week 3-4 — Il silenzio di Nazaret
+  2: 'Il sogno di Giuseppe — Fidarsi nel buio',
+  3: 'La Nascita — Dio entra nella semplicità',
+  4: 'Maria custodisce — Stare senza capire',
+  // Week 3-4 — Il silenzio di Nazaret (Num 5-7, Settimana="Week 3-4")
   5: 'C\'è un tempo per ogni cosa — Il ritmo della vita',
-  6: 'Fermatevi e sappiate — Il comando più difficile',
-  7: 'Conosciuto da sempre — Lo sguardo di Dio su di te',
+  6: 'Quelli che sperano nel Signore — La forza che nasce dall\'attesa',
+  7: 'Non affannatevi — La presenza nel presente',
 };
 
 function renderBlock(block: any) {

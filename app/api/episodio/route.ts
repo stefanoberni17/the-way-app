@@ -86,7 +86,12 @@ export async function GET(request: NextRequest) {
       isCompleted = curr?.completed || false;
     }
 
-    // Query Notion DB per Numero (fetch diretto)
+    // Calcola la stringa "Week X-(X+1)" corrispondente all'episodio
+    // (Notion usa questo campo per distinguere i track paralleli)
+    const weekForEp = getWeekFromEpisode(episodeNumber);
+    const settimanaStr = `Week ${weekForEp}-${weekForEp + 1}`;
+
+    // Query Notion DB: filtra per Numero + Settimana per evitare duplicati
     const queryRes = await fetch(
       `https://api.notion.com/v1/databases/${process.env.NOTION_DATABASE_EPISODI}/query`,
       {
@@ -94,9 +99,12 @@ export async function GET(request: NextRequest) {
         headers: NOTION_HEADERS,
         body: JSON.stringify({
           filter: {
-            property: 'Numero',
-            number: { equals: episodeNumber },
+            and: [
+              { property: 'Numero', number: { equals: episodeNumber } },
+              { property: 'Settimana', rich_text: { equals: settimanaStr } },
+            ],
           },
+          sorts: [{ timestamp: 'created_time', direction: 'ascending' }],
         }),
       }
     );

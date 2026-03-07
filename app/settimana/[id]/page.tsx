@@ -7,35 +7,56 @@ import EpisodeCard from '@/components/EpisodeCard';
 import WeekCarousel from '@/components/WeekCarousel';
 import { isWeekUnlockedInBeta } from '@/lib/weekUnlockLogic';
 
-// The Way — Notion page IDs per ogni coppia di settimane
+// The Way — Notion page IDs per settimana
+// Settimane singole: 1&2 condividono il Notion "Week 1-2", 3&4 il "Week 3-4"
 const WEEK_IDS_MAP: Record<number, string> = {
-  1: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',  // Week 1-2 — La voce nel deserto
-  2: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
-  3: '316655f7-26c7-8148-b5f4-f58ca267545a',  // Week 3-4 — Il silenzio di Nazaret
-  4: '316655f7-26c7-8148-b5f4-f58ca267545a',
-  5: '316655f7-26c7-8131-b21d-ff3daa9eee74',  // Week 5-6 — La voce che chiama (future)
-  6: '316655f7-26c7-8131-b21d-ff3daa9eee74',
+  1: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',  // Week 1 — La voce nel deserto
+  2: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',  // Week 2 — La voce nel deserto (cont.)
+  3: '316655f7-26c7-8148-b5f4-f58ca267545a',  // Week 3 — Il silenzio di Nazaret
+  4: '316655f7-26c7-8148-b5f4-f58ca267545a',  // Week 4 — Il silenzio di Nazaret (cont.)
+  5: '316655f7-26c7-8131-b21d-ff3daa9eee74',  // Week 5 — La voce che chiama (future)
+  6: '316655f7-26c7-8131-b21d-ff3daa9eee74',  // Week 6 — La voce che chiama (cont., future)
 };
 
+// 6 episodi per settimana singola
 const WEEK_EPISODES: Record<string, number[]> = {
-  '1': [1, 2, 3, 4],
-  '2': [1, 2, 3, 4],
-  '3': [5, 6, 7],   // Week 3-4 — Il silenzio di Nazaret
-  '4': [5, 6, 7],
-  '5': [8, 9, 10],  // future
-  '6': [8, 9, 10],
+  '1': [1, 2, 3, 4, 5, 6],
+  '2': [7, 8, 9, 10, 11, 12],
+  '3': [13, 14, 15, 16, 17, 18],
+  '4': [19, 20, 21, 22, 23, 24],
+  '5': [25, 26, 27, 28, 29, 30],  // future
+  '6': [31, 32, 33, 34, 35, 36],  // future
 };
 
 const EPISODE_TITLES: Record<number, string> = {
-  // Week 1-2 — La voce nel deserto (Num 1-4, Settimana="Week 1-2")
-  1: 'L\'Annunciazione — Il sì che cambia tutto',
-  2: 'Il sogno di Giuseppe — Fidarsi nel buio',
-  3: 'La Nascita — Dio entra nella semplicità',
-  4: 'Maria custodisce — Stare senza capire',
-  // Week 3-4 — Il silenzio di Nazaret (Num 5-7, Settimana="Week 3-4")
-  5: 'C\'è un tempo per ogni cosa — Il ritmo della vita',
-  6: 'Quelli che sperano nel Signore — La forza che nasce dall\'attesa',
-  7: 'Non affannatevi — La presenza nel presente',
+  // Week 1 — La voce nel deserto (Notion "Week 1-2" Num 1-6)
+  1:  'L\'Annunciazione — Il sì che cambia tutto',
+  2:  'Il sogno di Giuseppe — Fidarsi nel buio',
+  3:  'La Nascita — Dio entra nella semplicità',
+  4:  'Maria custodisce — Stare senza capire',
+  5:  'Come un bimbo svezzato — La presenza semplice',
+  6:  'Fermatevi e sappiate — Il comando più difficile',
+  // Week 2 — La voce nel deserto cont. (Notion "Week 1-2" Num 7-12)
+  7:  'Conosciuto da sempre — Lo sguardo di Dio su di te',
+  8:  'Confida, non appoggiarti — Fiducia semplice',
+  9:  'Nella calma sarà la vostra forza — Rallentare',
+  10: 'Simeone — Riconoscere dopo l\'attesa',
+  11: 'Il Battesimo — Tu sei il mio figlio amato',
+  12: 'Il Signore è il mio pastore — Sicurezza',
+  // Week 3 — Il silenzio di Nazaret (Notion "Week 3-4" Num 1-6)
+  13: 'Gesù al Tempio a 12 anni — Autonomia e radici',
+  14: 'Maria custodiva, Gesù cresceva — Il silenzio che forma',
+  15: 'Elia e la voce sottile — Dio nel sussurro',
+  16: 'Solo in Dio riposa l\'anima mia — Smettere di agitarsi',
+  17: 'C\'è un tempo per ogni cosa — Il ritmo della vita',
+  18: 'Quelli che sperano nel Signore — La forza che nasce dall\'attesa',
+  // Week 4 — Il silenzio di Nazaret cont. (Notion "Week 3-4" Num 7-12)
+  19: 'Non affannatevi — La presenza nel presente',
+  20: 'Insegnaci a contare i nostri giorni — La saggezza del tempo',
+  21: 'Dio dirige i tuoi passi — Progettare con umiltà',
+  22: 'Il Signore è mia luce — Di chi avrò timore?',
+  23: 'Venite a me, voi affaticati — Il riposo che non devi meritare',
+  24: 'Sta\' in silenzio davanti al Signore — L\'arte di aspettare',
 };
 
 function renderBlock(block: any) {

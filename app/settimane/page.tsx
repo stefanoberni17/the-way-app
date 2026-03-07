@@ -5,19 +5,47 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { getUnlockedWeeks, isWeekUnlockedInBeta, getWeekLockMessage } from '@/lib/weekUnlockLogic';
 
-interface Settimana {
-  id: string;
-  numero: number;
-  settimana: string;
+interface SingleWeek {
+  id: string;         // Notion page ID (shared between the 2 weeks of a pair)
+  numero: number;     // single week number (1, 2, 3, 4)
+  settimana: string;  // "Settimana 1" etc.
   titolo: string;
   tema: string;
-  episodi: string;
+  episodi: string;    // "1–6" etc.
   stato: string;
+}
+
+// Expand a pair page into two single-week objects
+function expandPairToWeeks(pair: any): SingleWeek[] {
+  const w1 = pair.numero * 2 - 1;
+  const w2 = pair.numero * 2;
+  const ep1Start = (w1 - 1) * 6 + 1;
+  const ep2Start = (w2 - 1) * 6 + 1;
+  return [
+    {
+      id: pair.id,
+      numero: w1,
+      settimana: `Settimana ${w1}`,
+      titolo: pair.titolo,
+      tema: pair.tema,
+      episodi: `${ep1Start}–${ep1Start + 5}`,
+      stato: pair.stato,
+    },
+    {
+      id: pair.id,
+      numero: w2,
+      settimana: `Settimana ${w2}`,
+      titolo: pair.titolo,
+      tema: pair.tema,
+      episodi: `${ep2Start}–${ep2Start + 5}`,
+      stato: pair.stato,
+    },
+  ];
 }
 
 export default function SettimanaPage() {
   const router = useRouter();
-  const [settimane, setSettimane] = useState<Settimana[]>([]);
+  const [settimane, setSettimane] = useState<SingleWeek[]>([]);
   const [unlockedWeeks, setUnlockedWeeks] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [checkingAuth, setCheckingAuth] = useState(true);
@@ -51,10 +79,14 @@ export default function SettimanaPage() {
     fetch('/api/settimane')
       .then(res => res.json())
       .then(data => {
-        const filtered = (data.settimane || [])
-          .filter((s: Settimana) => s.numero <= 6)
-          .sort((a: Settimana, b: Settimana) => a.numero - b.numero);
-        setSettimane(filtered);
+        // Fetch returns pair pages (Numero 1 = "Week 1-2", 2 = "Week 3-4", ...)
+        // Keep only the 2 pairs that map to Beta single weeks 1-4
+        const pairs = (data.settimane || [])
+          .filter((s: any) => s.numero <= 2)
+          .sort((a: any, b: any) => a.numero - b.numero);
+        // Expand each pair into 2 single weeks
+        const weeks = pairs.flatMap(expandPairToWeeks);
+        setSettimane(weeks);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -102,7 +134,7 @@ export default function SettimanaPage() {
 
             if (isBetaLocked) {
               return (
-                <div key={settimana.id} className="bg-white rounded-2xl shadow-sm p-6 border border-stone-200 border-l-4 border-l-stone-200 opacity-50">
+                <div key={settimana.numero} className="bg-white rounded-2xl shadow-sm p-6 border border-stone-200 border-l-4 border-l-stone-200 opacity-50">
                   <div className="flex items-start justify-between mb-3">
                     <span className="text-xs font-semibold px-3 py-1 rounded-full text-stone-500 bg-stone-100">
                       {settimana.settimana}
@@ -123,7 +155,7 @@ export default function SettimanaPage() {
 
             return (
               <div
-                key={settimana.id}
+                key={settimana.numero}
                 onClick={() => isUnlocked && router.push(`/settimana/${settimana.id}?week=${settimana.numero}`)}
                 className={`bg-white rounded-2xl shadow-sm p-6 transition-all border border-stone-200 border-l-4 ${
                   isUnlocked ? 'cursor-pointer hover:shadow-md' : 'opacity-60 cursor-not-allowed'

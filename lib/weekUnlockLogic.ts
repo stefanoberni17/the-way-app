@@ -1,28 +1,16 @@
 // The Way — Logica unlock settimane basata su completamento episodi
-// 33 settimane totali, organizzate in coppie (1-2, 3-4, ..., 31-32) + week 33
+// 4 settimane Beta (singole), 6 episodi ciascuna
 
-// Mapping settimane → range episodi (3 episodi per coppia di settimane)
-const WEEK_EPISODES: Record<number, { start: number; end: number }> = {
-  1:  { start: 1,  end: 3  },   // Week 1-2 condividono ep 1-3
-  2:  { start: 1,  end: 3  },
-  3:  { start: 4,  end: 6  },   // Week 3-4 condividono ep 4-6
-  4:  { start: 4,  end: 6  },
-  5:  { start: 7,  end: 9  },
-  6:  { start: 7,  end: 9  },
-  7:  { start: 10, end: 12 },
-  8:  { start: 10, end: 12 },
-  9:  { start: 13, end: 15 },
-  10: { start: 13, end: 15 },
-  11: { start: 16, end: 18 },
-  12: { start: 16, end: 18 },
-  13: { start: 19, end: 21 },
-  14: { start: 19, end: 21 },
-  15: { start: 22, end: 24 },
-  16: { start: 22, end: 24 },
-  17: { start: 25, end: 27 },
-  18: { start: 25, end: 27 },
-  19: { start: 28, end: 30 },
-  20: { start: 28, end: 30 },
+// Mapping settimane → range episodi (6 episodi per singola settimana)
+const WEEK_EPISODE_RANGES: Record<number, { start: number; end: number }> = {
+  1:  { start: 1,  end: 6  },
+  2:  { start: 7,  end: 12 },
+  3:  { start: 13, end: 18 },
+  4:  { start: 19, end: 24 },
+  5:  { start: 25, end: 30 },
+  6:  { start: 31, end: 36 },
+  7:  { start: 37, end: 42 },
+  8:  { start: 43, end: 48 },
 };
 
 const TOTAL_WEEKS = 33;
@@ -48,8 +36,7 @@ export function getUnlockedWeeks(completedEpisodes: EpisodeProgress[]): number[]
       continue;
     }
 
-    const previousWeek = week - 1;
-    const range = WEEK_EPISODES[previousWeek];
+    const range = WEEK_EPISODE_RANGES[week - 1];
     if (!range) break; // Episodi non ancora mappati
 
     const allPreviousCompleted = Array.from(
@@ -86,10 +73,10 @@ export function getNextWeekToUnlock(completedEpisodes: EpisodeProgress[]): numbe
 // ========================================
 
 /**
- * MVP Beta: Week 1-4 accessibili (episodi 1-7)
+ * MVP Beta: Settimane 1-4 accessibili (episodi 1-24)
  */
 export const BETA_MAX_WEEK = 4;
-export const BETA_MAX_EPISODE = 7;
+export const BETA_MAX_EPISODE = 24;
 
 export function isWeekUnlockedInBeta(weekNumber: number): boolean {
   return weekNumber <= BETA_MAX_WEEK;

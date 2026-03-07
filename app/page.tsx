@@ -135,7 +135,7 @@ export default function HomePage() {
   }
 
   const currentWeek = profile?.current_week || 1;
-  const BETA_MAX_EPISODE = 7;
+  const BETA_MAX_EPISODE = 24;
   const progressPercentage = Math.round((completedEpisodes / BETA_MAX_EPISODE) * 100);
 
   const properties = weekData?.page?.properties || {};
@@ -185,8 +185,10 @@ export default function HomePage() {
               ) : (
                 <button
                   onClick={() => {
-                    if (nextEpisode === 1) {
-                      router.push(`/settimana/${WEEK_IDS[currentWeek]}`);
+                    // First episode of each week → show week overview page first
+                    const WEEK_FIRST_EPISODES = new Set([1, 7, 13, 19]);
+                    if (WEEK_FIRST_EPISODES.has(nextEpisode)) {
+                      router.push(`/settimana/${WEEK_IDS[currentWeek]}?week=${currentWeek}`);
                     } else {
                       router.push(`/episodio/${nextEpisode}`);
                     }
@@ -212,7 +214,14 @@ export default function HomePage() {
           !isAllDone && (
             <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-5 mb-5">
               <button
-                onClick={() => router.push(`/episodio/${nextEpisode}`)}
+                onClick={() => {
+                  const WEEK_FIRST_EPISODES = new Set([1, 7, 13, 19]);
+                  if (WEEK_FIRST_EPISODES.has(nextEpisode)) {
+                    router.push(`/settimana/${WEEK_IDS[currentWeek]}?week=${currentWeek}`);
+                  } else {
+                    router.push(`/episodio/${nextEpisode}`);
+                  }
+                }}
                 className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-5 rounded-xl transition-all text-sm flex items-center justify-center gap-2"
               >
                 <span>▶</span>

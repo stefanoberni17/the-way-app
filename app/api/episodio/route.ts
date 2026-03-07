@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { getWeekFromEpisode, isEpisodeInMVP } from '@/lib/episodeMapping';
+import { getWeekFromEpisode, getNotionEpisodeRef, isEpisodeInMVP } from '@/lib/episodeMapping';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -13,18 +13,17 @@ const NOTION_HEADERS = {
   'Content-Type': 'application/json',
 };
 
-// Ultimo episodio di ogni coppia di settimane (3 ep per coppia)
-const WEEK_PAIR_LAST_EPISODES: Record<number, number> = {
-  1: 4,   // Week 1-2 → passa a Week 3 (4 passi disponibili)
-  3: 7,   // Week 3-4 → passa a Week 5 (placeholder)
-  5: 9,
-  7: 12,
-  9: 15,
-  11: 18,
-  13: 21,
-  15: 24,
-  17: 27,
-  19: 30,
+// Ultimo episodio di ogni settimana singola (6 ep per settimana)
+// Completare l'ultimo ep di una settimana avanza current_week al successivo
+const WEEK_LAST_EPISODES: Record<number, number> = {
+  1: 6,    // Week 1 → avanza a Week 2
+  2: 12,   // Week 2 → avanza a Week 3
+  3: 18,   // Week 3 → avanza a Week 4
+  4: 24,   // Week 4 → avanza a Week 5
+  5: 30,
+  6: 36,
+  7: 42,
+  8: 48,
 };
 
 // Decodifica sequenze unicode letterali (es. u00f2 → ò) prodotte da copia-incolla errata in Notion
@@ -111,12 +110,11 @@ export async function GET(request: NextRequest) {
       isCompleted = curr?.completed || false;
     }
 
-    // Calcola la stringa "Week X-(X+1)" corrispondente all'episodio
-    // (Notion usa questo campo per distinguere i track paralleli)
-    const weekForEp = getWeekFromEpisode(episodeNumber);
-    const settimanaStr = `Week ${weekForEp}-${weekForEp + 1}`;
+    // Calcola track Notion ("Week 1-2", "Week 3-4", ...) e numero locale (1-12)
+    // per l'episodio globale (6 ep per settimana singola, 12 per track Notion)
+    const { settimana: settimanaStr, localNum } = getNotionEpisodeRef(episodeNumber);
 
-    // Query Notion DB: filtra per Numero + Settimana per evitare duplicati
+    // Query Notion DB: filtra per Numero locale + Settimana per evitare duplicati cross-track
     const queryRes = await fetch(
       `https://api.notion.com/v1/databases/${process.env.NOTION_DATABASE_EPISODI}/query`,
       {
@@ -125,7 +123,7 @@ export async function GET(request: NextRequest) {
         body: JSON.stringify({
           filter: {
             and: [
-              { property: 'Numero', number: { equals: episodeNumber } },
+              { property: 'Numero', number: { equals: localNum } },
               { property: 'Settimana', rich_text: { equals: settimanaStr } },
             ],
           },
@@ -214,8 +212,8 @@ export async function POST(request: NextRequest) {
 
     if (error) throw error;
 
-    // Auto-update current_week se l'episodio è l'ultimo della coppia
-    for (const [weekPair, lastEp] of Object.entries(WEEK_PAIR_LAST_EPISODES)) {
+    // Auto-update current_week se l'episodio è l'ultimo della settimana
+    for (const [week, lastEp] of Object.entries(WEEK_LAST_EPISODES)) {
       if (episodeNumber === lastEp) {
         const { data: profile } = await supabaseAdmin
           .from('profiles')
@@ -224,13 +222,12 @@ export async function POST(request: NextRequest) {
           .single();
 
         const currentWeek = profile?.current_week || 1;
-        const completedWeekPair = parseInt(weekPair);
+        const completedWeek = parseInt(week);
 
-        if (currentWeek <= completedWeekPair + 1) {
-          const nextWeek = completedWeekPair + 2;
+        if (currentWeek <= completedWeek) {
           await supabaseAdmin
             .from('profiles')
-            .update({ current_week: nextWeek })
+            .update({ current_week: completedWeek + 1 })
             .eq('user_id', userId);
         }
         break;

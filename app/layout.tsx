@@ -53,7 +53,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="it" className={`${dmSans.variable} ${playfair.variable} ${dmSans.className}`}>
-      <body className="pb-20">
+      <body className="pb-tabbar">
         <ServiceWorkerRegistration />
         <GlobalMeditationWrapper>
           {children}

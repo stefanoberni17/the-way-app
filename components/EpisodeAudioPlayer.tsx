@@ -116,16 +116,19 @@ function FilePlayer({ audioUrl, episodeNumber }: { audioUrl: string; episodeNumb
         </button>
 
         <div className="flex-1 min-w-0">
-          <input
-            type="range"
-            min={0}
-            max={duration || 0}
-            step={0.1}
-            value={current}
-            onChange={seek}
-            className="w-full h-1 accent-blue-600 cursor-pointer"
-          />
-          <div className="flex items-center justify-between mt-1 text-[10px] text-blue-700/70 font-medium">
+          {/* Wrapper con padding verticale per aumentare l'hit-area touch (iOS richiede ~44px) */}
+          <div className="py-2 -my-2">
+            <input
+              type="range"
+              min={0}
+              max={duration || 0}
+              step={0.1}
+              value={current}
+              onChange={seek}
+              className="w-full h-1.5 accent-blue-600 cursor-pointer"
+            />
+          </div>
+          <div className="flex items-center justify-between mt-1 text-[11px] text-blue-700/70 font-medium tabular-nums">
             <span>{formatTime(current)}</span>
             <span>{formatTime(duration)}</span>
           </div>
@@ -133,7 +136,7 @@ function FilePlayer({ audioUrl, episodeNumber }: { audioUrl: string; episodeNumb
 
         <button
           onClick={cycleSpeed}
-          className="text-[11px] font-bold text-blue-700 bg-white px-2 py-1 rounded-md border border-blue-200 hover:bg-blue-50 transition-all flex-shrink-0"
+          className="text-xs font-bold text-blue-700 bg-white px-2.5 py-2 rounded-md border border-blue-200 hover:bg-blue-50 transition-all flex-shrink-0 min-w-[44px]"
           aria-label="Velocità riproduzione"
         >
           {speed}×

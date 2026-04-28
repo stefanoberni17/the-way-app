@@ -34,3 +34,22 @@ textarea::placeholder {
   color: rgb(107 114 128); /* gray-500 */
   opacity: 1;
 }
+
+/* ── Mobile / PWA safe areas (iPhone home indicator) ── */
+.safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 0px);
+}
+
+/* Padding di sicurezza per il body: spazio TabBar (64px) + safe-area iOS */
+.pb-tabbar {
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+}
+
+/* Quando vogliamo escludere lo zoom automatico iOS sui form (font ≥ 16px) */
+@media (max-width: 768px) {
+  input:not([type='checkbox']):not([type='radio']),
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}

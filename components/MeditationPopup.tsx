@@ -161,7 +161,10 @@ export default function MeditationPopup({
   const seconds = timeLeft % 60;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 pb-24 animate-fadeIn overflow-y-auto">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 animate-fadeIn overflow-y-auto"
+      style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
+    >
       <audio ref={audioRef} />
 
       <div className="bg-gradient-to-br from-blue-950 via-indigo-900 to-blue-900 rounded-3xl shadow-2xl w-full max-w-lg p-6 md:p-10 relative animate-scaleIn my-auto border border-white/10">

@@ -70,7 +70,10 @@ export default function InstallBanner() {
   if (!deferredPrompt && !showIosHint) return null;
 
   return (
-    <div className="fixed bottom-20 left-3 right-3 z-40 bg-slate-900 text-white rounded-2xl shadow-2xl p-4 flex items-start gap-3 max-w-md mx-auto border border-slate-700">
+    <div
+      className="fixed left-3 right-3 z-40 bg-slate-900 text-white rounded-2xl shadow-2xl p-4 flex items-start gap-3 max-w-md mx-auto border border-slate-700"
+      style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom) + 0.75rem)' }}
+    >
       <div className="text-2xl flex-shrink-0">✝️</div>
       <div className="flex-1 min-w-0">
         <p className="font-bold text-sm">Aggiungi The Way alla home</p>

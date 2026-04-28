@@ -478,12 +478,12 @@ export default function EpisodioPage() {
                 </div>
                 <button
                   onClick={cycleFontSize}
-                  className="text-xs font-bold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1"
-                  aria-label="Cambia dimensione testo"
+                  className="text-xs font-bold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 px-3 py-2 rounded-lg transition-all flex items-center gap-1 min-h-[44px] min-w-[56px] justify-center"
+                  aria-label={`Cambia dimensione testo (attuale: ${fontSize})`}
                   title="Dimensione testo"
                 >
-                  <span className="text-[10px]">A</span>
-                  <span className="text-sm">A</span>
+                  <span className="text-xs">A</span>
+                  <span className="text-base">A</span>
                   <span className="text-[10px] text-gray-400 ml-0.5">{fontSize}</span>
                 </button>
               </div>

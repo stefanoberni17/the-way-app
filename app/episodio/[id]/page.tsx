@@ -68,67 +68,110 @@ function renderRichText(texts: any[]): React.ReactNode {
 }
 
 /**
- * Renderizza la lista di blocchi con due ottimizzazioni rispetto a renderBlock singolo:
- *  1. Quote consecutivi → vengono fusi in un unico blockquote con un solo border-l-4
- *     e un'unica spaziatura, evitando il "look frammentato" su passi con 8-10 quote.
- *  2. Divider (---) che si trova tra due quote → viene reso come piccolo
- *     separatore amber centrato dentro il blockquote (separazione di scena), non come <hr>
- *     che spezzerebbe il blocco scritturale.
- *  3. Quote vuoti → ignorati (artefatti del CMS Notion).
+ * Determina se un paragrafo è "tutto italic" (chiusa autoriale del passo,
+ * es. "*Prenditi un momento...*"). Va escluso dal run scritturale.
+ */
+function isAllItalicParagraph(block: any): boolean {
+  if (block.type !== 'paragraph') return false;
+  const texts = block.paragraph?.rich_text || [];
+  if (texts.length === 0) return false;
+  const hasContent = texts.some((t: any) => (t.plain_text || '').trim().length > 0);
+  if (!hasContent) return false;
+  return texts.every((t: any) => !t.plain_text?.trim() || t.annotations?.italic);
+}
+
+/**
+ * Renderizza la lista di blocchi raggruppando il "run scritturale" in un solo blockquote.
+ *
+ * Problema risolto: su Notion alcuni passi hanno tutto il versetto preceduto da `>`
+ * (ogni riga è un blocco `quote`); altri hanno `>` solo sulla prima riga e le righe
+ * successive vengono salvate come `paragraph` separati. Senza intervento, in app
+ * i due stili appaiono drammaticamente diversi (banda laterale solo su alcune righe,
+ * font sans su altre).
+ *
+ * Soluzione: appena trovo un quote, apro un "run scritturale" e ci raccolgo TUTTI
+ * i blocchi adiacenti che sembrano testo biblico:
+ *   - quote (sempre)
+ *   - paragraph NON in solo italic (le continuazioni del versetto)
+ *   - divider tra due quote → mini-separatore di scena
+ * Mi fermo a: heading, callout, list, paragraph all-italic (= closing autoriale),
+ * divider terminale (cioè non seguito da un altro quote).
+ *
+ * Risultato: tutto il testo biblico ha **una sola banda laterale amber**, font-serif
+ * uniforme, niente alternanza di stili.
  */
 function renderBlocks(blocks: any[], fontSize: FontSize = 'M'): React.ReactNode[] {
   const sizes = FONT_SIZE_CLASSES[fontSize];
   const out: React.ReactNode[] = [];
   let i = 0;
 
+  const renderQuoteLikeText = (texts: any[], key: string) => (
+    <p key={key} className={`text-stone-800 font-serif leading-relaxed ${sizes.quote}`}>
+      {renderRichText(texts)}
+    </p>
+  );
+
   while (i < blocks.length) {
     const block = blocks[i];
 
     if (block.type === 'quote') {
-      // Raccogli un "run" di quote consecutivi (con eventuale divider interno tra loro)
       const startId = block.id;
-      const runItems: Array<{ kind: 'quote' | 'sep'; node: React.ReactNode; key: string }> = [];
+      const runItems: Array<{ node: React.ReactNode; key: string }> = [];
       let j = i;
 
       while (j < blocks.length) {
         const b = blocks[j];
 
+        // 1. Quote: sempre dentro il run
         if (b.type === 'quote') {
-          const richText: any[] = b.quote?.rich_text || [];
-          // Salta quote vuoti (solo whitespace)
-          const text = richText.map((t: any) => t.plain_text || '').join('');
+          const rt: any[] = b.quote?.rich_text || [];
+          const text = rt.map((t: any) => t.plain_text || '').join('');
           if (text.trim().length > 0) {
-            runItems.push({
-              kind: 'quote',
-              key: b.id,
-              node: <p className={`text-stone-800 font-serif leading-relaxed ${sizes.quote}`}>{renderRichText(richText)}</p>,
-            });
+            runItems.push({ key: b.id, node: renderQuoteLikeText(rt, b.id) });
           }
           j++;
           continue;
         }
 
-        // Divider tra due quote → lo trattiamo come "separatore di scena" interno al blockquote.
-        // Se il prossimo blocco non è quote, non è "interno": esci.
+        // 2. Paragraph (non all-italic): continuazione del versetto. Aggiunto al run
+        //    e renderizzato con lo stesso stile dei quote (font-serif).
+        if (b.type === 'paragraph' && !isAllItalicParagraph(b)) {
+          const rt: any[] = b.paragraph?.rich_text || [];
+          const text = rt.map((t: any) => t.plain_text || '').join('');
+          if (text.trim().length === 0) {
+            // Paragrafo vuoto: spaziatore interno (mantiene il run aperto)
+            runItems.push({
+              key: b.id,
+              node: <span key={b.id} className="block h-1" aria-hidden />,
+            });
+          } else {
+            runItems.push({ key: b.id, node: renderQuoteLikeText(rt, b.id) });
+          }
+          j++;
+          continue;
+        }
+
+        // 3. Divider tra due "blocchi scritturali": mini-separatore di scena
         if (b.type === 'divider') {
           const next = blocks[j + 1];
-          if (next?.type === 'quote') {
+          const nextIsScripture =
+            next?.type === 'quote' ||
+            (next?.type === 'paragraph' && !isAllItalicParagraph(next));
+          if (nextIsScripture) {
             runItems.push({
-              kind: 'sep',
               key: b.id,
-              node: <span className="block w-8 h-px bg-amber-400/50 mx-auto my-3" aria-hidden />,
+              node: <span key={b.id} className="block w-8 h-px bg-amber-400/50 mx-auto my-3" aria-hidden />,
             });
             j++;
             continue;
           }
         }
 
+        // Tutto il resto chiude il run (heading, callout, list, closing italic, divider terminale)
         break;
       }
 
-      // Se nel run c'è almeno un quote con testo, renderizziamo il blockquote unico
-      const hasQuote = runItems.some((it) => it.kind === 'quote');
-      if (hasQuote) {
+      if (runItems.length > 0) {
         out.push(
           <blockquote
             key={`quote-run-${startId}`}
@@ -145,7 +188,7 @@ function renderBlocks(blocks: any[], fontSize: FontSize = 'M'): React.ReactNode[
       continue;
     }
 
-    // Blocchi non-quote: rendering classico
+    // Blocchi non-quote standalone: rendering classico
     const node = renderBlock(block, fontSize);
     if (node) out.push(node);
     i++;

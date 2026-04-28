@@ -56,34 +56,33 @@ export default function RegisterPage() {
     setError('');
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
+      // Registrazione atomica server-side (vedi /api/register):
+      //  - signUp con client anon (Supabase invia email conferma)
+      //  - upsert profilo con service_role (bypassa RLS)
+      // Lo facciamo server-side perché subito dopo signUp NON c'è ancora una
+      // sessione attiva (è richiesta la conferma email), quindi auth.uid() è
+      // null e le policy RLS su profiles bloccherebbero l'upsert client-side.
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          name: nome,
+          age: eta || null,
+          goals: obiettivi || null,
+          passions: passioni || null,
+          dream: sogno || null,
+          current_situation: situazioneAttuale || null,
+        }),
       });
 
-      if (authError) throw authError;
-
-      console.log('✅ Utente creato:', authData);
-
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert({
-          user_id: authData.user?.id,
-          name: nome.trim(),
-          age: eta ? parseInt(eta) : null,
-          goals: obiettivi.trim() || null,
-          passions: passioni.trim() || null,
-          dream: sogno.trim() || null,
-          current_situation: situazioneAttuale.trim() || null,
-          onboarding_completed: false,
-        }, { onConflict: 'user_id' });
-
-      if (profileError) {
-        console.error('❌ Errore profilo:', profileError);
-        throw new Error(profileError.message || 'Errore nella creazione del profilo');
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Errore registrazione');
       }
 
-      console.log('✅ Profilo creato!');
+      console.log('✅ Utente + profilo creati:', data.userId);
       setSuccess(true);
 
     } catch (error: any) {

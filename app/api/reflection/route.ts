@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getAuthUser } from '@/lib/auth';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -10,12 +11,17 @@ const supabaseAdmin = createClient(
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const authUserId = await getAuthUser(request);
+    const userId = authUserId || searchParams.get('userId');
     const episodeNumber = parseInt(searchParams.get('episodeNumber') || '0');
 
-    if (!userId || !episodeNumber) {
+    if (!userId) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+
+    if (!episodeNumber) {
       return NextResponse.json(
-        { error: 'userId e episodeNumber richiesti' },
+        { error: 'episodeNumber richiesto' },
         { status: 400 }
       );
     }
@@ -44,11 +50,18 @@ export async function GET(request: NextRequest) {
 // POST - Salva o aggiorna riflessione
 export async function POST(request: NextRequest) {
   try {
-    const { userId, episodeNumber, reflectionText, reflectionQuestion } = await request.json();
+    const body = await request.json();
+    const authUserId = await getAuthUser(request);
+    const userId = authUserId || body.userId;
+    const { episodeNumber, reflectionText, reflectionQuestion } = body;
 
-    if (!userId || !episodeNumber || !reflectionText) {
+    if (!userId) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+
+    if (!episodeNumber || !reflectionText) {
       return NextResponse.json(
-        { error: 'userId, episodeNumber e reflectionText richiesti' },
+        { error: 'episodeNumber e reflectionText richiesti' },
         { status: 400 }
       );
     }

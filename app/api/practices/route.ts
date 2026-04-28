@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getAuthUser } from '@/lib/auth';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,11 +13,12 @@ type DayKey = 'day1' | 'day2' | 'day3' | 'day4' | 'day5' | 'day6' | 'day7' | 'da
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const authUserId = await getAuthUser(request);
+    const userId = authUserId || searchParams.get('userId');
     const weekNumber = parseInt(searchParams.get('weekNumber') || '1');
 
     if (!userId) {
-      return NextResponse.json({ error: 'userId required' }, { status: 400 });
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
     }
 
     const { data, error } = await supabaseAdmin
@@ -59,11 +61,18 @@ export async function GET(request: NextRequest) {
 // POST - Aggiorna completamento giorno pratica
 export async function POST(request: NextRequest) {
   try {
-    const { userId, weekNumber, practiceNumber, day, completed } = await request.json();
+    const body = await request.json();
+    const authUserId = await getAuthUser(request);
+    const userId = authUserId || body.userId;
+    const { weekNumber, practiceNumber, day, completed } = body;
 
-    if (!userId || !weekNumber || !practiceNumber || !day) {
+    if (!userId) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
+
+    if (!weekNumber || !practiceNumber || !day) {
       return NextResponse.json(
-        { error: 'userId, weekNumber, practiceNumber e day richiesti' },
+        { error: 'weekNumber, practiceNumber e day richiesti' },
         { status: 400 }
       );
     }

@@ -67,7 +67,7 @@ export default function RegisterPage() {
 
       const { error: profileError } = await supabase
         .from('profiles')
-        .insert({
+        .upsert({
           user_id: authData.user?.id,
           name: nome.trim(),
           age: eta ? parseInt(eta) : null,
@@ -76,7 +76,7 @@ export default function RegisterPage() {
           dream: sogno.trim() || null,
           current_situation: situazioneAttuale.trim() || null,
           onboarding_completed: false,
-        });
+        }, { onConflict: 'user_id' });
 
       if (profileError) {
         console.error('❌ Errore profilo:', profileError);

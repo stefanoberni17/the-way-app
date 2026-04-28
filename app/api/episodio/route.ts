@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getWeekFromEpisode, getNotionEpisodeRef, isEpisodeInMVP } from '@/lib/episodeMapping';
+import { getAuthUser } from '@/lib/auth';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -72,7 +73,8 @@ async function fetchAllBlocks(pageId: string): Promise<any[]> {
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const episodeNumber = parseInt(searchParams.get('number') || '1');
-  const userId = searchParams.get('userId');
+  const authUserId = await getAuthUser(request);
+  const userId = authUserId || searchParams.get('userId');
   const extended = searchParams.get('extended') === 'true';
 
   try {
@@ -151,6 +153,9 @@ export async function GET(request: NextRequest) {
     const getTitle = (prop: any) =>
       prop?.title?.[0]?.plain_text || '';
 
+    const getUrl = (prop: any) =>
+      prop?.url || '';
+
     let blocks: any[] = [];
     if (extended) {
       blocks = await fetchAllBlocks(pageId);
@@ -169,6 +174,8 @@ export async function GET(request: NextRequest) {
         mainTheme: getText(properties['Tema principale']),
         concepts: getText(properties['Concetti collegati']),
         salmoSupport: getText(properties['Salmo/Proverbio di supporto']),
+        practices: getText(properties['Pratiche consigliate']),
+        audioUrl: getUrl(properties['Audio URL']),
         durata: properties['Durata stimata']?.number || null,
         weekNumber: getWeekFromEpisode(episodeNumber),
         locked: false,
@@ -189,11 +196,21 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { episodeNumber, userId } = await request.json();
+    const body = await request.json();
+    const authUserId = await getAuthUser(request);
+    const userId = authUserId || body.userId;
+    const { episodeNumber } = body;
 
-    if (!userId || !episodeNumber) {
+    if (!userId) {
       return NextResponse.json(
-        { error: 'userId e episodeNumber richiesti' },
+        { error: 'Non autenticato' },
+        { status: 401 }
+      );
+    }
+
+    if (!episodeNumber) {
+      return NextResponse.json(
+        { error: 'episodeNumber richiesto' },
         { status: 400 }
       );
     }

@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import EpisodeAudioPlayer from '@/components/EpisodeAudioPlayer';
 
 interface EpisodeData {
   number: number;
@@ -16,11 +17,23 @@ interface EpisodeData {
   mainTheme: string;
   concepts: string;
   salmoSupport: string;
+  practices: string;
+  audioUrl: string;
   durata: number | null;
   weekNumber: number;
   locked: boolean;
   completed: boolean;
 }
+
+type FontSize = 'S' | 'M' | 'L';
+
+const FONT_SIZE_CLASSES: Record<FontSize, { quote: string; paragraph: string }> = {
+  S: { quote: 'text-base', paragraph: 'text-sm' },
+  M: { quote: 'text-lg', paragraph: 'text-base' },
+  L: { quote: 'text-xl', paragraph: 'text-lg' },
+};
+
+const FONT_SIZE_CYCLE: FontSize[] = ['S', 'M', 'L'];
 
 // Estrae testo plain da tutti i blocchi (per TTS)
 function getBlocksPlainText(blocks: any[]): string {
@@ -39,8 +52,9 @@ function getBlocksPlainText(blocks: any[]): string {
     .join('. ');
 }
 
-function renderBlock(block: any): React.ReactNode {
+function renderBlock(block: any, fontSize: FontSize = 'M'): React.ReactNode {
   const { type, id } = block;
+  const sizes = FONT_SIZE_CLASSES[fontSize];
 
   switch (type) {
     case 'paragraph': {
@@ -48,7 +62,7 @@ function renderBlock(block: any): React.ReactNode {
       const content = texts.map((t: any) => t.plain_text).join('');
       if (!content.trim()) return <div key={id} className="h-4" />;
       return (
-        <p key={id} className="text-gray-800 leading-loose mb-4 text-base">
+        <p key={id} className={`text-gray-800 leading-relaxed mb-4 ${sizes.paragraph}`}>
           {texts.map((t: any, i: number) => {
             const ann = t.annotations || {};
             let el: React.ReactNode = t.plain_text;
@@ -98,10 +112,17 @@ function renderBlock(block: any): React.ReactNode {
 
     case 'quote': {
       const texts = block.quote?.rich_text || [];
-      const content = texts.map((t: any) => t.plain_text).join('');
       return (
-        <blockquote key={id} className="border-l-4 border-blue-400 bg-blue-50 px-5 py-4 my-4 rounded-r-xl">
-          <p className="text-gray-800 italic text-base leading-loose font-medium">{content}</p>
+        <blockquote key={id} className="border-l-4 border-blue-300 pl-5 pr-2 my-5">
+          <p className={`text-gray-800 font-serif leading-relaxed ${sizes.quote}`}>
+            {texts.map((t: any, i: number) => {
+              const ann = t.annotations || {};
+              let el: React.ReactNode = t.plain_text;
+              if (ann.bold) el = <strong key={i} className="font-semibold">{el}</strong>;
+              if (ann.italic) el = <em key={i}>{el}</em>;
+              return el;
+            })}
+          </p>
         </blockquote>
       );
     }
@@ -189,10 +210,8 @@ export default function EpisodioPage() {
   const [readingBlocks, setReadingBlocks] = useState<any[]>([]);
   const [loadingReading, setLoadingReading] = useState(false);
 
-  // Web Speech API
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
+  // Tipografia step 2 (persistita in localStorage)
+  const [fontSize, setFontSize] = useState<FontSize>('M');
 
   const [reflectionText, setReflectionText] = useState('');
   const [savingReflection, setSavingReflection] = useState(false);
@@ -265,14 +284,18 @@ export default function EpisodioPage() {
       .finally(() => setLoadingReading(false));
   }, [userId, episodeNumber]);
 
-  // Cleanup TTS all'unmount
+  // Carica e persiste la dimensione del font scelta dall'utente per la lettura
   useEffect(() => {
-    return () => {
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
-    };
+    const saved = localStorage.getItem('theway:fontSize') as FontSize | null;
+    if (saved && FONT_SIZE_CYCLE.includes(saved)) setFontSize(saved);
   }, []);
+
+  const cycleFontSize = () => {
+    const i = FONT_SIZE_CYCLE.indexOf(fontSize);
+    const next = FONT_SIZE_CYCLE[(i + 1) % FONT_SIZE_CYCLE.length];
+    setFontSize(next);
+    localStorage.setItem('theway:fontSize', next);
+  };
 
   // Auto-save riflessione dopo 2 secondi di inattività
   useEffect(() => {
@@ -302,78 +325,8 @@ export default function EpisodioPage() {
     return () => clearTimeout(timer);
   }, [reflectionText, userId, episodeNumber]);
 
-  // --- Web Speech API ---
-
-  // Cerca una voce maschile italiana (Luca su Apple, Cosimo su Windows)
-  const getMaleItalianVoice = (): SpeechSynthesisVoice | null => {
-    const voices = window.speechSynthesis.getVoices();
-    const italianVoices = voices.filter(v => v.lang.startsWith('it'));
-    const maleNames = ['Luca', 'Cosimo', 'Giorgio'];
-    return (
-      italianVoices.find(v => maleNames.some(n => v.name.includes(n))) ||
-      italianVoices[0] ||
-      null
-    );
-  };
-
-  // Avvia effettivamente la sintesi vocale con la voce trovata
-  const launchSpeech = (voice: SpeechSynthesisVoice | null) => {
-    const text = getBlocksPlainText(readingBlocks);
-    if (!text) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'it-IT';
-    utterance.rate = 0.82;
-    // Voce maschile trovata → pitch leggermente basso e solenne
-    // Nessuna voce italiana → pitch basso per simulare tono grave
-    utterance.pitch = voice ? 0.9 : 0.8;
-    if (voice) utterance.voice = voice;
-    utterance.onend = () => { setIsSpeaking(false); setIsPaused(false); };
-    utterance.onerror = () => { setIsSpeaking(false); setIsPaused(false); };
-    speechRef.current = utterance;
-    window.speechSynthesis.speak(utterance);
-    setIsSpeaking(true);
-    setIsPaused(false);
-  };
-
-  const startSpeech = () => {
-    if (typeof window === 'undefined' || !window.speechSynthesis) return;
-
-    const tryStart = () => launchSpeech(getMaleItalianVoice());
-
-    // Su Chrome/Edge le voci si caricano in modo asincrono al primo accesso
-    if (window.speechSynthesis.getVoices().length > 0) {
-      tryStart();
-    } else {
-      window.speechSynthesis.addEventListener('voiceschanged', tryStart, { once: true });
-    }
-  };
-
-  const pauseSpeech = () => {
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.pause();
-      setIsPaused(true);
-    }
-  };
-
-  const resumeSpeech = () => {
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.resume();
-      setIsPaused(false);
-    }
-  };
-
-  const stopSpeech = () => {
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
-    setIsSpeaking(false);
-    setIsPaused(false);
-  };
-
-  // Cambia step fermando l'audio se attivo
+  // Cambia step. Il player audio si occupa autonomamente del cleanup all'unmount.
   const goToStep = (step: number) => {
-    if (isSpeaking) stopSpeech();
     setCurrentStep(step);
   };
 
@@ -456,10 +409,14 @@ export default function EpisodioPage() {
     );
   }
 
+  // Step 2 (lettura) ha bisogno di più larghezza per una line-length confortevole.
+  // Gli altri step (form, callout) restano stretti per leggibilità.
+  const containerMaxWidth = currentStep === 2 ? 'max-w-prose' : 'max-w-lg';
+
   // Vista principale con step
   return (
     <main className="min-h-screen bg-stone-50 py-6 px-4 pb-28">
-      <div className="max-w-lg mx-auto">
+      <div className={`${containerMaxWidth} mx-auto transition-[max-width] duration-300`}>
 
         <button
           onClick={() => router.back()}
@@ -505,79 +462,52 @@ export default function EpisodioPage() {
             </div>
           )}
 
-          {/* STEP 2 — Lettura del Passo (NEW) */}
+          {/* STEP 2 — Lettura del Passo */}
           {currentStep === 2 && (
             <div>
-              {/* Header */}
-              <div className="flex items-center gap-3 mb-3">
+              {/* Header con toggle tipografia */}
+              <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center text-xl flex-shrink-0">
                   📖
                 </div>
-                <div>
+                <div className="flex-1 min-w-0">
                   <p className="font-bold text-gray-800 text-sm">Lettura del Passo</p>
                   {episodeData?.riferimento && (
                     <p className="text-xs text-blue-500 italic">{episodeData.riferimento}</p>
                   )}
                 </div>
+                <button
+                  onClick={cycleFontSize}
+                  className="text-xs font-bold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1"
+                  aria-label="Cambia dimensione testo"
+                  title="Dimensione testo"
+                >
+                  <span className="text-[10px]">A</span>
+                  <span className="text-sm">A</span>
+                  <span className="text-[10px] text-gray-400 ml-0.5">{fontSize}</span>
+                </button>
               </div>
 
-              {/* Controlli audiolettura */}
-              <div className="flex items-center gap-2 mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 border border-blue-100">
-                <span className="text-xs text-blue-700 font-semibold flex-1 flex items-center gap-1">
-                  🔊 Audiolettura
-                </span>
-                {loadingReading ? (
-                  <span className="text-xs text-gray-400 animate-pulse">Caricamento...</span>
-                ) : readingBlocks.length > 0 ? (
-                  <>
-                    {!isSpeaking ? (
-                      <button
-                        onClick={startSpeech}
-                        className="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all flex items-center gap-1 shadow-sm"
-                      >
-                        ▶ Ascolta
-                      </button>
-                    ) : isPaused ? (
-                      <button
-                        onClick={resumeSpeech}
-                        className="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all flex items-center gap-1"
-                      >
-                        ▶ Riprendi
-                      </button>
-                    ) : (
-                      <button
-                        onClick={pauseSpeech}
-                        className="bg-amber-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-amber-600 transition-all flex items-center gap-1"
-                      >
-                        ⏸ Pausa
-                      </button>
-                    )}
-                    {isSpeaking && (
-                      <button
-                        onClick={stopSpeech}
-                        className="bg-gray-400 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg hover:bg-gray-500 transition-all"
-                        title="Ferma"
-                      >
-                        ⬛
-                      </button>
-                    )}
-                  </>
-                ) : (
-                  <span className="text-xs text-gray-400">Non disponibile</span>
-                )}
-              </div>
+              {/* Player audio: file mp3 da Notion se presente, altrimenti TTS */}
+              {readingBlocks.length > 0 && (
+                <div className="mb-5">
+                  <EpisodeAudioPlayer
+                    audioUrl={episodeData?.audioUrl}
+                    fallbackText={getBlocksPlainText(readingBlocks)}
+                    episodeNumber={episodeNumber}
+                  />
+                </div>
+              )}
 
-              <div className="w-full h-px bg-gray-100 mb-5" />
-
-              {/* Testo del passo */}
+              {/* Testo del passo (scroll naturale di pagina, niente container interno) */}
               {loadingReading ? (
                 <div className="flex flex-col items-center justify-center py-10 gap-3">
                   <div className="text-3xl animate-pulse">📖</div>
                   <p className="text-sm text-blue-400">Caricamento lettura...</p>
                 </div>
               ) : readingBlocks.length > 0 ? (
-                <div className="max-h-96 overflow-y-auto pr-1 -mr-2 scrollbar-thin">
-                  {readingBlocks.map((block: any) => renderBlock(block))}
+                <div>
+                  {readingBlocks.map((block: any) => renderBlock(block, fontSize))}
                 </div>
               ) : (
                 <div className="text-center py-8">
@@ -695,6 +625,17 @@ export default function EpisodioPage() {
                       Salmo/Proverbio di supporto: {episodeData.salmoSupport}
                     </p>
                   )}
+                </div>
+              )}
+
+              {episodeData?.practices && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5">
+                  <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">
+                    🌱 Pratica per oggi
+                  </p>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    {episodeData.practices}
+                  </p>
                 </div>
               )}
 

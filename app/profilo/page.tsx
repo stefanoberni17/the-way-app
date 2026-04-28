@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import PushPermission from '@/components/PushPermission';
 
 export default function ProfiloPage() {
   const router = useRouter();
@@ -125,7 +126,11 @@ export default function ProfiloPage() {
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 -mt-3">
+      <div className="max-w-3xl mx-auto px-4 -mt-3 space-y-4">
+
+        {/* Notifiche push: frase del giorno */}
+        <PushPermission />
+
         <form onSubmit={handleSave} className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 md:p-8">
 
           {error && (

@@ -6,10 +6,18 @@ import {
   SYSTEM_PROMPT,
   WEB_FORMAT
 } from '@/lib/maestro-ai';
+import { getAuthUser } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages, userId } = await request.json();
+    const body = await request.json();
+    const authUserId = await getAuthUser(request);
+    const userId = authUserId || body.userId;
+    const { messages } = body;
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Non autenticato' }, { status: 401 });
+    }
 
     if (!messages || messages.length === 0) {
       return NextResponse.json({ error: 'Messages required' }, { status: 400 });

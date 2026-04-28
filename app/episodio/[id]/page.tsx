@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import EpisodeAudioPlayer from '@/components/EpisodeAudioPlayer';
+import { BookOpen, Pencil, Heart } from 'lucide-react';
 
 interface EpisodeData {
   number: number;
@@ -19,6 +20,8 @@ interface EpisodeData {
   salmoSupport: string;
   practices: string;
   audioUrl: string;
+  /** "Lectio" | "Integrazione" | "Pratica" — default Lectio */
+  tipo: string;
   durata: number | null;
   weekNumber: number;
   locked: boolean;
@@ -52,6 +55,105 @@ function getBlocksPlainText(blocks: any[]): string {
     .join('. ');
 }
 
+// Renderizza un singolo rich_text con le sue annotazioni (bold/italic/code)
+function renderRichText(texts: any[]): React.ReactNode {
+  return texts.map((t: any, i: number) => {
+    const ann = t.annotations || {};
+    let el: React.ReactNode = t.plain_text;
+    if (ann.bold) el = <strong key={i} className="font-semibold">{el}</strong>;
+    if (ann.italic) el = <em key={i}>{el}</em>;
+    if (ann.code) el = <code key={i} className="bg-stone-100 px-1 rounded text-sm">{el}</code>;
+    return el;
+  });
+}
+
+/**
+ * Renderizza la lista di blocchi con due ottimizzazioni rispetto a renderBlock singolo:
+ *  1. Quote consecutivi → vengono fusi in un unico blockquote con un solo border-l-4
+ *     e un'unica spaziatura, evitando il "look frammentato" su passi con 8-10 quote.
+ *  2. Divider (---) che si trova tra due quote → viene reso come piccolo
+ *     separatore amber centrato dentro il blockquote (separazione di scena), non come <hr>
+ *     che spezzerebbe il blocco scritturale.
+ *  3. Quote vuoti → ignorati (artefatti del CMS Notion).
+ */
+function renderBlocks(blocks: any[], fontSize: FontSize = 'M'): React.ReactNode[] {
+  const sizes = FONT_SIZE_CLASSES[fontSize];
+  const out: React.ReactNode[] = [];
+  let i = 0;
+
+  while (i < blocks.length) {
+    const block = blocks[i];
+
+    if (block.type === 'quote') {
+      // Raccogli un "run" di quote consecutivi (con eventuale divider interno tra loro)
+      const startId = block.id;
+      const runItems: Array<{ kind: 'quote' | 'sep'; node: React.ReactNode; key: string }> = [];
+      let j = i;
+
+      while (j < blocks.length) {
+        const b = blocks[j];
+
+        if (b.type === 'quote') {
+          const richText: any[] = b.quote?.rich_text || [];
+          // Salta quote vuoti (solo whitespace)
+          const text = richText.map((t: any) => t.plain_text || '').join('');
+          if (text.trim().length > 0) {
+            runItems.push({
+              kind: 'quote',
+              key: b.id,
+              node: <p className={`text-stone-800 font-serif leading-relaxed ${sizes.quote}`}>{renderRichText(richText)}</p>,
+            });
+          }
+          j++;
+          continue;
+        }
+
+        // Divider tra due quote → lo trattiamo come "separatore di scena" interno al blockquote.
+        // Se il prossimo blocco non è quote, non è "interno": esci.
+        if (b.type === 'divider') {
+          const next = blocks[j + 1];
+          if (next?.type === 'quote') {
+            runItems.push({
+              kind: 'sep',
+              key: b.id,
+              node: <span className="block w-8 h-px bg-amber-400/50 mx-auto my-3" aria-hidden />,
+            });
+            j++;
+            continue;
+          }
+        }
+
+        break;
+      }
+
+      // Se nel run c'è almeno un quote con testo, renderizziamo il blockquote unico
+      const hasQuote = runItems.some((it) => it.kind === 'quote');
+      if (hasQuote) {
+        out.push(
+          <blockquote
+            key={`quote-run-${startId}`}
+            className="border-l-4 border-amber-300 pl-5 pr-2 my-6 space-y-3"
+          >
+            {runItems.map((it) => (
+              <div key={it.key}>{it.node}</div>
+            ))}
+          </blockquote>
+        );
+      }
+
+      i = j;
+      continue;
+    }
+
+    // Blocchi non-quote: rendering classico
+    const node = renderBlock(block, fontSize);
+    if (node) out.push(node);
+    i++;
+  }
+
+  return out;
+}
+
 function renderBlock(block: any, fontSize: FontSize = 'M'): React.ReactNode {
   const { type, id } = block;
   const sizes = FONT_SIZE_CLASSES[fontSize];
@@ -60,17 +162,22 @@ function renderBlock(block: any, fontSize: FontSize = 'M'): React.ReactNode {
     case 'paragraph': {
       const texts = block.paragraph?.rich_text || [];
       const content = texts.map((t: any) => t.plain_text).join('');
-      if (!content.trim()) return <div key={id} className="h-4" />;
+      if (!content.trim()) return <div key={id} className="h-3" />;
+
+      // Closing italic puro (es. "*Prenditi un momento...*") → rendering più
+      // sobrio e uniforme su tutti i passi: stone-500, serif italic, piccolo.
+      const isAllItalic = texts.every((t: any) => t.annotations?.italic);
+      if (isAllItalic && texts.length > 0) {
+        return (
+          <p key={id} className="text-stone-500 italic font-serif text-sm leading-relaxed mt-6 mb-4">
+            {texts.map((t: any) => t.plain_text).join('')}
+          </p>
+        );
+      }
+
       return (
-        <p key={id} className={`text-gray-800 leading-relaxed mb-4 ${sizes.paragraph}`}>
-          {texts.map((t: any, i: number) => {
-            const ann = t.annotations || {};
-            let el: React.ReactNode = t.plain_text;
-            if (ann.bold) el = <strong key={i}>{el}</strong>;
-            if (ann.italic) el = <em key={i}>{el}</em>;
-            if (ann.code) el = <code key={i} className="bg-gray-100 px-1 rounded text-sm">{el}</code>;
-            return el;
-          })}
+        <p key={id} className={`text-stone-800 leading-relaxed mb-4 ${sizes.paragraph}`}>
+          {renderRichText(texts)}
         </p>
       );
     }
@@ -79,49 +186,42 @@ function renderBlock(block: any, fontSize: FontSize = 'M'): React.ReactNode {
     case 'heading_2':
     case 'heading_3': {
       const texts = block[type]?.rich_text || [];
-      const content = texts.map((t: any) => t.plain_text).join('');
       const Tag = type === 'heading_1' ? 'h2' : type === 'heading_2' ? 'h3' : 'h4';
       const cls =
-        type === 'heading_1' ? 'text-xl font-bold text-gray-800 mt-8 mb-3' :
-        type === 'heading_2' ? 'text-lg font-semibold text-gray-800 mt-6 mb-2' :
-        'text-base font-semibold text-gray-700 mt-4 mb-2';
-      return <Tag key={id} className={cls}>{content}</Tag>;
+        type === 'heading_1' ? 'text-xl font-serif font-bold text-slate-900 mt-8 mb-3' :
+        type === 'heading_2' ? 'text-lg font-serif font-semibold text-slate-900 mt-6 mb-2' :
+        'text-base font-semibold text-stone-700 mt-4 mb-2';
+      return <Tag key={id} className={cls}>{renderRichText(texts)}</Tag>;
     }
 
     case 'bulleted_list_item': {
       const texts = block.bulleted_list_item?.rich_text || [];
-      const content = texts.map((t: any) => t.plain_text).join('');
       return (
         <div key={id} className="flex gap-3 mb-2">
-          <span className="text-blue-500 mt-1.5 flex-shrink-0 text-lg leading-none">•</span>
-          <p className="text-gray-700 text-base leading-loose">{content}</p>
+          <span className="text-amber-600 mt-1.5 flex-shrink-0 text-lg leading-none">·</span>
+          <p className={`text-stone-700 leading-relaxed ${sizes.paragraph}`}>{renderRichText(texts)}</p>
         </div>
       );
     }
 
     case 'numbered_list_item': {
       const texts = block.numbered_list_item?.rich_text || [];
-      const content = texts.map((t: any) => t.plain_text).join('');
       return (
         <div key={id} className="flex gap-3 mb-2">
-          <span className="text-blue-600 font-bold flex-shrink-0 mt-0.5">›</span>
-          <p className="text-gray-700 text-base leading-loose">{content}</p>
+          <span className="text-amber-700 font-bold flex-shrink-0 mt-0.5">›</span>
+          <p className={`text-stone-700 leading-relaxed ${sizes.paragraph}`}>{renderRichText(texts)}</p>
         </div>
       );
     }
 
     case 'quote': {
+      // Gestito da renderBlocks (raggruppamento di quote consecutivi).
+      // Fallback per quando renderBlock viene chiamato in isolamento (non dovrebbe più capitare).
       const texts = block.quote?.rich_text || [];
       return (
-        <blockquote key={id} className="border-l-4 border-blue-300 pl-5 pr-2 my-5">
-          <p className={`text-gray-800 font-serif leading-relaxed ${sizes.quote}`}>
-            {texts.map((t: any, i: number) => {
-              const ann = t.annotations || {};
-              let el: React.ReactNode = t.plain_text;
-              if (ann.bold) el = <strong key={i} className="font-semibold">{el}</strong>;
-              if (ann.italic) el = <em key={i}>{el}</em>;
-              return el;
-            })}
+        <blockquote key={id} className="border-l-4 border-amber-300 pl-5 pr-2 my-5">
+          <p className={`text-stone-800 font-serif leading-relaxed ${sizes.quote}`}>
+            {renderRichText(texts)}
           </p>
         </blockquote>
       );
@@ -129,18 +229,17 @@ function renderBlock(block: any, fontSize: FontSize = 'M'): React.ReactNode {
 
     case 'callout': {
       const texts = block.callout?.rich_text || [];
-      const emoji = block.callout?.icon?.emoji || '✝️';
-      const content = texts.map((t: any) => t.plain_text).join('');
+      const emoji = block.callout?.icon?.emoji || '✦';
       return (
-        <div key={id} className="bg-amber-50 border-l-4 border-amber-400 p-4 my-4 rounded flex items-start gap-3">
+        <div key={id} className="bg-stone-50 border-l-4 border-amber-400 p-4 my-4 rounded flex items-start gap-3">
           <span className="text-xl flex-shrink-0">{emoji}</span>
-          <p className="text-gray-700 text-base leading-loose">{content}</p>
+          <p className={`text-stone-700 leading-relaxed ${sizes.paragraph}`}>{renderRichText(texts)}</p>
         </div>
       );
     }
 
     case 'divider':
-      return <hr key={id} className="border-blue-100 my-6" />;
+      return <hr key={id} className="border-stone-200 my-6" />;
 
     case 'toggle': {
       const texts = block.toggle?.rich_text || [];
@@ -148,7 +247,7 @@ function renderBlock(block: any, fontSize: FontSize = 'M'): React.ReactNode {
       return (
         <details key={id} className="my-2 bg-gray-50 rounded-lg">
           <summary className="px-4 py-3 cursor-pointer font-semibold text-gray-700 text-sm list-none flex items-center gap-2">
-            <span className="text-blue-500">▶</span> {summary}
+            <span className="text-amber-600">▸</span> {summary}
           </summary>
           <div className="px-4 pb-3 pt-1 text-sm text-gray-500 italic">
             Contenuto nel passo completo
@@ -173,17 +272,17 @@ function StepProgress({ current, total }: { current: number; total: number }) {
           <div key={n} className="flex items-center flex-1 last:flex-none">
             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300 flex-shrink-0 ${
               isDone
-                ? 'bg-blue-600 border-blue-600 text-white'
+                ? 'bg-amber-500 border-amber-500 text-slate-900'
                 : isActive
-                ? 'bg-blue-50 border-blue-600 text-blue-600'
-                : 'bg-white border-gray-200 text-gray-400'
+                ? 'bg-amber-50 border-amber-500 text-amber-700'
+                : 'bg-white border-stone-200 text-stone-400'
             }`}>
               {isDone ? '✓' : n}
             </div>
             {n < total && (
-              <div className="flex-1 h-0.5 mx-1.5 bg-gray-200 overflow-hidden rounded">
+              <div className="flex-1 h-0.5 mx-1.5 bg-stone-200 overflow-hidden rounded">
                 <div
-                  className="h-full bg-blue-600 transition-all duration-500"
+                  className="h-full bg-amber-500 transition-all duration-500"
                   style={{ width: isDone ? '100%' : '0%' }}
                 />
               </div>
@@ -370,24 +469,24 @@ export default function EpisodioPage() {
   // Schermata di celebrazione completamento
   if (showCelebration) {
     return (
-      <div className="fixed inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 flex items-center justify-center z-50 p-6">
-        <div className="text-center text-white">
-          <div className="text-8xl mb-4 animate-bounce">✨</div>
-          <h2 className="text-3xl font-extrabold mb-3">
-            Passo completato!
+      <div className="fixed inset-0 bg-slate-900 flex items-center justify-center z-50 p-6">
+        <div className="text-center text-white max-w-md">
+          <div className="text-6xl md:text-7xl mb-4 animate-pulse">✦</div>
+          <h2 className="text-3xl font-serif font-bold mb-3">
+            Passo completato
           </h2>
-          <p className="text-lg text-blue-100 mb-2 font-medium">
+          <p className="text-lg text-stone-300 mb-2 font-medium">
             {episodeData?.riferimento && (
-              <span className="block text-sm text-blue-200 italic mb-1">{episodeData.riferimento}</span>
+              <span className="block text-sm text-amber-400 italic mb-1">{episodeData.riferimento}</span>
             )}
             {episodeData?.title}
           </p>
           {episodeData?.versettoPortare && (
-            <p className="text-sm text-blue-200 italic mt-4 max-w-xs mx-auto leading-relaxed">
+            <p className="text-sm text-stone-300 italic font-serif mt-5 max-w-xs mx-auto leading-relaxed border-l-2 border-amber-400 pl-4 text-left">
               &ldquo;{episodeData.versettoPortare}&rdquo;
             </p>
           )}
-          <p className="text-xs text-blue-300 mt-6">
+          <p className="text-xs text-stone-400 mt-6 italic">
             Porta questo versetto con te oggi.
           </p>
           <button
@@ -400,7 +499,7 @@ export default function EpisodioPage() {
                 router.back();
               }
             }}
-            className="mt-10 bg-white text-blue-700 font-bold px-8 py-3 rounded-full shadow-lg hover:bg-blue-50 transition-all hover:scale-105 active:scale-95"
+            className="mt-10 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-900 font-bold px-8 py-3 rounded-full shadow-lg transition-all"
           >
             Continua il percorso →
           </button>
@@ -420,7 +519,7 @@ export default function EpisodioPage() {
 
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-sm text-gray-500 font-medium mb-5 hover:text-blue-600 transition-colors"
+          className="flex items-center gap-2 text-sm text-stone-500 font-medium mb-5 hover:text-amber-700 transition-colors"
         >
           ← Torna indietro
         </button>
@@ -432,29 +531,29 @@ export default function EpisodioPage() {
           {/* STEP 1 — Intro */}
           {currentStep === 1 && (
             <div>
-              <div className="mb-3 flex items-center gap-2">
-                <span className="text-xs font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
+              <div className="mb-3 flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1 rounded-full">
                   Passo {episodeData?.number} · Week {episodeData?.weekNumber}
                 </span>
                 {episodeData?.durata && (
-                  <span className="text-xs text-gray-400">⏱ ~{episodeData.durata} min</span>
+                  <span className="text-xs text-stone-400">~{episodeData.durata} min</span>
                 )}
               </div>
-              {episodeData?.riferimento && (
-                <p className="text-xs text-blue-500 font-semibold italic mb-2">{episodeData.riferimento}</p>
+              {episodeData?.riferimento && episodeData?.tipo === 'Lectio' && (
+                <p className="text-xs text-amber-700 font-semibold italic mb-2">{episodeData.riferimento}</p>
               )}
-              <h1 className="text-2xl font-extrabold text-gray-800 leading-tight mb-3">
+              <h1 className="text-2xl font-serif font-bold text-slate-900 leading-tight mb-3">
                 {episodeData?.title}
               </h1>
               {episodeData?.mainTheme && (
-                <p className="text-blue-600 font-semibold text-sm mb-4">
-                  🎯 {episodeData.mainTheme}
+                <p className="text-stone-600 text-sm mb-4 italic font-serif">
+                  {episodeData.mainTheme}
                 </p>
               )}
               {episodeData?.invitoApertura && (
-                <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
-                  <p className="text-xs text-blue-700 font-semibold uppercase tracking-wide mb-1">✨ Invito all&apos;apertura</p>
-                  <p className="text-sm text-gray-600 leading-relaxed italic">
+                <div className="bg-stone-50 rounded-xl p-4 border border-stone-200">
+                  <p className="text-xs text-amber-700 font-semibold uppercase tracking-wide mb-1.5">Invito all&apos;apertura</p>
+                  <p className="text-sm text-stone-700 leading-relaxed italic font-serif">
                     {episodeData.invitoApertura}
                   </p>
                 </div>
@@ -462,18 +561,29 @@ export default function EpisodioPage() {
             </div>
           )}
 
-          {/* STEP 2 — Lettura del Passo */}
-          {currentStep === 2 && (
+          {/* STEP 2 — Lettura del Passo / Esercizio (Integrazione) / Pratica */}
+          {currentStep === 2 && (() => {
+            // I passi "Integrazione" e "Pratica" non sono lectio biblica:
+            // adattiamo header, icona e label.
+            const tipo = episodeData?.tipo || 'Lectio';
+            const isLectio = tipo === 'Lectio';
+            const Icon = isLectio ? BookOpen : tipo === 'Pratica' ? Heart : Pencil;
+            const headerLabel =
+              isLectio ? 'Lettura del Passo'
+              : tipo === 'Pratica' ? 'Pratica'
+              : 'Esercizio di integrazione';
+
+            return (
             <div>
               {/* Header con toggle tipografia */}
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center text-xl flex-shrink-0">
-                  📖
+                <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Icon className="w-5 h-5 text-amber-700" strokeWidth={1.75} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-gray-800 text-sm">Lettura del Passo</p>
-                  {episodeData?.riferimento && (
-                    <p className="text-xs text-blue-500 italic">{episodeData.riferimento}</p>
+                  <p className="font-serif font-bold text-slate-900 text-sm">{headerLabel}</p>
+                  {episodeData?.riferimento && isLectio && (
+                    <p className="text-xs text-amber-700 italic">{episodeData.riferimento}</p>
                   )}
                 </div>
                 <button
@@ -488,8 +598,9 @@ export default function EpisodioPage() {
                 </button>
               </div>
 
-              {/* Player audio: file mp3 da Notion se presente, altrimenti TTS */}
-              {readingBlocks.length > 0 && (
+              {/* Player audio: solo per Lectio (i passi di Integrazione/Pratica
+                  sono testi da scrivere, non hanno senso letti dal TTS). */}
+              {isLectio && readingBlocks.length > 0 && (
                 <div className="mb-5">
                   <EpisodeAudioPlayer
                     audioUrl={episodeData?.audioUrl}
@@ -502,41 +613,42 @@ export default function EpisodioPage() {
               {/* Testo del passo (scroll naturale di pagina, niente container interno) */}
               {loadingReading ? (
                 <div className="flex flex-col items-center justify-center py-10 gap-3">
-                  <div className="text-3xl animate-pulse">📖</div>
-                  <p className="text-sm text-blue-400">Caricamento lettura...</p>
+                  <div className="w-8 h-8 rounded-full border-2 border-amber-300 border-t-amber-600 animate-spin" />
+                  <p className="text-sm text-stone-500">Caricamento...</p>
                 </div>
               ) : readingBlocks.length > 0 ? (
                 <div>
-                  {readingBlocks.map((block: any) => renderBlock(block, fontSize))}
+                  {renderBlocks(readingBlocks, fontSize)}
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <div className="text-4xl mb-3">✝️</div>
-                  <p className="text-sm text-gray-500 italic">
+                  <BookOpen className="w-10 h-10 text-stone-300 mx-auto mb-3" strokeWidth={1.5} />
+                  <p className="text-sm text-stone-500 italic">
                     Il testo completo non è ancora disponibile per questo passo.
                   </p>
-                  {episodeData?.riferimento && (
-                    <p className="text-xs text-blue-400 mt-2 font-medium">{episodeData.riferimento}</p>
+                  {episodeData?.riferimento && isLectio && (
+                    <p className="text-xs text-amber-700 mt-2 font-medium">{episodeData.riferimento}</p>
                   )}
                 </div>
               )}
             </div>
-          )}
+            );
+          })()}
 
           {/* STEP 3 — Mini-lezione + Guida osservazione */}
           {currentStep === 3 && (
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-xl flex-shrink-0">
-                  💡
+                <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Heart className="w-5 h-5 text-amber-700" strokeWidth={1.75} />
                 </div>
                 <div>
-                  <p className="font-bold text-gray-800 text-sm">Insegnamento</p>
-                  <p className="text-xs text-gray-500">La lezione di questo passo</p>
+                  <p className="font-serif font-bold text-slate-900 text-sm">Insegnamento</p>
+                  <p className="text-xs text-stone-500">La lezione di questo passo</p>
                 </div>
               </div>
-              <div className="w-full h-px bg-gray-100 mb-4" />
-              <p className="text-sm text-gray-700 leading-relaxed border-l-4 border-blue-400 pl-4 mb-5">
+              <div className="w-full h-px bg-stone-200 mb-4" />
+              <p className="text-sm text-stone-700 leading-relaxed border-l-4 border-amber-300 pl-4 mb-5">
                 {episodeData?.miniLesson || 'Contenuto non ancora disponibile.'}
               </p>
               {episodeData?.guidaOsservazione && (
@@ -553,18 +665,18 @@ export default function EpisodioPage() {
           {/* STEP 4 — Domanda riflessiva + Journaling */}
           {currentStep === 4 && (
             <div>
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100 mb-4">
-                <p className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-3">
-                  💭 Domanda riflessiva
+              <div className="bg-stone-50 rounded-xl p-5 border border-stone-200 mb-4">
+                <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-3">
+                  Domanda riflessiva
                 </p>
-                <p className="text-gray-800 text-sm leading-relaxed italic font-medium">
+                <p className="text-slate-800 text-sm leading-relaxed italic font-serif font-medium">
                   &ldquo;{episodeData?.reflectionQuestion || 'Domanda non ancora disponibile.'}&rdquo;
                 </p>
               </div>
 
               <div className="mb-3">
-                <label className="block text-xs font-bold text-gray-700 mb-2">
-                  ✍️ La tua riflessione (obbligatoria)
+                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wide">
+                  La tua riflessione
                 </label>
                 <textarea
                   value={reflectionText}
@@ -575,24 +687,24 @@ export default function EpisodioPage() {
                     }
                   }}
                   placeholder="Scrivi qui la tua riflessione..."
-                  className="w-full h-32 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 resize-none text-sm text-gray-700 transition-all"
+                  className="w-full h-32 px-4 py-3 border border-stone-200 rounded-xl focus:border-amber-400 focus:ring-2 focus:ring-amber-200 outline-none resize-none text-sm text-stone-800 transition-all bg-stone-50"
                   maxLength={MAX_CHARS}
                 />
                 <div className="flex items-center justify-between mt-2">
                   <span className={`text-xs ${
                     reflectionText.length >= MAX_CHARS
                       ? 'text-red-500 font-bold'
-                      : 'text-gray-500'
+                      : 'text-stone-500'
                   }`}>
                     {reflectionText.length}/{MAX_CHARS} caratteri
                   </span>
                   {savingReflection && (
-                    <span className="text-xs text-blue-600 flex items-center gap-1">
-                      <span className="animate-spin">⏳</span> Salvataggio...
+                    <span className="text-xs text-amber-700 flex items-center gap-1">
+                      <span className="animate-spin">⋯</span> Salvataggio...
                     </span>
                   )}
                   {reflectionSaved && !savingReflection && reflectionText.trim() && (
-                    <span className="text-xs text-green-600 flex items-center gap-1">
+                    <span className="text-xs text-green-700 flex items-center gap-1">
                       ✓ Salvato
                     </span>
                   )}
@@ -600,9 +712,9 @@ export default function EpisodioPage() {
               </div>
 
               {!reflectionText.trim() && (
-                <div className="bg-amber-50 border-l-4 border-amber-400 p-3 rounded">
-                  <p className="text-xs text-amber-800">
-                    💡 Devi scrivere una riflessione per completare questo passo
+                <div className="bg-stone-50 border-l-4 border-amber-400 p-3 rounded">
+                  <p className="text-xs text-stone-700">
+                    Scrivi una riflessione per completare questo passo
                   </p>
                 </div>
               )}
@@ -613,27 +725,27 @@ export default function EpisodioPage() {
           {currentStep === 5 && (
             <div>
               {episodeData?.versettoPortare && (
-                <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-5 border border-indigo-100 mb-5">
-                  <p className="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2">
-                    🕊️ Versetto da portare con te
+                <div className="bg-slate-900 text-white rounded-xl p-5 mb-5 border border-slate-700 shadow-sm">
+                  <p className="text-xs font-bold text-amber-400 uppercase tracking-[0.2em] mb-3">
+                    Versetto da portare con te
                   </p>
-                  <p className="text-gray-800 text-sm leading-relaxed italic font-medium">
+                  <p className="text-stone-100 text-base leading-relaxed italic font-serif border-l-2 border-amber-400 pl-4">
                     &ldquo;{episodeData.versettoPortare}&rdquo;
                   </p>
                   {episodeData.salmoSupport && (
-                    <p className="text-xs text-gray-400 mt-3 italic">
-                      Salmo/Proverbio di supporto: {episodeData.salmoSupport}
+                    <p className="text-xs text-stone-400 mt-3 italic">
+                      Salmo di supporto: {episodeData.salmoSupport}
                     </p>
                   )}
                 </div>
               )}
 
               {episodeData?.practices && (
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5">
+                <div className="bg-stone-50 border border-stone-200 rounded-xl p-4 mb-5">
                   <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">
-                    🌱 Pratica per oggi
+                    Pratica per oggi
                   </p>
-                  <p className="text-sm text-gray-700 leading-relaxed">
+                  <p className="text-sm text-stone-700 leading-relaxed">
                     {episodeData.practices}
                   </p>
                 </div>
@@ -641,12 +753,12 @@ export default function EpisodioPage() {
 
               {conceptTags.length > 0 && (
                 <div className="mb-5">
-                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
-                    🔑 Concetti chiave
+                  <p className="text-xs font-bold text-stone-500 uppercase tracking-wider mb-3">
+                    Concetti chiave
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {conceptTags.map((tag, i) => (
-                      <span key={i} className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full font-medium border border-gray-200">
+                      <span key={i} className="text-xs bg-stone-100 text-stone-700 px-3 py-1.5 rounded-full font-medium border border-stone-200">
                         {tag}
                       </span>
                     ))}
@@ -656,22 +768,22 @@ export default function EpisodioPage() {
 
               {completed ? (
                 <div className="w-full bg-green-50 border border-green-200 text-green-700 text-sm font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2">
-                  ✅ Passo completato
+                  ✓ Passo completato
                 </div>
               ) : reflectionSaved && reflectionText.trim() ? (
                 <button
                   onClick={handleComplete}
                   disabled={completing}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-60 shadow-sm"
+                  className="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-white text-sm font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-60 shadow-sm"
                 >
                   {completing
-                    ? <><span className="animate-spin">⏳</span> Salvataggio...</>
-                    : <>✓ Completa passo</>
+                    ? <><span className="animate-spin">⋯</span> Salvataggio...</>
+                    : <>Completa passo</>
                   }
                 </button>
               ) : (
-                <div className="w-full bg-amber-50 border border-amber-200 text-amber-700 text-sm font-medium py-3 px-4 rounded-xl flex items-center justify-center gap-2">
-                  ⚠️ Completa la riflessione per procedere
+                <div className="w-full bg-stone-50 border border-stone-200 text-stone-700 text-sm font-medium py-3 px-4 rounded-xl flex items-center justify-center gap-2">
+                  Completa la riflessione per procedere
                 </div>
               )}
             </div>
@@ -684,7 +796,7 @@ export default function EpisodioPage() {
           {currentStep > 1 && (
             <button
               onClick={() => goToStep(currentStep - 1)}
-              className="flex-1 bg-white border-2 border-gray-200 text-gray-600 font-semibold text-sm py-3.5 rounded-xl hover:border-gray-300 transition-all"
+              className="flex-1 bg-white border border-stone-200 text-stone-600 font-semibold text-sm py-3.5 rounded-xl hover:bg-stone-50 transition-all"
             >
               ← Indietro
             </button>
@@ -692,7 +804,7 @@ export default function EpisodioPage() {
           {currentStep < TOTAL_STEPS && (
             <button
               onClick={() => goToStep(currentStep + 1)}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm py-3.5 px-6 rounded-xl transition-all shadow-sm"
+              className="flex-1 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-white font-bold text-sm py-3.5 px-6 rounded-xl transition-all shadow-sm"
             >
               Continua →
             </button>

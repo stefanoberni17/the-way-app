@@ -156,6 +156,9 @@ export async function GET(request: NextRequest) {
     const getUrl = (prop: any) =>
       prop?.url || '';
 
+    const getSelect = (prop: any) =>
+      prop?.select?.name || '';
+
     let blocks: any[] = [];
     if (extended) {
       blocks = await fetchAllBlocks(pageId);
@@ -176,6 +179,7 @@ export async function GET(request: NextRequest) {
         salmoSupport: getText(properties['Salmo/Proverbio di supporto']),
         practices: getText(properties['Pratiche consigliate']),
         audioUrl: getUrl(properties['Audio URL']),
+        tipo: getSelect(properties['Tipo']) || 'Lectio',
         durata: properties['Durata stimata']?.number || null,
         weekNumber: getWeekFromEpisode(episodeNumber),
         locked: false,

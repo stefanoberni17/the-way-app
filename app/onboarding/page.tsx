@@ -48,8 +48,8 @@ export default function OnboardingPage() {
       subtitle: "La Via del Cuore",
       content: (
         <div className="text-center max-w-2xl mx-auto">
-          <div className="text-8xl mb-8">✝️</div>
-          <p className="text-xl text-gray-700 leading-relaxed mb-6 font-medium">
+          <div className="text-5xl md:text-6xl mb-6">✝️</div>
+          <p className="text-base md:text-lg text-gray-700 leading-relaxed mb-6 font-medium">
             Il Vangelo non è solo un testo antico da studiare.<br/>
             È una Parola viva che parla a ogni cuore, oggi.
           </p>
@@ -180,8 +180,8 @@ export default function OnboardingPage() {
       subtitle: "Facoltativo, ma comodo",
       content: (
         <div className="max-w-xl mx-auto text-center">
-          <div className="text-7xl mb-6">📱</div>
-          <p className="text-lg text-gray-700 mb-8 leading-relaxed">
+          <div className="text-5xl md:text-6xl mb-5">📱</div>
+          <p className="text-base md:text-lg text-gray-700 mb-6 leading-relaxed">
             Puoi parlare con La Guida direttamente su Telegram,
             in qualsiasi momento della giornata — anche senza aprire l'app.
           </p>
@@ -262,11 +262,17 @@ export default function OnboardingPage() {
   const isLastSlide = currentSlide === slides.length;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-900 to-blue-900 flex items-center justify-center p-4">
-      <div className="max-w-4xl w-full">
+    <main
+      className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-900 to-blue-900 overflow-y-auto"
+      style={{
+        paddingTop: 'max(1rem, env(safe-area-inset-top))',
+        paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))',
+      }}
+    >
+      <div className="max-w-4xl w-full mx-auto px-4">
 
         {/* Progress dots */}
-        <div className="flex justify-center gap-2 mb-8">
+        <div className="flex justify-center gap-2 mb-6 sticky top-0 py-3 bg-gradient-to-b from-blue-950 via-blue-950/95 to-blue-950/0 z-10">
           {slides.map((_, i) => (
             <div
               key={i}
@@ -279,15 +285,15 @@ export default function OnboardingPage() {
           ))}
         </div>
 
-        {/* Card */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 mb-6 min-h-[32rem]">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800 text-center mb-2">
+        {/* Card — niente min-height, scroll naturale */}
+        <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10 mb-5">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 text-center mb-2 font-serif leading-tight">
             {currentContent.title}
           </h1>
           {currentContent.subtitle && (
-            <p className="text-center text-gray-500 mb-8 italic">{currentContent.subtitle}</p>
+            <p className="text-center text-gray-500 mb-6 italic text-sm md:text-base">{currentContent.subtitle}</p>
           )}
-          <div className="mt-8">
+          <div className="mt-6">
             {currentContent.content}
           </div>
         </div>

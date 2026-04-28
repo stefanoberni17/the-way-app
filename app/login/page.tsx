@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import BrandCross from '@/components/BrandCross';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,31 +48,31 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-5">
+    <main className="min-h-screen bg-slate-900 flex flex-col items-center justify-center px-5 py-10 overflow-y-auto">
 
       {/* ── Hero brand ── */}
-      <div className="text-center mb-8 w-full max-w-sm">
-        <div className="text-5xl mb-4">✝️</div>
+      <div className="text-center mb-7 w-full max-w-sm">
+        <BrandCross className="mx-auto mb-3" />
         <h1 className="text-3xl font-serif font-bold text-white tracking-tight">
           The Way
         </h1>
-        <p className="text-amber-400 font-semibold text-xs mt-1 uppercase tracking-widest">
+        <p className="text-amber-400 font-semibold text-[11px] mt-1 uppercase tracking-[0.2em]">
           La Via del Cuore
         </p>
 
-        <div className="mt-5 bg-white/8 backdrop-blur-sm rounded-2xl px-5 py-4 border border-white/12">
+        <div className="mt-5 bg-white/[0.06] backdrop-blur-sm rounded-xl px-5 py-4 border border-white/10">
           <p className="text-slate-300 text-sm leading-relaxed italic font-serif">
             &ldquo;Io sono la Via, la Verità e la Vita.&rdquo;
             <br />
-            <span className="text-amber-400 text-xs not-italic font-sans">— Giovanni 14,6</span>
+            <span className="text-amber-400 text-xs not-italic font-sans tracking-wide">— Giovanni 14,6</span>
           </p>
         </div>
       </div>
 
       {/* ── Form card ── */}
-      <div className="bg-white rounded-2xl shadow-2xl p-7 w-full max-w-sm">
-        <h2 className="text-xl font-bold text-gray-800 mb-0.5">Bentornato!</h2>
-        <p className="text-stone-500 text-sm mb-6">Il tuo percorso ti aspetta.</p>
+      <div className="bg-white rounded-xl shadow-md border border-stone-200/60 p-6 w-full max-w-sm">
+        <h2 className="text-xl font-serif font-bold text-slate-900 mb-0.5">Bentornato</h2>
+        <p className="text-stone-500 text-sm mb-6 italic">Il tuo percorso ti aspetta.</p>
 
         <form onSubmit={handleLogin} className="space-y-5">
           {error && (

@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import BrandCross from '@/components/BrandCross';
+import { Mail } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -96,25 +98,27 @@ export default function RegisterPage() {
   // ── Schermata successo ──
   if (success) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-900 to-blue-900 flex flex-col items-center justify-center p-5">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center">
-          <div className="text-5xl mb-4">📬</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Controlla la tua email!
+      <main className="min-h-screen bg-slate-900 flex flex-col items-center justify-center px-5 py-10 overflow-y-auto">
+        <div className="bg-white rounded-xl shadow-md border border-stone-200/60 p-7 w-full max-w-sm text-center">
+          <div className="w-14 h-14 rounded-full bg-amber-100 mx-auto mb-4 flex items-center justify-center">
+            <Mail className="w-7 h-7 text-amber-700" strokeWidth={1.75} />
+          </div>
+          <h2 className="text-2xl font-serif font-bold text-slate-900 mb-2">
+            Controlla la tua email
           </h2>
-          <p className="text-gray-600 text-sm leading-relaxed mb-5">
+          <p className="text-stone-600 text-sm leading-relaxed mb-5">
             Abbiamo inviato un link di conferma a{' '}
-            <strong className="text-gray-800">{email}</strong>.
+            <strong className="text-slate-900">{email}</strong>.
             <br />
             Clicca il link per attivare il tuo account, poi torna qui ad accedere.
           </p>
 
           {/* Avviso spam */}
-          <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6 text-left">
-            <p className="text-amber-800 text-xs font-semibold mb-0.5">
-              📁 Non trovi l'email?
+          <div className="bg-stone-50 border border-stone-200 rounded-lg px-4 py-3 mb-6 text-left">
+            <p className="text-slate-900 text-xs font-semibold mb-0.5">
+              Non trovi l&apos;email?
             </p>
-            <p className="text-amber-700 text-xs leading-relaxed">
+            <p className="text-stone-600 text-xs leading-relaxed">
               Controlla la cartella <strong>Spam</strong> o{' '}
               <strong>Posta indesiderata</strong> — a volte ci finisce per errore.
               Se non arriva entro qualche minuto, riprova con una email diversa.
@@ -123,7 +127,7 @@ export default function RegisterPage() {
 
           <button
             onClick={() => router.push('/login')}
-            className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-sm"
+            className="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-white font-semibold py-3 px-8 rounded-xl transition-all shadow-sm"
           >
             Vai al Login
           </button>
@@ -133,70 +137,36 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-950 via-indigo-900 to-blue-900 py-10 px-5">
+    <main className="min-h-screen bg-slate-900 py-10 px-5 overflow-y-auto">
       <div className="w-full max-w-sm mx-auto">
 
         {/* ── Header brand ── */}
         <div className="text-center mb-6">
-          <div className="text-4xl mb-2">✝️</div>
-          <h1 className="text-xl font-bold text-white">The Way</h1>
-          <p className="text-amber-400 font-semibold text-xs mt-0.5 uppercase tracking-widest">
+          <BrandCross className="mx-auto mb-2" size={48} />
+          <h1 className="text-xl font-serif font-bold text-white">The Way</h1>
+          <p className="text-amber-400 font-semibold text-[11px] mt-1 uppercase tracking-[0.2em]">
             La Via del Cuore
           </p>
         </div>
 
-        {/* ── Step indicator ── */}
-        <div className="flex items-center gap-2 mb-6 px-1">
-          {/* Passo 1 */}
-          <div className="flex items-center gap-2 flex-1">
-            <div
-              className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all ${
-                step >= 1
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white/20 text-white/50'
-              }`}
-            >
-              {step > 1 ? '✓' : '1'}
-            </div>
-            <span
-              className={`text-xs font-medium truncate ${
-                step === 1 ? 'text-white' : 'text-white/50'
-              }`}
-            >
-              Il tuo account
-            </span>
-          </div>
-
-          {/* Linea */}
+        {/* ── Step indicator: solo dots, niente label che troncavano su mobile ── */}
+        <div className="flex items-center justify-center gap-2 mb-6">
           <div
-            className={`h-0.5 w-8 shrink-0 rounded-full transition-all ${
-              step > 1 ? 'bg-blue-400' : 'bg-white/20'
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              step === 1 ? 'w-10 bg-amber-400' : 'w-2 bg-white/30'
             }`}
+            aria-label="Passo 1"
           />
-
-          {/* Passo 2 */}
-          <div className="flex items-center gap-2 flex-1">
-            <div
-              className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all ${
-                step >= 2
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white/20 text-white/50'
-              }`}
-            >
-              2
-            </div>
-            <span
-              className={`text-xs font-medium truncate ${
-                step === 2 ? 'text-white' : 'text-white/50'
-              }`}
-            >
-              Il tuo percorso
-            </span>
-          </div>
+          <div
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              step === 2 ? 'w-10 bg-amber-400' : 'w-2 bg-white/30'
+            }`}
+            aria-label="Passo 2"
+          />
         </div>
 
         {/* ── Card ── */}
-        <div className="bg-white rounded-2xl shadow-2xl p-7">
+        <div className="bg-white rounded-xl shadow-md border border-stone-200/60 p-6">
 
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm mb-5">
@@ -208,8 +178,8 @@ export default function RegisterPage() {
           {step === 1 && (
             <form onSubmit={handleNextStep} className="space-y-5">
               <div>
-                <h2 className="text-lg font-bold text-gray-800">Crea il tuo account</h2>
-                <p className="text-gray-500 text-sm mt-0.5">Ti vuole meno di un minuto.</p>
+                <h2 className="text-lg font-serif font-bold text-slate-900">Crea il tuo account</h2>
+                <p className="text-stone-500 text-sm mt-0.5 italic">Ti vuole meno di un minuto.</p>
               </div>
 
               <div>
@@ -220,7 +190,7 @@ export default function RegisterPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+                  className="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none text-sm bg-stone-50"
                   placeholder="tua@email.com"
                   required
                 />
@@ -234,7 +204,7 @@ export default function RegisterPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+                  className="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none text-sm bg-stone-50"
                   placeholder="Minimo 6 caratteri"
                   required
                 />
@@ -248,13 +218,13 @@ export default function RegisterPage() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+                  className="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none text-sm bg-stone-50"
                   placeholder="Ripeti la password"
                   required
                 />
               </div>
 
-              <div className="border-t border-gray-100 pt-4">
+              <div className="border-t border-stone-100 pt-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   Come ti chiami? *
                 </label>
@@ -262,7 +232,7 @@ export default function RegisterPage() {
                   type="text"
                   value={nome}
                   onChange={(e) => setNome(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+                  className="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none text-sm bg-stone-50"
                   placeholder="Il tuo nome"
                   required
                 />
@@ -277,7 +247,7 @@ export default function RegisterPage() {
                   type="number"
                   value={eta}
                   onChange={(e) => setEta(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+                  className="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none text-sm bg-stone-50"
                   placeholder="Es. 30"
                   min="13"
                   max="120"
@@ -290,15 +260,15 @@ export default function RegisterPage() {
                   type="checkbox"
                   id="privacy-consent"
                   required
-                  className="mt-0.5 w-4 h-4 accent-blue-600 shrink-0 cursor-pointer"
+                  className="mt-0.5 w-4 h-4 accent-amber-500 shrink-0 cursor-pointer"
                 />
-                <label htmlFor="privacy-consent" className="text-xs text-gray-500 leading-relaxed cursor-pointer">
+                <label htmlFor="privacy-consent" className="text-xs text-stone-500 leading-relaxed cursor-pointer">
                   Ho letto e accetto la{' '}
                   <a
                     href="/privacy"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-700 underline"
+                    className="text-amber-700 hover:text-amber-800 underline"
                   >
                     Privacy Policy
                   </a>
@@ -308,7 +278,7 @@ export default function RegisterPage() {
 
               <button
                 type="submit"
-                className="w-full bg-blue-700 hover:bg-blue-800 active:bg-blue-900 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm"
+                className="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-sm"
               >
                 Continua →
               </button>
@@ -319,8 +289,8 @@ export default function RegisterPage() {
           {step === 2 && (
             <form onSubmit={handleRegister} className="space-y-5">
               <div>
-                <h2 className="text-lg font-bold text-gray-800">Il tuo percorso</h2>
-                <p className="text-gray-500 text-sm mt-0.5 leading-relaxed">
+                <h2 className="text-lg font-serif font-bold text-slate-900">Il tuo percorso</h2>
+                <p className="text-stone-500 text-sm mt-0.5 leading-relaxed">
                   Queste info aiutano La Guida a personalizzare la tua esperienza.
                   Puoi saltarle e aggiungerle dopo dal profilo.
                 </p>
@@ -334,7 +304,7 @@ export default function RegisterPage() {
                 <textarea
                   value={obiettivi}
                   onChange={(e) => setObiettivi(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm resize-none"
+                  className="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none text-sm bg-stone-50 resize-none"
                   placeholder="Es. Ritrovare la fede, trovare pace interiore, capire il Vangelo…"
                   rows={3}
                 />
@@ -349,7 +319,7 @@ export default function RegisterPage() {
                   type="text"
                   value={passioni}
                   onChange={(e) => setPassioni(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+                  className="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none text-sm bg-stone-50"
                   placeholder="Es. Meditazione, famiglia, musica, natura…"
                 />
               </div>
@@ -363,7 +333,7 @@ export default function RegisterPage() {
                   type="text"
                   value={sogno}
                   onChange={(e) => setSogno(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+                  className="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none text-sm bg-stone-50"
                   placeholder="Es. Vivere con più pace, essere un punto di riferimento…"
                 />
               </div>
@@ -376,7 +346,7 @@ export default function RegisterPage() {
                 <textarea
                   value={situazioneAttuale}
                   onChange={(e) => setSituazioneAttuale(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm resize-none"
+                  className="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none text-sm bg-stone-50 resize-none"
                   placeholder="Es. Momento di cambiamento, cerco senso e direzione…"
                   rows={2}
                 />
@@ -386,16 +356,16 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => { setStep(1); setError(''); }}
-                  className="flex-1 py-3 px-4 rounded-xl border border-gray-200 text-gray-600 font-semibold text-sm hover:bg-gray-50 transition-all"
+                  className="flex-1 py-3 px-4 rounded-xl border border-stone-200 text-stone-600 font-semibold text-sm hover:bg-stone-50 transition-all"
                 >
                   ← Indietro
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-blue-700 hover:bg-blue-800 active:bg-blue-900 text-white font-bold py-3 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                  className="flex-1 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-900 font-bold py-3 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                 >
-                  {loading ? 'Creazione…' : 'Inizia ✝️'}
+                  {loading ? 'Creazione…' : 'Inizia il cammino'}
                 </button>
               </div>
             </form>

@@ -4,24 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useMeditation } from '@/components/MeditationContext';
-
-const WEEK_NAMES: Record<number, string> = {
-  1: 'La voce nel deserto',
-  2: 'La voce nel deserto',
-  3: 'Il silenzio di Nazaret',
-  4: 'Il silenzio di Nazaret',
-  5: 'La voce che chiama',
-  6: 'La voce che chiama',
-};
-
-const WEEK_IDS: Record<number, string> = {
-  1: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',  // Week 1-2
-  2: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
-  3: '316655f7-26c7-8148-b5f4-f58ca267545a',  // Week 3-4
-  4: '316655f7-26c7-8148-b5f4-f58ca267545a',
-  5: '316655f7-26c7-8131-b21d-ff3daa9eee74',  // Week 5-6
-  6: '316655f7-26c7-8131-b21d-ff3daa9eee74',
-};
+import { WEEK_IDS, WEEK_NAMES } from '@/lib/weekIds';
+import { BETA_MAX_EPISODE } from '@/lib/weekUnlockLogic';
 
 const DAY_KEYS = [
   'day1','day2','day3','day4','day5','day6','day7',
@@ -135,7 +119,6 @@ export default function HomePage() {
   }
 
   const currentWeek = profile?.current_week || 1;
-  const BETA_MAX_EPISODE = 24;
   const progressPercentage = Math.round((completedEpisodes / BETA_MAX_EPISODE) * 100);
 
   const properties = weekData?.page?.properties || {};
@@ -186,7 +169,7 @@ export default function HomePage() {
                 <button
                   onClick={() => {
                     // First episode of each week → show week overview page first
-                    const WEEK_FIRST_EPISODES = new Set([1, 7, 13, 19]);
+                    const WEEK_FIRST_EPISODES = new Set([1, 8, 15, 22]);
                     if (WEEK_FIRST_EPISODES.has(nextEpisode)) {
                       router.push(`/settimana/${WEEK_IDS[currentWeek]}?week=${currentWeek}`);
                     } else {
@@ -215,7 +198,7 @@ export default function HomePage() {
             <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-5 mb-5">
               <button
                 onClick={() => {
-                  const WEEK_FIRST_EPISODES = new Set([1, 7, 13, 19]);
+                  const WEEK_FIRST_EPISODES = new Set([1, 8, 15, 22]);
                   if (WEEK_FIRST_EPISODES.has(nextEpisode)) {
                     router.push(`/settimana/${WEEK_IDS[currentWeek]}?week=${currentWeek}`);
                   } else {
@@ -253,8 +236,8 @@ export default function HomePage() {
                   const practice = practices.find(p => p.practice_number === index + 1);
                   const completedDays = practice?.completed_days || {};
                   const completedCount = DAY_KEYS.filter(day => completedDays[day]).length;
-                  const percentage = Math.round((completedCount / 14) * 100);
-                  const isComplete = completedCount === 14;
+                  const percentage = Math.round((completedCount / 7) * 100);
+                  const isComplete = completedCount === 7;
 
                   return (
                     <div

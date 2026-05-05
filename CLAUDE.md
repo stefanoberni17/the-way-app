@@ -143,11 +143,13 @@ PRIMARY KEY (user_id, episode_number)
 user_id          UUID
 week_number      INT
 practice_number  INT         -- 1, 2 o 3
-completed_days   JSONB       -- { day1: bool, ..., day14: bool }
+completed_days   JSONB       -- { day1: bool, ..., day7: bool } (Lun..Dom)
+week_start_date  DATE        -- lunedì Europe/Rome della settimana di calendario corrente
 created_at       TIMESTAMPTZ
 updated_at       TIMESTAMPTZ
 PRIMARY KEY (user_id, week_number, practice_number)
 ```
+**Reset settimanale**: `app/api/practices` confronta `week_start_date` con il lunedì attuale (helper `lib/weekStart.ts#getMondayRome`); se diverso, azzera `completed_days` e aggiorna `week_start_date`. Così le caselle Lun-Dom ripartono ogni nuovo lunedì anche se l'utente resta più giorni sulla stessa `week_number` del percorso.
 
 ### `telegram_conversations`
 ```sql
@@ -166,54 +168,53 @@ Retention automatica: il cron `/api/cron/cleanup-telegram` elimina righe più ve
 Il contenuto educativo è su Notion. Due database principali:
 
 ### Database Settimane (`NOTION_DATABASE_SETTIMANE`)
-6 pagine, una per ogni settimana. Ogni pagina ha le properties:
-- `Settimana` — numero (1-6)
-- `Titolo` / `Tema`
+Una pagina per ogni settimana singola del percorso (W1, W2, W3, …). Ogni pagina ha le properties:
+- `Settimana` — title `"Week N"`
+- `Numero` — N
+- `Titolo` / `Tema principale` / `Essenza` / `Domanda guida`
 - `Mantra` — citazione settimanale (testo con `<br>` per a capo)
-- `Pratiche` — 3 pratiche separate da `\n`
-- `Episodi` — lista episodi di quella settimana
+- `Versetto guida`
+- `Pratiche` — 3 pratiche separate da `\n` (o `<br>`)
+- `Passi biblici` — 7 voci numerate (6 Lectio + 1 Integrazione)
+- `Stato` — `Da fare` / `In lavorazione` / `Completo`
 
-### Database Episodi (`NOTION_DATABASE_EPISODI`)
-19 pagine. Ogni pagina ha:
-- `Numero` — episodio 1-19
-- `Titolo`
-- `MiniLezione` — testo formativo
-- `DomandaRiflettiva` — domanda per la riflessione
-- `Tema` / `Concetti`
-- Blocchi Notion completi (paragrafi, heading, quote, callout, toggle, list, ecc.)
+### Database Passi Biblici (`NOTION_DATABASE_EPISODI`)
+Una pagina per ogni passo. Properties chiave:
+- `Numero` — 1..7 entro la settimana (renormalizzato)
+- `Settimana` — text `"Week N"` (singolo, niente più "Week 1-2" bundled)
+- `Tipo` — `Lectio` / `Integrazione` / `Pratica`
+- `Passo biblico` — title del passo
+- `Riferimento`, `Mini-lezione breve`, `Guida osservazione`, `Domanda riflessiva`, `Versetto da portare`, `Pratiche consigliate`, `Salmo/Proverbio di supporto`, `Concetti collegati`, `Tema principale`
+- `Durata stimata`, `Audio URL`
+
+L'API `/api/episodio` filtra `Numero=localNum AND Settimana="Week N"`.
 
 ### Mapping Settimane → Notion Page IDs
-```typescript
-// In GlobalMeditationWrapper.tsx e app/page.tsx (mantenere sincronizzati!)
-const WEEK_IDS: Record<number, string> = {
-  1: '2b1655f7-26c7-8025-8afe-df0ed131d708',  // Week 1-2: La ferita del rifiuto
-  2: '2b1655f7-26c7-8025-8afe-df0ed131d708',
-  3: '2b1655f7-26c7-8054-a0d4-c4a48c509852',  // Week 3-4: Presenza e ascolto
-  4: '2b1655f7-26c7-8054-a0d4-c4a48c509852',
-  5: '2b1655f7-26c7-8038-bd91-c3fa9e5b31cb',  // Week 5-6: Valore e appartenenza
-  6: '2b1655f7-26c7-8038-bd91-c3fa9e5b31cb',
-}
-```
-> ⚠️ Questo mapping è duplicato in più file — se cambia, aggiornare tutti.
+Sorgente unica: [lib/weekIds.ts](lib/weekIds.ts) — esporta `WEEK_IDS` e `WEEK_NAMES`. **Importare da lì** invece di duplicare il mapping nei singoli file.
 
 ---
 
 ## Struttura del Percorso (MVP)
 
-| Settimane | Tema | Episodi |
-|-----------|------|---------|
-| 1-2 | La ferita del rifiuto | 1-5 |
-| 3-4 | Presenza e ascolto | 6-12 |
-| 5-6 | Valore e appartenenza | 13-19 |
+| Settimana | Tema | Passi (globali) |
+|-----------|------|-----------------|
+| 1 | La voce nel deserto (Presenza) | 1-7 |
+| 2 | La voce nel deserto cont. | 8-14 |
+| 3 | Il silenzio di Nazaret (Presenza cont.) | 15-21 |
+| 4 | Il silenzio di Nazaret cont. | 22-28 |
+| 5 | La voce che chiama (Ascolto) — Beta-locked | 29-35 |
+| 6 | La voce che chiama cont. — Beta-locked | 36-42 |
+
+7 passi per settimana = 6 Lectio + 1 Integrazione. Beta: 4 settimane × 7 = **28 passi totali**.
 
 **Logica sblocco settimane** (`lib/weekUnlockLogic.ts`):
 - Week 1 sempre disponibile
-- Week N si sblocca quando tutti gli episodi della week N-1 sono completati
-- Beta: max week 4 (episodi 1-12), costante `BETA_MAX_WEEK = 4`
+- Week N si sblocca quando tutti i passi della week N-1 sono completati
+- Beta: `BETA_MAX_WEEK = 4`, `BETA_MAX_EPISODE = 28`
 
-**Logica sblocco episodi** (`/api/episodio`):
-- Episodio N si sblocca solo se N-1 è completato
-- Episodio 1 sempre disponibile
+**Logica sblocco passi** (`/api/episodio`):
+- Passo N si sblocca solo se N-1 è completato
+- Passo 1 sempre disponibile
 
 ---
 
@@ -250,7 +251,7 @@ Quando l'utente completa l'ultimo episodio di una settimana:
     → Se già completata in sessioni precedenti: solo bottone fisso in fondo
 ```
 
-**Nota**: Le settimane 1-2 condividono gli stessi episodi (1-5), così come 3-4 (6-12) e 5-6 (13-19). Completare gli episodi di week 1 sblocca sia week 2 che week 3.
+**Nota**: Ogni settimana del percorso ha la propria pagina Notion e i propri 7 passi (vedi [lib/weekIds.ts](lib/weekIds.ts) e [lib/episodeMapping.ts](lib/episodeMapping.ts)). Le bundled storiche "Week 1-2"/"Week 3-4"/"Week 5-6" sono state archiviate (Numero ≥ 90) e non vengono più referenziate dal codice.
 
 ### Meditazione Guidata
 ```

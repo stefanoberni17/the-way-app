@@ -14,17 +14,17 @@ const NOTION_HEADERS = {
   'Content-Type': 'application/json',
 };
 
-// Ultimo episodio di ogni settimana singola (6 ep per settimana)
-// Completare l'ultimo ep di una settimana avanza current_week al successivo
+// Ultimo passo di ogni settimana singola (7 passi per settimana: 6 Lectio + 1 Integrazione)
+// Completare l'ultimo passo di una settimana avanza current_week al successivo
 const WEEK_LAST_EPISODES: Record<number, number> = {
-  1: 6,    // Week 1 → avanza a Week 2
-  2: 12,   // Week 2 → avanza a Week 3
-  3: 18,   // Week 3 → avanza a Week 4
-  4: 24,   // Week 4 → avanza a Week 5
-  5: 30,
-  6: 36,
-  7: 42,
-  8: 48,
+  1: 7,    // Week 1 → avanza a Week 2
+  2: 14,   // Week 2 → avanza a Week 3
+  3: 21,   // Week 3 → avanza a Week 4
+  4: 28,   // Week 4 → avanza a Week 5
+  5: 35,
+  6: 42,
+  7: 49,
+  8: 56,
 };
 
 // Decodifica sequenze unicode letterali (es. u00f2 → ò) prodotte da copia-incolla errata in Notion
@@ -112,8 +112,8 @@ export async function GET(request: NextRequest) {
       isCompleted = curr?.completed || false;
     }
 
-    // Calcola track Notion ("Week 1-2", "Week 3-4", ...) e numero locale (1-12)
-    // per l'episodio globale (6 ep per settimana singola, 12 per track Notion)
+    // Calcola Settimana Notion ("Week N") e numero locale (1-7) per il passo globale
+    // (7 passi per settimana singola: 6 Lectio + 1 Integrazione)
     const { settimana: settimanaStr, localNum } = getNotionEpisodeRef(episodeNumber);
 
     // Query Notion DB: filtra per Numero locale + Settimana per evitare duplicati cross-track

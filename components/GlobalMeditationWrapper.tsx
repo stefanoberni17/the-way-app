@@ -5,24 +5,11 @@ import { usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import MeditationPopup from './MeditationPopup';
 import { MeditationContext } from './MeditationContext';
+import { WEEK_IDS, WEEK_NAMES as WEEK_NAMES_BASE } from '@/lib/weekIds';
 
-const WEEK_NAMES: Record<number, string> = {
-  1: 'Week 1-2 — La voce nel deserto',
-  2: 'Week 1-2 — La voce nel deserto',
-  3: 'Week 3-4 — Il silenzio di Nazaret',
-  4: 'Week 3-4 — Il silenzio di Nazaret',
-  5: 'Week 5-6 — La voce che chiama',
-  6: 'Week 5-6 — La voce che chiama',
-};
-
-// The Way — Notion page IDs per ogni coppia di settimane
-const WEEK_IDS: Record<number, string> = {
-  1: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',  // Week 1-2 — La voce nel deserto
-  2: '314655f7-26c7-8152-bc43-f9ccdbf8b0bf',
-  3: '316655f7-26c7-8148-b5f4-f58ca267545a',  // Week 3-4 — Il silenzio di Nazaret
-  4: '316655f7-26c7-8148-b5f4-f58ca267545a',
-  5: '316655f7-26c7-8131-b21d-ff3daa9eee74',  // Week 5-6 — La voce che chiama (future)
-  6: '316655f7-26c7-8131-b21d-ff3daa9eee74',
+const formatWeekName = (n: number): string => {
+  const name = WEEK_NAMES_BASE[n];
+  return name ? `Week ${n} — ${name}` : `Week ${n}`;
 };
 
 export default function GlobalMeditationWrapper({ children }: { children: React.ReactNode }) {
@@ -61,7 +48,7 @@ export default function GlobalMeditationWrapper({ children }: { children: React.
           .replace(/<br>/g, '\n');
 
         setMantra(mantraText);
-        setWeekName(WEEK_NAMES[currentWeek] || `Week ${currentWeek}`);
+        setWeekName(formatWeekName(currentWeek));
       }
     };
 

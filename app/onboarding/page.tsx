@@ -214,7 +214,7 @@ export default function OnboardingPage() {
       content: (
         <div className="max-w-xl mx-auto">
           <div className="bg-slate-900 text-white rounded-xl p-7 mb-5 border border-slate-700 shadow-md">
-            <p className="text-xs text-amber-400 mb-2 uppercase tracking-[0.2em] font-semibold">Week 1-2</p>
+            <p className="text-xs text-amber-400 mb-2 uppercase tracking-[0.2em] font-semibold">Week 1</p>
             <h3 className="text-2xl md:text-3xl font-serif font-bold mb-4">La voce nel deserto</h3>
             <p className="text-slate-300 mb-5 leading-relaxed text-sm">
               Il cammino inizia dall&apos;origine: Giovanni che prepara la Via, Gesù che entra nella storia.
@@ -223,7 +223,7 @@ export default function OnboardingPage() {
             <div className="space-y-2.5 text-sm bg-white/[0.05] rounded-lg p-4 border border-white/10">
               <p className="flex items-start gap-2.5">
                 <BookOpen className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" strokeWidth={1.75} />
-                <span className="text-slate-200">Passi: 1–4</span>
+                <span className="text-slate-200">7 passi: 6 Lectio + 1 Integrazione</span>
               </p>
               <p className="flex items-start gap-2.5">
                 <Target className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" strokeWidth={1.75} />

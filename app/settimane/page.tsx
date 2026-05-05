@@ -6,41 +6,28 @@ import { supabase } from '@/lib/supabase';
 import { getUnlockedWeeks, isWeekUnlockedInBeta, getWeekLockMessage } from '@/lib/weekUnlockLogic';
 
 interface SingleWeek {
-  id: string;         // Notion page ID (shared between the 2 weeks of a pair)
-  numero: number;     // single week number (1, 2, 3, 4)
-  settimana: string;  // "Settimana 1" etc.
+  id: string;         // Notion page ID (singolo per settimana)
+  numero: number;     // 1, 2, 3, 4...
+  settimana: string;  // "Settimana 1"
   titolo: string;
   tema: string;
-  episodi: string;    // "1–6" etc.
+  episodi: string;    // "1–7" etc.
   stato: string;
 }
 
-// Expand a pair page into two single-week objects
-function expandPairToWeeks(pair: any): SingleWeek[] {
-  const w1 = pair.numero * 2 - 1;
-  const w2 = pair.numero * 2;
-  const ep1Start = (w1 - 1) * 6 + 1;
-  const ep2Start = (w2 - 1) * 6 + 1;
-  return [
-    {
-      id: pair.id,
-      numero: w1,
-      settimana: `Settimana ${w1}`,
-      titolo: pair.titolo,
-      tema: pair.tema,
-      episodi: `${ep1Start}–${ep1Start + 5}`,
-      stato: pair.stato,
-    },
-    {
-      id: pair.id,
-      numero: w2,
-      settimana: `Settimana ${w2}`,
-      titolo: pair.titolo,
-      tema: pair.tema,
-      episodi: `${ep2Start}–${ep2Start + 5}`,
-      stato: pair.stato,
-    },
-  ];
+// Una pagina Notion = una settimana singola (7 passi).
+function toSingleWeek(page: any): SingleWeek {
+  const wn = page.numero;
+  const start = (wn - 1) * 7 + 1;
+  return {
+    id: page.id,
+    numero: wn,
+    settimana: `Settimana ${wn}`,
+    titolo: page.titolo,
+    tema: page.tema,
+    episodi: `${start}–${start + 6}`,
+    stato: page.stato,
+  };
 }
 
 export default function SettimanaPage() {
@@ -79,13 +66,11 @@ export default function SettimanaPage() {
     fetch('/api/settimane')
       .then(res => res.json())
       .then(data => {
-        // Fetch returns pair pages (Numero 1 = "Week 1-2", 2 = "Week 3-4", ...)
-        // Keep only the 2 pairs that map to Beta single weeks 1-4
-        const pairs = (data.settimane || [])
-          .filter((s: any) => s.numero <= 2)
-          .sort((a: any, b: any) => a.numero - b.numero);
-        // Expand each pair into 2 single weeks
-        const weeks = pairs.flatMap(expandPairToWeeks);
+        // Una pagina Notion per settimana singola; le bundled archiviate hanno Numero >= 90.
+        const weeks = (data.settimane || [])
+          .filter((s: any) => s.numero >= 1 && s.numero <= 8)
+          .sort((a: any, b: any) => a.numero - b.numero)
+          .map(toSingleWeek);
         setSettimane(weeks);
         setLoading(false);
       })

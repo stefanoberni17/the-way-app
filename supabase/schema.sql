@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   updated_at                 TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- user_episode_progress: tracking completamento episodi (1-24 in Beta)
+-- user_episode_progress: tracking completamento passi (1-28 in Beta: 4 settimane × 7 passi)
 CREATE TABLE IF NOT EXISTS public.user_episode_progress (
   user_id        UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   episode_number INT  NOT NULL,
@@ -53,16 +53,23 @@ CREATE TABLE IF NOT EXISTS public.episode_reflections (
   PRIMARY KEY (user_id, episode_number)
 );
 
--- weekly_practices: 3 pratiche per settimana, completate in massimo 14 giorni (jsonb { day1..day14 })
+-- weekly_practices: 3 pratiche per settimana del percorso, tracciate su 7 giorni
+-- (jsonb { day1..day7 } = Lun..Dom). week_start_date è il lunedì Europe/Rome
+-- della settimana di calendario corrente: quando cambia, l'API azzera completed_days.
 CREATE TABLE IF NOT EXISTS public.weekly_practices (
   user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   week_number     INT  NOT NULL,
   practice_number INT  NOT NULL CHECK (practice_number BETWEEN 1 AND 3),
   completed_days  JSONB NOT NULL DEFAULT '{}'::jsonb,
+  week_start_date DATE,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (user_id, week_number, practice_number)
 );
+
+-- Migration idempotente per istanze esistenti (la colonna è stata aggiunta dopo il go-live)
+ALTER TABLE public.weekly_practices
+  ADD COLUMN IF NOT EXISTS week_start_date DATE;
 
 -- telegram_conversations: storia messaggi bot Telegram (sliding window 20 + cleanup 90gg via cron)
 CREATE TABLE IF NOT EXISTS public.telegram_conversations (

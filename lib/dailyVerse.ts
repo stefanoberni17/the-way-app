@@ -13,6 +13,7 @@ const NOTION_HEADERS = {
 export interface DailyVerse {
   text: string;
   reference: string;
+  notionPageId: string;
 }
 
 const getTitle = (prop: any): string => prop?.title?.[0]?.plain_text || '';
@@ -57,7 +58,7 @@ export async function getRandomDailyVerse(): Promise<DailyVerse | null> {
     const reference = getText(props['Riferimento']);
 
     if (!text) return null;
-    return { text, reference };
+    return { text, reference, notionPageId: pick.id || '' };
   } catch (err) {
     console.error('Errore fetch frase del giorno:', err);
     return null;

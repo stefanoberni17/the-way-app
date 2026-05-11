@@ -8,8 +8,6 @@ interface WeekCarouselProps {
   mantra: string;
   pratiche: string[];
   scopertaChiave: string;
-  onLoadExtended: () => void;
-  loadingExtended: boolean;
 }
 
 const SLIDES = [
@@ -26,8 +24,6 @@ export default function WeekCarousel({
   mantra,
   pratiche,
   scopertaChiave,
-  onLoadExtended,
-  loadingExtended,
 }: WeekCarouselProps) {
   const [current, setCurrent] = useState(0);
   const touchStartX = useRef(0);
@@ -161,19 +157,12 @@ export default function WeekCarousel({
               </div>
             </div>
             <div className="w-full h-px bg-amber-100 mb-4" />
-            <p className="text-gray-700 text-sm leading-relaxed mb-5">
+            <p className="text-gray-700 text-sm leading-relaxed mb-3">
               {scopertaChiave || <span className="text-stone-400 italic">Contenuto non ancora disponibile.</span>}
             </p>
-            <button
-              onClick={onLoadExtended}
-              disabled={loadingExtended}
-              className="w-full border-2 border-dashed border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-            >
-              {loadingExtended
-                ? <><span className="animate-spin inline-block">⏳</span> Caricamento...</>
-                : <>📚 Vedi versione estesa della settimana</>
-              }
-            </button>
+            <p className="text-xs text-stone-400 text-center italic mt-4">
+              ↓ Continua sotto per la preghiera e l'approfondimento
+            </p>
           </div>
 
         </div>

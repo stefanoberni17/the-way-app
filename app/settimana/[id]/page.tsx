@@ -5,6 +5,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import EpisodeCard from '@/components/EpisodeCard';
 import WeekCarousel from '@/components/WeekCarousel';
+import WeekDeepDive from '@/components/WeekDeepDive';
 import { isWeekUnlockedInBeta } from '@/lib/weekUnlockLogic';
 import { WEEK_IDS as WEEK_IDS_MAP } from '@/lib/weekIds';
 
@@ -270,6 +271,8 @@ export default function SettimanaPage() {
     .map((p: string) => p.trim())
     .filter(Boolean);
   const scopertaChiave = (properties['Scoperta chiave']?.rich_text?.[0]?.plain_text || '').replace(/<br>/g, '\n');
+  const preghiera = (properties.Preghiera?.rich_text?.[0]?.plain_text || '').replace(/<br>/g, '\n');
+  const integrazione = (properties.Integrazione?.rich_text?.[0]?.plain_text || '').replace(/<br>/g, '\n');
 
   const weekEpisodes = WEEK_EPISODES[weekNumber.toString()] || [];
   const nextWeekInBeta = nextWeekNumber !== null && isWeekUnlockedInBeta(nextWeekNumber);
@@ -405,10 +408,16 @@ export default function SettimanaPage() {
             mantra={mantra}
             pratiche={pratiche}
             scopertaChiave={scopertaChiave}
-            onLoadExtended={handleLoadExtended}
-            loadingExtended={loadingExtended}
           />
         </div>
+
+        {/* Approfondimento: preghiera + integrazione + versione estesa */}
+        <WeekDeepDive
+          preghiera={preghiera}
+          integrazione={integrazione}
+          onOpenExtended={handleLoadExtended}
+          loadingExtended={loadingExtended}
+        />
 
         {/* Episodi */}
         <div className="mb-6" ref={episodesRef}>

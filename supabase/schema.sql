@@ -96,6 +96,19 @@ CREATE TABLE IF NOT EXISTS public.push_subscriptions (
 CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user
   ON public.push_subscriptions (user_id);
 
+-- daily_verses: versetto del giorno scritto dal cron (broadcast: 1 riga al giorno per tutti)
+CREATE TABLE IF NOT EXISTS public.daily_verses (
+  delivery_date  DATE PRIMARY KEY,
+  text           TEXT NOT NULL,
+  reference      TEXT,
+  notion_page_id TEXT,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Tracking "letto" per utente: data dell'ultimo versetto giornaliero visto
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS last_daily_verse_seen DATE;
+
 -- ============================================
 -- 2. TRIGGER: auto-creazione profilo alla signup
 -- (la riga viene poi arricchita dalla pagina /register lato client)
@@ -129,6 +142,7 @@ ALTER TABLE public.episode_reflections     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.weekly_practices        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.telegram_conversations  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.push_subscriptions      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.daily_verses            ENABLE ROW LEVEL SECURITY;
 
 -- ---- profiles ----
 DROP POLICY IF EXISTS "profiles_select_own" ON public.profiles;
@@ -198,6 +212,12 @@ CREATE POLICY "push_insert_own" ON public.push_subscriptions
 DROP POLICY IF EXISTS "push_delete_own" ON public.push_subscriptions;
 CREATE POLICY "push_delete_own" ON public.push_subscriptions
   FOR DELETE USING (auth.uid() = user_id);
+
+-- ---- daily_verses ----
+-- Broadcast: tutti gli utenti autenticati leggono. Scrittura solo da service_role (cron).
+DROP POLICY IF EXISTS "dv_select_authenticated" ON public.daily_verses;
+CREATE POLICY "dv_select_authenticated" ON public.daily_verses
+  FOR SELECT TO authenticated USING (true);
 
 -- ============================================
 -- 4. updated_at automatico

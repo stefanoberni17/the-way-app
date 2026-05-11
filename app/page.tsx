@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useMeditation } from '@/components/MeditationContext';
+import DailyVerseCard from '@/components/DailyVerseCard';
 import { WEEK_IDS, WEEK_NAMES } from '@/lib/weekIds';
 import { BETA_MAX_EPISODE } from '@/lib/weekUnlockLogic';
 
@@ -146,6 +147,9 @@ export default function HomePage() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 -mt-3">
+
+        {/* ── Versetto del giorno (push del mattino, persistito) ── */}
+        <DailyVerseCard name={profile?.name} />
 
         {/* ── Versetto hero ── */}
         {mantra ? (

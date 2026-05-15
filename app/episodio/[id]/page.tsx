@@ -400,6 +400,12 @@ export default function EpisodioPage() {
         setCompleted(data.episode.completed);
         setLoading(false);
 
+        // Se il passo è già completato, apri direttamente Step 5
+        // (così l'approfondimento è la prima cosa visibile al rientro)
+        if (data.episode.completed) {
+          setCurrentStep(5);
+        }
+
         const reflectionRes = await fetch(`/api/reflection?userId=${userId}&episodeNumber=${episodeNumber}`);
         const reflectionData = await reflectionRes.json();
         if (reflectionData.reflection) {
@@ -810,29 +816,53 @@ export default function EpisodioPage() {
                 </div>
               )}
 
-              {/* Vai più a fondo — Approfondimento collassato */}
+              {/* Vai più a fondo — Approfondimento
+                  Pre-completamento: collassato e discreto (non distrae dalla riflessione)
+                  Post-completamento: aperto e prominente ("premio" per chi rientra) */}
               {episodeData?.approfondimento && (
-                <details className="group mb-5 bg-white border border-stone-200 rounded-xl overflow-hidden">
-                  <summary className="cursor-pointer list-none px-5 py-4 flex items-center justify-between hover:bg-stone-50 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg">📚</span>
-                      <div>
-                        <p className="text-xs font-bold text-amber-700 uppercase tracking-wider">
-                          Vai più a fondo
-                        </p>
-                        <p className="text-xs text-stone-500 italic mt-0.5">
-                          Una lettura ampia — per chi vuole entrare in profondità
-                        </p>
+                completed ? (
+                  <div className="mb-5 bg-gradient-to-br from-amber-50 via-stone-50 to-amber-50 border-2 border-amber-200 rounded-2xl overflow-hidden shadow-sm">
+                    <div className="h-1 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500" />
+                    <div className="px-6 py-5">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="text-2xl">📚</span>
+                        <div>
+                          <p className="text-xs font-bold text-amber-800 uppercase tracking-widest">
+                            Ora che hai vissuto il passo
+                          </p>
+                          <p className="text-base font-serif text-slate-800 mt-1">
+                            Vai più a fondo
+                          </p>
+                        </div>
+                      </div>
+                      <div className="prose prose-sm prose-stone max-w-none text-stone-700 leading-relaxed font-serif whitespace-pre-line">
+                        {episodeData.approfondimento}
                       </div>
                     </div>
-                    <span className="text-stone-400 text-sm group-open:rotate-180 transition-transform">▾</span>
-                  </summary>
-                  <div className="px-5 pb-5 pt-1 border-t border-stone-100">
-                    <div className="prose prose-sm prose-stone max-w-none text-stone-700 leading-relaxed font-serif whitespace-pre-line">
-                      {episodeData.approfondimento}
-                    </div>
                   </div>
-                </details>
+                ) : (
+                  <details className="group mb-5 bg-white border border-stone-200 rounded-xl overflow-hidden">
+                    <summary className="cursor-pointer list-none px-5 py-4 flex items-center justify-between hover:bg-stone-50 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg">📚</span>
+                        <div>
+                          <p className="text-xs font-bold text-amber-700 uppercase tracking-wider">
+                            Vai più a fondo
+                          </p>
+                          <p className="text-xs text-stone-500 italic mt-0.5">
+                            Una lettura ampia — disponibile dopo aver vissuto il passo
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-stone-400 text-sm group-open:rotate-180 transition-transform">▾</span>
+                    </summary>
+                    <div className="px-5 pb-5 pt-1 border-t border-stone-100">
+                      <div className="prose prose-sm prose-stone max-w-none text-stone-700 leading-relaxed font-serif whitespace-pre-line">
+                        {episodeData.approfondimento}
+                      </div>
+                    </div>
+                  </details>
+                )
               )}
 
               {completed ? (

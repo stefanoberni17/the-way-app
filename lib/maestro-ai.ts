@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { createClient } from '@supabase/supabase-js';
+import { getTodayRome, subtractDays } from './weekStart';
 
 export const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -225,6 +226,21 @@ Hai accesso a:
 Usa queste informazioni per personalizzare le risposte, ma mai in modo invadente.
 **Non interpretare in modo psicologico o diagnostico. Rifletti solo ciò che è esplicitamente emerso.**
 
+# RITMO QUOTIDIANO
+
+Hai accesso a medie e trend dei check-in serali della persona — due dimensioni
+qualitative: presenza durante la giornata e connessione con sé.
+
+REGOLE FERREE:
+- MAI elencare i numeri ("la tua presenza è 6.4 su 10")
+- MAI diagnosticare ("hai un problema di connessione")
+- MAI fare confronti competitivi ("la settimana scorsa eri più presente")
+- SOLO se la persona porta il tema, puoi accennare in modo organico:
+  "Noto che in questi giorni la presenza si è fatta più sottile" —
+  come restituzione gentile, non come report
+- Se i dati sono insufficienti (<3 check-in), comportati come se non ci fossero
+- I check-in sono uno specchio per la persona, non un cruscotto per te
+
 # SETTIMANE DEL PERCORSO
 
 ## PARTE 1 — LE FONDAMENTA (Week 1-10)
@@ -313,6 +329,59 @@ Stai rispondendo nella chat web dell'app. Tieni presente:
 - Le pratiche possono essere descritte in 3-5 righe con istruzioni chiare
 - Una sola domanda per messaggio, mai due`;
 
+// Distilla gli ultimi 7 giorni di check-in in un blocco testuale qualitativo.
+// Mai numeri grezzi → solo medie e trend, e solo se ci sono dati sufficienti.
+interface CheckinRow {
+  checkin_date: string;
+  q_presence: number | null;
+  q_connection: number | null;
+  note: string | null;
+  checkin_submitted_at: string | null;
+}
+
+function distillCheckins(rows: CheckinRow[]): string {
+  if (!rows || rows.length === 0) return '';
+
+  const presences = rows.map(r => r.q_presence).filter((v): v is number => typeof v === 'number');
+  const connections = rows.map(r => r.q_connection).filter((v): v is number => typeof v === 'number');
+  const count = rows.length;
+
+  if (count < 3) {
+    return `
+## Ritmo quotidiano (ultimi 7 giorni)
+Check-in compilati: ${count} (dati insufficienti per leggere un pattern)
+`;
+  }
+
+  const avg = (arr: number[]) =>
+    arr.length > 0 ? Math.round((arr.reduce((s, x) => s + x, 0) / arr.length) * 10) / 10 : null;
+
+  const trend = (arr: number[]): string => {
+    if (arr.length < 4) return 'stabile';
+    const recent = arr.slice(0, 3);
+    const earlier = arr.slice(3);
+    const rAvg = avg(recent)!;
+    const eAvg = avg(earlier)!;
+    const diff = rAvg - eAvg;
+    if (Math.abs(diff) < 1.5) return 'stabile';
+    return diff > 0 ? 'in crescita' : 'in calo';
+  };
+
+  // Nota più recente (testo libero) se presente
+  const lastNote = rows.find(r => r.note && r.note.trim().length > 0);
+  const noteLine = lastNote
+    ? `Nota recente (${lastNote.checkin_date}): "${(lastNote.note || '').slice(0, 200)}"`
+    : '';
+
+  return `
+## Ritmo quotidiano (ultimi 7 giorni)
+Check-in compilati: ${count} su 7
+Presenza durante la giornata: ${avg(presences)} — ${trend(presences)}
+Connessione con sé: ${avg(connections)} — ${trend(connections)}
+${noteLine}
+`;
+}
+
 export async function buildUserContext(userId: string): Promise<string> {
   const { data: profile } = await supabaseAdmin
     .from('profiles')
@@ -332,6 +401,18 @@ export async function buildUserContext(userId: string): Promise<string> {
     .select('episode_number, reflection_question, reflection_text, created_at')
     .eq('user_id', userId)
     .order('episode_number', { ascending: true });
+
+  const today = getTodayRome();
+  const sevenDaysAgo = subtractDays(today, 7);
+  const { data: checkins } = await supabaseAdmin
+    .from('daily_checkins')
+    .select('checkin_date, q_presence, q_connection, note, checkin_submitted_at')
+    .eq('user_id', userId)
+    .gte('checkin_date', sevenDaysAgo)
+    .not('checkin_submitted_at', 'is', null)
+    .order('checkin_date', { ascending: false });
+
+  const rhythmBlock = distillCheckins(checkins || []);
 
   const currentWeek = profile?.current_week || 1;
 
@@ -364,6 +445,7 @@ Domanda: "${r.reflection_question}"
 Risposta: "${r.reflection_text}"
 `).join('\n')
   : 'Nessuna riflessione ancora scritta'}
+${rhythmBlock}
 ${profile?.maestro_notes ? `
 ## Note della Guida (memoria distillata)
 *Pattern ricorrenti e temi emersi nelle conversazioni precedenti*

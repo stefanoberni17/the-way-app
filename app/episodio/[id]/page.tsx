@@ -19,6 +19,7 @@ interface EpisodeData {
   concepts: string;
   salmoSupport: string;
   practices: string;
+  approfondimento: string;
   audioUrl: string;
   /** "Lectio" | "Integrazione" | "Pratica" — default Lectio */
   tipo: string;
@@ -807,6 +808,31 @@ export default function EpisodioPage() {
                     ))}
                   </div>
                 </div>
+              )}
+
+              {/* Vai più a fondo — Approfondimento collassato */}
+              {episodeData?.approfondimento && (
+                <details className="group mb-5 bg-white border border-stone-200 rounded-xl overflow-hidden">
+                  <summary className="cursor-pointer list-none px-5 py-4 flex items-center justify-between hover:bg-stone-50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg">📚</span>
+                      <div>
+                        <p className="text-xs font-bold text-amber-700 uppercase tracking-wider">
+                          Vai più a fondo
+                        </p>
+                        <p className="text-xs text-stone-500 italic mt-0.5">
+                          Una lettura ampia — per chi vuole entrare in profondità
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-stone-400 text-sm group-open:rotate-180 transition-transform">▾</span>
+                  </summary>
+                  <div className="px-5 pb-5 pt-1 border-t border-stone-100">
+                    <div className="prose prose-sm prose-stone max-w-none text-stone-700 leading-relaxed font-serif whitespace-pre-line">
+                      {episodeData.approfondimento}
+                    </div>
+                  </div>
+                </details>
               )}
 
               {completed ? (

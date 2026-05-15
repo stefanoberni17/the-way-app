@@ -245,3 +245,55 @@ DROP TRIGGER IF EXISTS trg_practices_updated_at ON public.weekly_practices;
 CREATE TRIGGER trg_practices_updated_at
   BEFORE UPDATE ON public.weekly_practices
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+-- ============================================
+-- 5. VITA QUOTIDIANA — daily_checkins
+-- Una riga al giorno per utente: ospita l'invito del giorno
+-- e il check-in serale (presenza + connessione con sé).
+-- ============================================
+CREATE TABLE IF NOT EXISTS public.daily_checkins (
+  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id               UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  checkin_date          DATE NOT NULL,                -- giorno locale Europe/Rome
+  week_number           INT,
+  episode_number        INT,
+
+  -- Invito del giorno
+  invitation_text       TEXT,
+  invitation_seen_at    TIMESTAMPTZ,
+  invitation_done_at    TIMESTAMPTZ,
+
+  -- Check-in serale (1-10, nullable finché non compilato)
+  q_presence            INT CHECK (q_presence   BETWEEN 1 AND 10),
+  q_connection          INT CHECK (q_connection BETWEEN 1 AND 10),
+  note                  TEXT,
+  checkin_submitted_at  TIMESTAMPTZ,
+  flagged               BOOLEAN NOT NULL DEFAULT false,
+
+  created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+  UNIQUE (user_id, checkin_date)
+);
+
+CREATE INDEX IF NOT EXISTS idx_daily_checkins_user_date
+  ON public.daily_checkins (user_id, checkin_date DESC);
+
+ALTER TABLE public.daily_checkins ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "dc_select_own" ON public.daily_checkins;
+CREATE POLICY "dc_select_own" ON public.daily_checkins
+  FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "dc_insert_own" ON public.daily_checkins;
+CREATE POLICY "dc_insert_own" ON public.daily_checkins
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "dc_update_own" ON public.daily_checkins;
+CREATE POLICY "dc_update_own" ON public.daily_checkins
+  FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+DROP TRIGGER IF EXISTS trg_daily_checkins_updated_at ON public.daily_checkins;
+CREATE TRIGGER trg_daily_checkins_updated_at
+  BEFORE UPDATE ON public.daily_checkins
+  FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();

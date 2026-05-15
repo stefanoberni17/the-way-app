@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useMeditation } from '@/components/MeditationContext';
 import DailyVerseCard from '@/components/DailyVerseCard';
+import DailyInvitationCard from '@/components/DailyInvitationCard';
+import EveningCheckinCard from '@/components/EveningCheckinCard';
+import EveningReminderBanner from '@/components/EveningReminderBanner';
 import { WEEK_IDS, WEEK_NAMES } from '@/lib/weekIds';
 import { BETA_MAX_EPISODE } from '@/lib/weekUnlockLogic';
 
@@ -28,6 +31,18 @@ export default function HomePage() {
   const [practices, setPractices] = useState<any[]>([]);
   const [loadingPractices, setLoadingPractices] = useState(false);
   const [practicesVisible, setPracticesVisible] = useState(true);
+  const [showCheckinToast, setShowCheckinToast] = useState(false);
+
+  // Toast "Custodito ✓" dopo submit check-in serale
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (sessionStorage.getItem('checkin_just_saved') === '1') {
+      sessionStorage.removeItem('checkin_just_saved');
+      setShowCheckinToast(true);
+      const t = setTimeout(() => setShowCheckinToast(false), 3000);
+      return () => clearTimeout(t);
+    }
+  }, []);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -133,6 +148,16 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-stone-50 pb-24">
 
+      {/* ── Banner serale alle 21 (se check-in non fatto) ── */}
+      <EveningReminderBanner />
+
+      {/* ── Toast "Custodito ✓" post check-in ── */}
+      {showCheckinToast && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-green-600 text-white text-sm font-bold px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 animate-fade-in">
+          <span>✓</span> Giornata custodita
+        </div>
+      )}
+
       {/* ── Top header ── */}
       <div className="bg-slate-900 px-5 pt-10 pb-8">
         <div className="max-w-2xl mx-auto">
@@ -150,6 +175,10 @@ export default function HomePage() {
 
         {/* ── Versetto del giorno (push del mattino, persistito) ── */}
         <DailyVerseCard name={profile?.name} />
+
+        {/* ── Vita Quotidiana: invito del giorno + check-in serale ── */}
+        <DailyInvitationCard />
+        <EveningCheckinCard />
 
         {/* ── Versetto hero ── */}
         {mantra ? (

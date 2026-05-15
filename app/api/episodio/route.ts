@@ -178,6 +178,8 @@ export async function GET(request: NextRequest) {
         concepts: getText(properties['Concetti collegati']),
         salmoSupport: getText(properties['Salmo/Proverbio di supporto']),
         practices: getText(properties['Pratiche consigliate']),
+        dailyInvitations: getText(properties['Inviti del giorno']),
+        approfondimento: getText(properties['Approfondimento']),
         audioUrl: getUrl(properties['Audio URL']),
         tipo: getSelect(properties['Tipo']) || 'Lectio',
         durata: properties['Durata stimata']?.number || null,

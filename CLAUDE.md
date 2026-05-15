@@ -44,12 +44,15 @@ naruto-inner-path/
 │   ├── episodio/[id]/page.tsx     # Episodio (id = numero episodio 1-19)
 │   ├── profilo/page.tsx
 │   ├── privacy/page.tsx           # Privacy Policy (pubblica, senza BottomTabBar)
+│   ├── cammino-oggi/page.tsx      # Check-in serale (2 slider 1-10 + nota)
 │   └── api/
 │       ├── settimane/route.ts     # GET → lista 6 settimane da Notion DB
 │       ├── settimana/route.ts     # GET ?id= → dettaglio pagina Notion + blocchi
 │       ├── episodio/route.ts      # GET ?number=&userId=  /  POST completamento
 │       ├── practices/route.ts     # GET/POST tracker pratiche (14 giorni × 3 pratiche)
 │       ├── reflection/route.ts    # GET/POST riflessioni post-episodio
+│       ├── daily-invitation/route.ts  # GET/POST invito del giorno (lazy upsert)
+│       ├── daily-checkin/route.ts # GET/POST check-in serale (2 dimensioni 1-10)
 │       ├── chat/route.ts          # POST → Claude Sonnet con context utente
 │       ├── telegram/route.ts      # POST → webhook bot Telegram
 │       └── cron/
@@ -61,11 +64,17 @@ naruto-inner-path/
 │   ├── GlobalMeditationWrapper.tsx# Context provider meditazione (in layout)
 │   ├── MeditationContext.tsx      # Context: { openMeditation, mantra, weekName }
 │   ├── MeditationPopup.tsx        # Popup meditazione guidata (2 fasi)
+│   ├── DailyVerseCard.tsx         # Versetto del giorno (push del mattino)
+│   ├── DailyInvitationCard.tsx    # Invito del giorno (Vita Quotidiana)
+│   ├── EveningCheckinCard.tsx     # Card check-in serale in home (3 stati)
+│   ├── EveningReminderBanner.tsx  # Banner sticky alle 21 se check-in non fatto
 │   └── Navigation.tsx             # (non in uso attivo)
 ├── lib/
 │   ├── supabase.ts                # Client Supabase pubblico (browser)
 │   ├── episodeMapping.ts          # Map episodio → Notion pageId, settimana
 │   ├── weekUnlockLogic.ts         # Logica sblocco settimane sequenziale
+│   ├── dailyInvitation.ts         # pickInvitation + fallback hardcoded per week
+│   ├── weekStart.ts               # getMondayRome / getTodayRome / subtractDays
 │   └── maestro-ai.ts             # System prompt + buildUserContext + callClaude
 ├── public/
 │   └── audio/
@@ -151,6 +160,29 @@ PRIMARY KEY (user_id, week_number, practice_number)
 ```
 **Reset settimanale**: `app/api/practices` confronta `week_start_date` con il lunedì attuale (helper `lib/weekStart.ts#getMondayRome`); se diverso, azzera `completed_days` e aggiorna `week_start_date`. Così le caselle Lun-Dom ripartono ogni nuovo lunedì anche se l'utente resta più giorni sulla stessa `week_number` del percorso.
 
+### `daily_checkins`
+```sql
+user_id               UUID
+checkin_date          DATE             -- giorno locale Europe/Rome
+week_number           INT
+episode_number        INT              -- passo guida da cui deriva l'invito
+
+-- Invito del giorno (mostrato in home)
+invitation_text       TEXT
+invitation_seen_at    TIMESTAMPTZ
+invitation_done_at    TIMESTAMPTZ
+
+-- Check-in serale (1-10, nullable finché non compilato)
+q_presence            INT              -- presenza durante la giornata
+q_connection          INT              -- connessione con se stesso
+note                  TEXT             -- max 500 char
+checkin_submitted_at  TIMESTAMPTZ
+flagged               BOOLEAN          -- true se la note contiene SAFETY_KEYWORDS
+
+UNIQUE (user_id, checkin_date)
+```
+Modulo "Vita Quotidiana": una riga per utente per giorno. L'invito viene popolato lazy al primo GET di `/api/daily-invitation` (selezione deterministica via `lib/dailyInvitation.ts#pickInvitation` — fonte primaria: campo Notion `Inviti del giorno` del passo guida; fallback: catalogo hardcoded per settimana). Il check-in serale si compila da `/cammino-oggi`. I dati alimentano `buildUserContext` del Maestro AI in modo distillato (medie + trend, mai numeri grezzi).
+
 ### `telegram_conversations`
 ```sql
 user_id     UUID
@@ -185,6 +217,8 @@ Una pagina per ogni passo. Properties chiave:
 - `Tipo` — `Lectio` / `Integrazione` / `Pratica`
 - `Passo biblico` — title del passo
 - `Riferimento`, `Mini-lezione breve`, `Guida osservazione`, `Domanda riflessiva`, `Versetto da portare`, `Pratiche consigliate`, `Salmo/Proverbio di supporto`, `Concetti collegati`, `Tema principale`
+- `Inviti del giorno` — rich_text con 3 micro-pratiche giornaliere (separate da `\n` o `<br>`). Linea-guida: una frase, max 12-15 parole, imperativo gentile ("Oggi nota...", "Lascia che..."), portabile in una giornata qualsiasi, niente lessico tecnico ("custodia del cuore" solo dalla Week 3 in poi). Letta da `lib/dailyInvitation.ts` per ruotare l'invito del giorno in home.
+- `Approfondimento` — rich_text con una lettura ampia legata al passo (~250-350 parole). Esegesi, contesto storico, voci della tradizione cristiana (Padri della Chiesa, mistici, teologi moderni), salmi/lectio correlati. Mostrato come `<details>` collassato nello Step 5 dell'episodio ("📚 Vai più a fondo"). Discreto: chi vuole apre, chi no resta nel flusso normale.
 - `Durata stimata`, `Audio URL`
 
 L'API `/api/episodio` filtra `Numero=localNum AND Settimana="Week N"`.
@@ -252,6 +286,34 @@ Quando l'utente completa l'ultimo episodio di una settimana:
 ```
 
 **Nota**: Ogni settimana del percorso ha la propria pagina Notion e i propri 7 passi (vedi [lib/weekIds.ts](lib/weekIds.ts) e [lib/episodeMapping.ts](lib/episodeMapping.ts)). Le bundled storiche "Week 1-2"/"Week 3-4"/"Week 5-6" sono state archiviate (Numero ≥ 90) e non vengono più referenziate dal codice.
+
+### Vita Quotidiana (Invito del giorno + Check-in serale)
+```
+MATTINA / GIORNO
+  Home → DailyInvitationCard → GET /api/daily-invitation
+    → Lazy upsert riga di oggi in `daily_checkins` (se non esiste)
+    → pickInvitation(): legge campo Notion "Inviti del giorno" del passo guida
+      (= ultimo passo completato, fallback passo 1 della week corrente)
+    → Selezione deterministica per giorno (hash userId + giorni dall'epoca)
+    → Fallback: WEEK_INVITATION_FALLBACK[weekNumber] in lib/dailyInvitation.ts
+  → Utente clicca "✓ L'ho vissuto" → POST { action: 'done' }
+
+SERA (18:00+)
+  Home → EveningCheckinCard mostra CTA "Fai il check-in della sera"
+  /cammino-oggi → 2 slider 1-10 (presenza + connessione con sé) + nota opzionale
+  → POST /api/daily-checkin → safety check sulla note (SAFETY_KEYWORDS)
+  → Redirect home con toast "Giornata custodita ✓"
+
+ALLE 21:00
+  EveningReminderBanner appare sticky in alto se check-in non fatto
+  → Dismissible per sessione (sessionStorage)
+
+MAESTRO AI
+  buildUserContext() include ultimi 7 giorni di check-in in forma DISTILLATA:
+    medie + trend ("in crescita/stabile/in calo"), nota recente troncata.
+  Regola ferrea nel SYSTEM_PROMPT ("# RITMO QUOTIDIANO"): mai elencare numeri,
+  mai diagnosticare, accennare solo se la persona porta il tema.
+```
 
 ### Meditazione Guidata
 ```

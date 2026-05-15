@@ -38,3 +38,24 @@ export function getMondayRome(date: Date = new Date()): string {
   const d = String(monday.getUTCDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
 }
+
+// Data odierna in TZ Roma in formato 'YYYY-MM-DD'.
+// Usata dal modulo Vita Quotidiana per identificare il giorno del check-in.
+export function getTodayRome(date: Date = new Date()): string {
+  const { year, month, day } = partsInRome(date);
+  const y = String(year);
+  const m = String(month).padStart(2, '0');
+  const d = String(day).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+// Sottrae N giorni a una data 'YYYY-MM-DD' (timezone-safe, lavora in UTC).
+export function subtractDays(dateStr: string, days: number): string {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const utc = Date.UTC(y, m - 1, d) - days * 24 * 60 * 60 * 1000;
+  const out = new Date(utc);
+  const yy = out.getUTCFullYear();
+  const mm = String(out.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(out.getUTCDate()).padStart(2, '0');
+  return `${yy}-${mm}-${dd}`;
+}

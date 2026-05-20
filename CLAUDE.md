@@ -45,6 +45,7 @@ naruto-inner-path/
 │   ├── profilo/page.tsx
 │   ├── privacy/page.tsx           # Privacy Policy (pubblica, senza BottomTabBar)
 │   ├── cammino-oggi/page.tsx      # Check-in serale (2 slider 1-10 + nota)
+│   ├── custoditi/page.tsx         # Tab "Custoditi": passi salvati + filtri tag
 │   └── api/
 │       ├── settimane/route.ts     # GET → lista 6 settimane da Notion DB
 │       ├── settimana/route.ts     # GET ?id= → dettaglio pagina Notion + blocchi
@@ -53,6 +54,7 @@ naruto-inner-path/
 │       ├── reflection/route.ts    # GET/POST riflessioni post-episodio
 │       ├── daily-invitation/route.ts  # GET/POST invito del giorno (lazy upsert)
 │       ├── daily-checkin/route.ts # GET/POST check-in serale (2 dimensioni 1-10)
+│       ├── saved-passages/route.ts # GET/POST/DELETE passi custoditi con tag tematici
 │       ├── chat/route.ts          # POST → Claude Sonnet con context utente
 │       ├── telegram/route.ts      # POST → webhook bot Telegram
 │       └── cron/
@@ -68,12 +70,15 @@ naruto-inner-path/
 │   ├── DailyInvitationCard.tsx    # Invito del giorno (Vita Quotidiana)
 │   ├── EveningCheckinCard.tsx     # Card check-in serale in home (3 stati)
 │   ├── EveningReminderBanner.tsx  # Banner sticky alle 21 se check-in non fatto
+│   ├── SavePassageButton.tsx      # Bottone "Custodisci" + modal tag (in Step 5 passo)
 │   └── Navigation.tsx             # (non in uso attivo)
 ├── lib/
 │   ├── supabase.ts                # Client Supabase pubblico (browser)
 │   ├── episodeMapping.ts          # Map episodio → Notion pageId, settimana
 │   ├── weekUnlockLogic.ts         # Logica sblocco settimane sequenziale
 │   ├── dailyInvitation.ts         # pickInvitation + fallback hardcoded per week
+│   ├── savedPassageTags.ts        # Catalogo tag tematici + auto-suggest passi
+│   ├── episodeMetadata.ts         # Metadata statici 28 passi MVP (title/ref/week)
 │   ├── weekStart.ts               # getMondayRome / getTodayRome / subtractDays
 │   └── maestro-ai.ts             # System prompt + buildUserContext + callClaude
 ├── public/
@@ -159,6 +164,18 @@ updated_at       TIMESTAMPTZ
 PRIMARY KEY (user_id, week_number, practice_number)
 ```
 **Reset settimanale**: `app/api/practices` confronta `week_start_date` con il lunedì attuale (helper `lib/weekStart.ts#getMondayRome`); se diverso, azzera `completed_days` e aggiorna `week_start_date`. Così le caselle Lun-Dom ripartono ogni nuovo lunedì anche se l'utente resta più giorni sulla stessa `week_number` del percorso.
+
+### `saved_passages`
+```sql
+user_id        UUID
+episode_number INT
+tags           JSONB    -- array di tag-id curati (es. ["paura","sera"])
+note           TEXT     -- opzionale (futuro)
+created_at     TIMESTAMPTZ
+updated_at     TIMESTAMPTZ
+PRIMARY KEY (user_id, episode_number)
+```
+Modulo "Custoditi": l'utente salva i passi a cui vuole tornare, taggandoli con categorie tematiche curate ("Quando ho paura", "Per la sera", "Quando devo decidere", ecc. — catalogo in `lib/savedPassageTags.ts`). Indice GIN su `tags` per filtraggio rapido. Pagina dedicata `/custoditi` (5° tab in BottomTabBar).
 
 ### `daily_checkins`
 ```sql
@@ -314,6 +331,24 @@ MAESTRO AI
   Regola ferrea nel SYSTEM_PROMPT ("# RITMO QUOTIDIANO"): mai elencare numeri,
   mai diagnosticare, accennare solo se la persona porta il tema.
 ```
+
+### Custoditi (passi salvati)
+```
+SALVARE
+  /episodio/[id] → Step 5 → "🤍 Custodisci questo passo"
+    → Modal: 12 tag tematici curati ("Quando ho paura", "Per la sera"...)
+      con auto-suggerimento basato sul passo (suggestTagsForEpisode in lib/savedPassageTags.ts)
+    → POST /api/saved-passages { episodeNumber, tags }
+    → Salva in saved_passages (upsert per user_id+episode_number)
+
+RITROVARE
+  BottomTabBar → "Custoditi" → /custoditi
+    → GET /api/saved-passages → lista row con tags
+    → Render con metadata da lib/episodeMetadata.ts (title, ref, week — no fetch Notion)
+    → Filtri chip: solo i tag effettivamente presenti tra i passi salvati
+    → Click sulla card → /episodio/[id]
+```
+Filosofia: l'utente custodisce i passi che gli parlano e li ritrova in base alle "necessità della vita" — non per tema del percorso, ma per stato interiore del momento.
 
 ### Meditazione Guidata
 ```

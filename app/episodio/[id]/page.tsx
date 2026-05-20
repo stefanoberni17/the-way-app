@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import EpisodeAudioPlayer from '@/components/EpisodeAudioPlayer';
+import SavePassageButton from '@/components/SavePassageButton';
 import { BookOpen, Pencil, Heart } from 'lucide-react';
 
 interface EpisodeData {
@@ -864,6 +865,9 @@ export default function EpisodioPage() {
                   </details>
                 )
               )}
+
+              {/* Custodisci questo passo — sempre visibile in Step 5 */}
+              <SavePassageButton episodeNumber={episodeNumber} />
 
               {completed ? (
                 <div className="w-full bg-green-50 border border-green-200 text-green-700 text-sm font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2">

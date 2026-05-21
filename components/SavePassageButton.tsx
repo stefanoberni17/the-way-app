@@ -125,21 +125,26 @@ export default function SavePassageButton({ episodeNumber }: SavePassageButtonPr
 
       {showModal && (
         <div
-          className="fixed inset-0 z-50 bg-slate-900/60 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm"
+          // z-[70] per stare SOPRA la BottomTabBar (che usa z-50)
+          className="fixed inset-0 z-[70] bg-slate-900/60 flex items-end sm:items-center justify-center backdrop-blur-sm"
           onClick={() => setShowModal(false)}
         >
           <div
-            className="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl w-full sm:max-w-md max-h-[85vh] overflow-y-auto"
+            // flex column: header fisso, body scrollabile, footer fisso
+            // max-h calcolato lasciando margine in alto su mobile
+            className="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl w-full sm:max-w-md flex flex-col max-h-[92vh] sm:max-h-[85vh] sm:m-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-5 pt-5 pb-4 border-b border-stone-100">
+            {/* HEADER fisso */}
+            <div className="px-5 pt-5 pb-4 border-b border-stone-100 shrink-0">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-xs font-bold text-amber-700 uppercase tracking-widest">
                   Custodisci il passo
                 </p>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="text-stone-400 hover:text-stone-600 text-2xl leading-none"
+                  className="text-stone-400 hover:text-stone-600 text-2xl leading-none w-8 h-8 flex items-center justify-center -mr-2"
+                  aria-label="Chiudi"
                 >
                   ×
                 </button>
@@ -149,7 +154,8 @@ export default function SavePassageButton({ episodeNumber }: SavePassageButtonPr
               </p>
             </div>
 
-            <div className="px-5 py-4 space-y-2">
+            {/* BODY scrollabile */}
+            <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 space-y-2">
               {PASSAGE_TAGS.map(tag => {
                 const selected = draftTags.includes(tag.id);
                 return (
@@ -174,7 +180,8 @@ export default function SavePassageButton({ episodeNumber }: SavePassageButtonPr
               })}
             </div>
 
-            <div className="px-5 py-4 border-t border-stone-100 sticky bottom-0 bg-white space-y-2">
+            {/* FOOTER fisso — non sticky, parte del flex container */}
+            <div className="px-5 py-4 border-t border-stone-100 bg-white space-y-2 shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
               <button
                 onClick={confirm}
                 disabled={busy}

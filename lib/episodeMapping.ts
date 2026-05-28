@@ -1,7 +1,7 @@
 // The Way — Episode (Passo) Mapping
 //
 // Struttura: 7 passi per settimana singola (6 Lectio + 1 Integrazione).
-// Beta: 4 settimane × 7 = 28 passi totali.
+// Beta: 6 settimane × 7 = 42 passi totali.
 //
 // Formula:
 //   weekNumber = ceil(globalEp / 7)
@@ -9,7 +9,7 @@
 //   settimana  = `Week ${weekNumber}`        → matcha la property Notion
 
 const PASSI_PER_WEEK = 7;
-const TOTAL_BETA_WEEKS = 4;
+const TOTAL_BETA_WEEKS = 6;
 const TOTAL_WEEKS = 6;
 
 export function getWeekFromEpisode(episodeNumber: number): number {

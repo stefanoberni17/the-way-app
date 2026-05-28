@@ -1,5 +1,5 @@
 // The Way — Logica unlock settimane basata su completamento episodi
-// 4 settimane Beta (singole), 7 passi ciascuna (6 Lectio + 1 Integrazione)
+// 6 settimane Beta (singole), 7 passi ciascuna (6 Lectio + 1 Integrazione)
 
 // Mapping settimane → range episodi (7 passi per singola settimana)
 const WEEK_EPISODE_RANGES: Record<number, { start: number; end: number }> = {
@@ -73,10 +73,10 @@ export function getNextWeekToUnlock(completedEpisodes: EpisodeProgress[]): numbe
 // ========================================
 
 /**
- * MVP Beta: Settimane 1-4 accessibili (passi 1-28, 7 per settimana)
+ * MVP Beta: Settimane 1-6 accessibili (passi 1-42, 7 per settimana)
  */
-export const BETA_MAX_WEEK = 4;
-export const BETA_MAX_EPISODE = 28;
+export const BETA_MAX_WEEK = 6;
+export const BETA_MAX_EPISODE = 42;
 
 export function isWeekUnlockedInBeta(weekNumber: number): boolean {
   return weekNumber <= BETA_MAX_WEEK;

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { getUnlockedWeeks, isWeekUnlockedInBeta, getWeekLockMessage } from '@/lib/weekUnlockLogic';
+import { getUnlockedWeeks, isWeekUnlockedInBeta, getWeekLockMessage, BETA_MAX_WEEK } from '@/lib/weekUnlockLogic';
 
 interface SingleWeek {
   id: string;         // Notion page ID (singolo per settimana)
@@ -102,8 +102,8 @@ export default function SettimanaPage() {
           </h1>
           <p className="text-slate-400 text-sm mt-1">
             {(() => {
-              const count = unlockedWeeks.filter(w => w <= 4).length;
-              return `${count} settiman${count === 1 ? 'a sbloccata' : 'e sbloccate'} · Beta: 4 disponibili`;
+              const count = unlockedWeeks.filter(w => w <= BETA_MAX_WEEK).length;
+              return `${count} settiman${count === 1 ? 'a sbloccata' : 'e sbloccate'} · Beta: ${BETA_MAX_WEEK} disponibili`;
             })()}
           </p>
         </div>
@@ -193,7 +193,7 @@ export default function SettimanaPage() {
               <span className="text-2xl">🔜</span>
               <div>
                 <p className="text-sm font-semibold text-amber-900">Altre settimane in arrivo</p>
-                <p className="text-xs text-amber-700 mt-0.5">Week 5 e oltre saranno disponibili nella versione completa. ✝️</p>
+                <p className="text-xs text-amber-700 mt-0.5">Week {BETA_MAX_WEEK + 1} e oltre saranno disponibili nella versione completa. ✝️</p>
               </div>
             </div>
           </div>

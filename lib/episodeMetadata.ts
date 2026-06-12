@@ -18,6 +18,8 @@ const W: Record<number, string> = {
   4: 'Il silenzio di Nazaret',
   5: 'Il deserto del primo silenzio',
   6: 'Comincia ad ascoltare',
+  7: 'Ascolto anche quando non sento',
+  8: 'La voce nel quotidiano',
 };
 
 const meta = (n: number, title: string, reference: string, week: number): EpisodeMeta => ({
@@ -82,6 +84,24 @@ export const EPISODE_METADATA: Record<number, EpisodeMeta> = {
   40: meta(40, 'Promessa di ascolto — Ascolterò',        'Salmo 85:9', 6),
   41: meta(41, 'Gesù si ritirava — Il ritmo del ritirarsi', 'Luca 5:16', 6),
   42: meta(42, 'Integrazione W6 — La voce piccola che è cominciata', 'Integrazione', 6),
+
+  // Week 7 — Ascolto anche quando non sento (Ascolto cont.)
+  43: meta(43, 'La sentinella che resta',                'Salmo 130:5-6', 7),
+  44: meta(44, 'Bussare nella notte',                    'Luca 11:5-13', 7),
+  45: meta(45, 'Dirsi le cose vere',                     'Salmo 27:14', 7),
+  46: meta(46, 'La sentinella',                          'Abacuc 2:1-3', 7),
+  47: meta(47, 'Sperare sperando',                       'Salmo 40:2', 7),
+  48: meta(48, "Credo, aiutami nella mia incredulità",   'Marco 9:14-29', 7),
+  49: meta(49, 'Integrazione W7 — Il diario del silenzio', 'Integrazione', 7),
+
+  // Week 8 — La voce nel quotidiano (Ascolto cont.)
+  50: meta(50, 'Non ci ardeva forse il cuore?',          'Luca 24:13-35', 8),
+  51: meta(51, 'La riva dove ti aspetta',                'Giovanni 21:1-14', 8),
+  52: meta(52, 'Lo riconosci nei volti',                 'Matteo 25:31-40', 8),
+  53: meta(53, 'Anche di notte il cuore istruisce',      'Salmo 16:7', 8),
+  54: meta(54, 'Alzati e mangia',                        '1 Re 19:5-7', 8),
+  55: meta(55, 'Chiamato per nome',                      'Luca 19:1-10', 8),
+  56: meta(56, 'Integrazione W8 — Il quaderno del feriale', 'Integrazione', 8),
 };
 
 export function getEpisodeMeta(n: number): EpisodeMeta | null {

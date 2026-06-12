@@ -8,6 +8,8 @@ export const WEEK_IDS: Record<number, string> = {
   4: '357655f7-26c7-8115-814c-d27e0b8c7cc4', // Week 4 — Il silenzio di Nazaret (cont.)
   5: '357655f7-26c7-81c4-8907-e14b3658daf4', // Week 5 — Il deserto del primo silenzio (chiusura Presenza)
   6: '357655f7-26c7-8175-963a-d8d9f540630f', // Week 6 — Comincia ad ascoltare (apertura Ascolto)
+  7: '37d655f7-26c7-81eb-b333-cd99ae6e35ce', // Week 7 — Ascolto anche quando non sento (Ascolto cont.)
+  8: '37d655f7-26c7-81ca-abdc-c88130bab0fb', // Week 8 — La voce nel quotidiano (Ascolto cont.)
 };
 
 export const WEEK_NAMES: Record<number, string> = {
@@ -17,4 +19,6 @@ export const WEEK_NAMES: Record<number, string> = {
   4: 'Il silenzio di Nazaret',
   5: 'Il deserto del primo silenzio',
   6: 'Comincia ad ascoltare',
+  7: 'Ascolto anche quando non sento',
+  8: 'La voce nel quotidiano',
 };

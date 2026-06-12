@@ -68,6 +68,22 @@ const EPISODE_TITLES: Record<number, string> = {
   40: 'Promessa di ascolto — Ascolterò',
   41: 'Gesù si ritirava — Il ritmo del ritirarsi',
   42: 'Integrazione W6 — La voce piccola che è cominciata',
+  // Week 7 — Ascolto anche quando non sento (Ascolto cont.)
+  43: 'La sentinella che resta',
+  44: 'Bussare nella notte',
+  45: 'Dirsi le cose vere',
+  46: 'La sentinella',
+  47: 'Sperare sperando',
+  48: 'Credo, aiutami nella mia incredulità',
+  49: 'Integrazione W7 — Il diario del silenzio',
+  // Week 8 — La voce nel quotidiano (Ascolto cont.)
+  50: 'Non ci ardeva forse il cuore?',
+  51: 'La riva dove ti aspetta',
+  52: 'Lo riconosci nei volti',
+  53: 'Anche di notte il cuore istruisce',
+  54: 'Alzati e mangia',
+  55: 'Chiamato per nome',
+  56: 'Integrazione W8 — Il quaderno del feriale',
 };
 
 function renderBlock(block: any) {

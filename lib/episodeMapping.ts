@@ -9,8 +9,8 @@
 //   settimana  = `Week ${weekNumber}`        → matcha la property Notion
 
 const PASSI_PER_WEEK = 7;
-const TOTAL_BETA_WEEKS = 6;
-const TOTAL_WEEKS = 6;
+const TOTAL_BETA_WEEKS = 8;
+const TOTAL_WEEKS = 8;
 
 export function getWeekFromEpisode(episodeNumber: number): number {
   return Math.ceil(episodeNumber / PASSI_PER_WEEK);

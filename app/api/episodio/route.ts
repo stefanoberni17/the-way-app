@@ -32,6 +32,20 @@ function decodeUnicodeEscapes(text: string): string {
   return text.replace(/u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
 }
 
+// Strip di tag HTML letterali escapati (es. "\<i\>", "\</em\>") apparsi in
+// alcuni Approfondimenti generati con copia-incolla da AI. Il testo finale è
+// renderizzato come plain (whitespace-pre-line), quindi questi marker
+// uscirebbero letterali. Manteniamo il contenuto, perdiamo solo l'enfasi.
+function stripEscapedHtmlTags(text: string): string {
+  // \<tag\> oppure \</tag\> con tag = sequenza alfanumerica corta (i, b, em, strong, code, u)
+  return text.replace(/\\<\/?([a-zA-Z]{1,8})\\>/g, '');
+}
+
+// Pulisce un testo prima di restituirlo al client (encoding + tag escapati).
+function cleanText(text: string): string {
+  return stripEscapedHtmlTags(decodeUnicodeEscapes(text));
+}
+
 // Applica la decodifica ai rich_text di un singolo blocco
 function decodeBlockRichText(block: any): any {
   const type = block.type;
@@ -42,9 +56,9 @@ function decodeBlockRichText(block: any): any {
       ...block[type],
       rich_text: block[type].rich_text.map((rt: any) => ({
         ...rt,
-        plain_text: decodeUnicodeEscapes(rt.plain_text || ''),
+        plain_text: cleanText(rt.plain_text || ''),
         text: rt.text
-          ? { ...rt.text, content: decodeUnicodeEscapes(rt.text.content || '') }
+          ? { ...rt.text, content: cleanText(rt.text.content || '') }
           : rt.text,
       })),
     },
@@ -148,10 +162,10 @@ export async function GET(request: NextRequest) {
     const properties = page.properties;
 
     const getText = (prop: any) =>
-      prop?.rich_text?.[0]?.plain_text || prop?.text?.[0]?.plain_text || '';
+      cleanText(prop?.rich_text?.[0]?.plain_text || prop?.text?.[0]?.plain_text || '');
 
     const getTitle = (prop: any) =>
-      prop?.title?.[0]?.plain_text || '';
+      cleanText(prop?.title?.[0]?.plain_text || '');
 
     const getUrl = (prop: any) =>
       prop?.url || '';

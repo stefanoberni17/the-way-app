@@ -310,6 +310,8 @@ export default function HomePage() {
                               key={day}
                               onClick={() => togglePracticeDay(index + 1, day)}
                               disabled={loadingPractices}
+                              aria-label={`Pratica ${index + 1}, ${DAY_LABELS[day]}: ${completedDays[day] ? 'fatta' : 'non ancora fatta'}`}
+                              aria-pressed={!!completedDays[day]}
                               className={`flex-1 flex flex-col items-center gap-0.5 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-95 ${
                                 completedDays[day]
                                   ? 'bg-amber-500 text-white shadow-sm'
@@ -317,7 +319,7 @@ export default function HomePage() {
                               } disabled:opacity-50`}
                             >
                               <span className="text-[9px] font-medium opacity-70">{DAY_LABELS[day]}</span>
-                              <span>{completedDays[day] ? '✓' : ''}</span>
+                              <span aria-hidden="true">{completedDays[day] ? '✓' : ''}</span>
                             </button>
                           ))}
                         </div>

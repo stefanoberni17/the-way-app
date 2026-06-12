@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { PASSAGE_TAGS, TAG_MAP } from '@/lib/savedPassageTags';
-import { getEpisodeMeta } from '@/lib/episodeMetadata';
+import { getEpisodeMetaSafe } from '@/lib/episodeMetadata';
 
 interface SavedRow {
   episode_number: number;
@@ -145,12 +145,11 @@ export default function CustoditiPage() {
         {/* Lista passi */}
         <div className="space-y-3">
           {filtered.map(row => {
-            const meta = getEpisodeMeta(row.episode_number);
-            if (!meta) return null;
+            const meta = getEpisodeMetaSafe(row.episode_number);
             return (
               <button
                 key={row.episode_number}
-                onClick={() => router.push(`/episodio/${row.episode_number}`)}
+                onClick={() => router.push(`/episodio/${row.episode_number}?step=1`)}
                 className="w-full text-left bg-white rounded-2xl shadow-sm border border-stone-200 hover:border-amber-300 hover:shadow transition-all overflow-hidden"
               >
                 <div className="h-1 bg-gradient-to-r from-amber-500 to-amber-400" />
@@ -163,9 +162,11 @@ export default function CustoditiPage() {
                       <h2 className="text-base font-serif text-slate-900 leading-tight mb-1">
                         {meta.title}
                       </h2>
-                      <p className="text-xs text-stone-500 italic">
-                        {meta.reference}
-                      </p>
+                      {meta.reference && (
+                        <p className="text-xs text-stone-500 italic">
+                          {meta.reference}
+                        </p>
+                      )}
                     </div>
                     <span className="text-stone-300 text-xl shrink-0">→</span>
                   </div>

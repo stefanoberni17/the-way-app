@@ -1,4 +1,4 @@
-// Metadata statici dei passi MVP (Week 1-4 = passi 1-28).
+// Metadata statici dei passi Beta (Week 1-6 = passi 1-42).
 // Usati per render veloce (es. pagina /custoditi) senza chiamare Notion.
 // Se serve aggiornare: i contenuti vivi (lezione, versetto) restano su Notion;
 // qui solo titolo + riferimento + settimana per visualizzazione in lista.
@@ -64,8 +64,45 @@ export const EPISODE_METADATA: Record<number, EpisodeMeta> = {
   26: meta(26, 'Venite a me, voi affaticati',           'Matteo 11:28-30', 4),
   27: meta(27, "Sta' in silenzio davanti al Signore",   'Salmo 37:7-9', 4),
   28: meta(28, 'Integrazione W4 — La fine del primo silenzio', 'Integrazione', 4),
+
+  // Week 5 — La voce che chiama (deserto, tentazione)
+  29: meta(29, 'Prima tentazione — Ego del corpo',      'Matteo 4:1-4', 5),
+  30: meta(30, 'Seconda tentazione — Ego spirituale',   'Matteo 4:5-7', 5),
+  31: meta(31, 'Terza tentazione — Ego del potere',     'Matteo 4:8-11', 5),
+  32: meta(32, 'Gesù nella sinagoga di Nazaret',        'Luca 4:14-21', 5),
+  33: meta(33, "Chi abita al riparo dell'Altissimo",    'Salmo 91', 5),
+  34: meta(34, 'Custodisci il tuo cuore',               'Proverbi 4:23', 5),
+  35: meta(35, 'Integrazione W5 — Le mie tre tentazioni', 'Integrazione', 5),
+
+  // Week 6 — La voce che chiama (chiamata, sequela)
+  36: meta(36, 'Chiamata dei primi discepoli',          'Marco 1:14-20', 6),
+  37: meta(37, 'Pesca miracolosa',                      'Luca 5:1-11', 6),
+  38: meta(38, 'Vieni e vedi',                          'Giovanni 1:35-51', 6),
+  39: meta(39, 'Il Signore è mia luce',                 'Salmo 27', 6),
+  40: meta(40, 'Eccomi, manda me',                      'Isaia 6:1-8', 6),
+  41: meta(41, 'Affida al Signore le tue opere',        'Proverbi 16:3', 6),
+  42: meta(42, 'Integrazione W6 — Cosa mi chiama, cosa devo lasciare', 'Integrazione', 6),
 };
 
 export function getEpisodeMeta(n: number): EpisodeMeta | null {
   return EPISODE_METADATA[n] || null;
+}
+
+/**
+ * Variante "safe": ritorna sempre un oggetto valido, anche per episodi non
+ * mappati. Utile per /custoditi: meglio mostrare una card con titolo
+ * generico che droppare silenziosamente il passo salvato.
+ */
+export function getEpisodeMetaSafe(n: number): EpisodeMeta {
+  const m = EPISODE_METADATA[n];
+  if (m) return m;
+  // Stima la settimana: 7 passi per settimana
+  const week = Math.max(1, Math.ceil(n / 7));
+  return {
+    number: n,
+    title: `Passo ${n}`,
+    reference: '',
+    weekNumber: week,
+    weekName: W[week] || `Week ${week}`,
+  };
 }

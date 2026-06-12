@@ -11,7 +11,8 @@ const RETENTION_DAYS = 90;
 export async function GET(request: NextRequest) {
   // Verifica autorizzazione cron (Vercel passa automaticamente CRON_SECRET)
   const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const expected = `Bearer ${process.env.CRON_SECRET}`;
+  if (!process.env.CRON_SECRET || authHeader !== expected) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

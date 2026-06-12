@@ -365,6 +365,9 @@ export default function EpisodioPage() {
   const searchParams = useSearchParams();
   const fromSettimana = searchParams.get('from');   // Notion page ID della settimana
   const fromWeek = searchParams.get('week');         // numero settimana
+  // Step iniziale esplicito (es. ?step=1 dalla tab Custoditi). Se presente,
+  // disabilita l'auto-jump a Step 5 dei passi già completati.
+  const initialStepParam = searchParams.get('step');
 
   const episodeNumber = parseInt(params.id as string);
   const TOTAL_STEPS = 5;
@@ -401,9 +404,14 @@ export default function EpisodioPage() {
         setCompleted(data.episode.completed);
         setLoading(false);
 
-        // Se il passo è già completato, apri direttamente Step 5
-        // (così l'approfondimento è la prima cosa visibile al rientro)
-        if (data.episode.completed) {
+        // Step iniziale:
+        // 1. Se l'URL contiene ?step=N (es. apertura dal tab Custoditi), rispettalo
+        // 2. Altrimenti, se il passo è già completato, apri direttamente Step 5
+        //    (così l'approfondimento è la prima cosa visibile al rientro)
+        if (initialStepParam) {
+          const n = parseInt(initialStepParam);
+          if (n >= 1 && n <= 5) setCurrentStep(n);
+        } else if (data.episode.completed) {
           setCurrentStep(5);
         }
 

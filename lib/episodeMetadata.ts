@@ -16,8 +16,8 @@ const W: Record<number, string> = {
   2: 'La voce nel deserto',
   3: 'Il silenzio di Nazaret',
   4: 'Il silenzio di Nazaret',
-  5: 'La voce che chiama',
-  6: 'La voce che chiama',
+  5: 'Il deserto del primo silenzio',
+  6: 'Comincia ad ascoltare',
 };
 
 const meta = (n: number, title: string, reference: string, week: number): EpisodeMeta => ({
@@ -65,23 +65,23 @@ export const EPISODE_METADATA: Record<number, EpisodeMeta> = {
   27: meta(27, "Sta' in silenzio davanti al Signore",   'Salmo 37:7-9', 4),
   28: meta(28, 'Integrazione W4 — La fine del primo silenzio', 'Integrazione', 4),
 
-  // Week 5 — La voce che chiama (deserto, tentazione)
-  29: meta(29, 'Prima tentazione — Ego del corpo',      'Matteo 4:1-4', 5),
-  30: meta(30, 'Seconda tentazione — Ego spirituale',   'Matteo 4:5-7', 5),
-  31: meta(31, 'Terza tentazione — Ego del potere',     'Matteo 4:8-11', 5),
-  32: meta(32, 'Gesù nella sinagoga di Nazaret',        'Luca 4:14-21', 5),
-  33: meta(33, "Chi abita al riparo dell'Altissimo",    'Salmo 91', 5),
-  34: meta(34, 'Custodisci il tuo cuore',               'Proverbi 4:23', 5),
-  35: meta(35, 'Integrazione W5 — Le mie tre tentazioni', 'Integrazione', 5),
+  // Week 5 — Il deserto del primo silenzio (chiusura Presenza)
+  29: meta(29, 'La sete che torna',                     'Salmo 42:2-3', 5),
+  30: meta(30, 'Anche i profeti vogliono mollare',      '1 Re 19:1-9', 5),
+  31: meta(31, 'Aspettare è già qualcosa',              'Lamentazioni 3:25-26', 5),
+  32: meta(32, 'Cercare nella notte',                   'Cantico 3:1-4', 5),
+  33: meta(33, 'Dal fondo, un sospiro',                 'Salmo 130:1-2', 5),
+  34: meta(34, 'Anche Lui si è ritirato',               'Marco 1:35', 5),
+  35: meta(35, 'Integrazione W5 — Quello che resta dopo il silenzio', 'Integrazione', 5),
 
-  // Week 6 — La voce che chiama (chiamata, sequela)
-  36: meta(36, 'Chiamata dei primi discepoli',          'Marco 1:14-20', 6),
-  37: meta(37, 'Pesca miracolosa',                      'Luca 5:1-11', 6),
-  38: meta(38, 'Vieni e vedi',                          'Giovanni 1:35-51', 6),
-  39: meta(39, 'Il Signore è mia luce',                 'Salmo 27', 6),
-  40: meta(40, 'Eccomi, manda me',                      'Isaia 6:1-8', 6),
-  41: meta(41, 'Affida al Signore le tue opere',        'Proverbi 16:3', 6),
-  42: meta(42, 'Integrazione W6 — Cosa mi chiama, cosa devo lasciare', 'Integrazione', 6),
+  // Week 6 — Comincia ad ascoltare (apertura Ascolto)
+  36: meta(36, 'La chiamata di Samuele — Parla, ascolto', '1 Samuele 3:1-10', 6),
+  37: meta(37, 'Marta e Maria — La parte buona',         'Luca 10:38-42', 6),
+  38: meta(38, 'Il buon pastore — La voce che già conosci', 'Giovanni 10:3-4', 6),
+  39: meta(39, 'La Trasfigurazione — Ascoltatelo',       'Matteo 17:5', 6),
+  40: meta(40, 'Promessa di ascolto — Ascolterò',        'Salmo 85:9', 6),
+  41: meta(41, 'Gesù si ritirava — Il ritmo del ritirarsi', 'Luca 5:16', 6),
+  42: meta(42, 'Integrazione W6 — La voce piccola che è cominciata', 'Integrazione', 6),
 };
 
 export function getEpisodeMeta(n: number): EpisodeMeta | null {

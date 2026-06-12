@@ -52,6 +52,22 @@ const EPISODE_TITLES: Record<number, string> = {
   26: 'Venite a me, voi affaticati — Il riposo che non devi meritare',
   27: 'Sta\' in silenzio davanti al Signore — L\'arte di aspettare',
   28: 'Integrazione W4 — La fine del primo silenzio',
+  // Week 5 — Il deserto del primo silenzio (chiusura Presenza)
+  29: 'La sete che torna',
+  30: 'Anche i profeti vogliono mollare',
+  31: 'Aspettare è già qualcosa',
+  32: 'Cercare nella notte',
+  33: 'Dal fondo, un sospiro',
+  34: 'Anche Lui si è ritirato',
+  35: 'Integrazione W5 — Quello che resta dopo il silenzio',
+  // Week 6 — Comincia ad ascoltare (apertura Ascolto)
+  36: 'La chiamata di Samuele — Parla, ascolto',
+  37: 'Marta e Maria — La parte buona',
+  38: 'Il buon pastore — La voce che già conosci',
+  39: 'La Trasfigurazione — Ascoltatelo',
+  40: 'Promessa di ascolto — Ascolterò',
+  41: 'Gesù si ritirava — Il ritmo del ritirarsi',
+  42: 'Integrazione W6 — La voce piccola che è cominciata',
 };
 
 function renderBlock(block: any) {

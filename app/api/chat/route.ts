@@ -23,6 +23,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Messages required' }, { status: 400 });
     }
 
+    // L'API Anthropic richiede che il primo messaggio sia di ruolo 'user'.
+    // La chat web include un saluto iniziale dell'assistente ("Ciao! Sono qui...")
+    // che, se passato come primo elemento, fa fallire la chiamata con un 400.
+    // Scartiamo quindi qualsiasi messaggio non-user in testa all'array.
+    const firstUserIdx = messages.findIndex((m: { role: string }) => m.role === 'user');
+    const apiMessages = firstUserIdx >= 0 ? messages.slice(firstUserIdx) : [];
+
+    if (apiMessages.length === 0) {
+      return NextResponse.json({ error: 'Nessun messaggio utente valido' }, { status: 400 });
+    }
+
     /* disabilitato per ora
     const lastUserMessage = messages[messages.length - 1];
     if (lastUserMessage.role === 'user' && checkSafetyKeywords(lastUserMessage.content)) {
@@ -33,7 +44,7 @@ export async function POST(request: NextRequest) {
     const userContext = await buildUserContext(userId);
     const systemPrompt = SYSTEM_PROMPT + WEB_FORMAT + '\n\n' + userContext;
 
-    const { text, usage } = await callClaude(systemPrompt, messages, 1500);
+    const { text, usage } = await callClaude(systemPrompt, apiMessages, 1500);
 
     return NextResponse.json({
       response: text,

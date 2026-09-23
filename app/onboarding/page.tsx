@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import BrandCross from '@/components/BrandCross';
-import { BookOpen, Eye, Calendar, Leaf, MessageCircle, Smartphone, Target } from 'lucide-react';
+import { BookOpen, Eye, Calendar, Leaf, MessageCircle, Smartphone, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import { Button, Eyebrow, IconBadge, Ornament, Verse } from '@/components/ui';
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -27,51 +28,49 @@ export default function OnboardingPage() {
         .eq('user_id', session.user.id);
 
       if (error) {
-        console.error('❌ Errore update onboarding:', error);
+        console.error('Errore update onboarding:', error);
         alert('Errore nel salvataggio. Riprova.');
         setCompleting(false);
         return;
       }
 
-      console.log('✅ Onboarding completato!');
       router.push('/');
 
     } catch (error) {
-      console.error('❌ Errore imprevisto:', error);
+      console.error('Errore imprevisto:', error);
       alert('Errore imprevisto. Riprova.');
       setCompleting(false);
     }
   };
 
+  const listCard = 'bg-paper-warm border border-line rounded-2xl p-5';
+
   const slides = [
     // SLIDE 1
     {
-      title: "Benvenuto in The Way",
-      subtitle: "La Via del Cuore",
+      eyebrow: 'Benvenuto',
+      title: 'Più di un libro sacro. Un viaggio per tornare a casa.',
       content: (
-        <div className="text-center max-w-2xl mx-auto">
-          <BrandCross className="mx-auto mb-5" size={64} />
-          <p className="text-base md:text-lg text-stone-700 leading-relaxed mb-6 font-medium">
+        <div className="text-center">
+          <BrandCross className="mx-auto mb-6" size={64} />
+          <p className="font-serif text-[22px] text-ink leading-[1.35] mb-6">
             Il Vangelo non è solo un testo antico da studiare.<br/>
             È una Parola viva che parla a ogni cuore, oggi.
           </p>
-          <div className="bg-stone-50 border border-stone-200 rounded-xl p-5 text-left space-y-3 text-stone-700">
-            <p className="flex items-start gap-3">
-              <span className="text-amber-600 mt-1 font-bold">·</span>
-              <span>Incontrare Gesù attraverso i racconti evangelici</span>
-            </p>
-            <p className="flex items-start gap-3">
-              <span className="text-amber-600 mt-1 font-bold">·</span>
-              <span>Riconoscere la tua storia nella storia dei personaggi biblici</span>
-            </p>
-            <p className="flex items-start gap-3">
-              <span className="text-amber-600 mt-1 font-bold">·</span>
-              <span>Crescere interiormente attraverso la contemplazione e la pratica</span>
-            </p>
+          <div className={`${listCard} text-left space-y-3`}>
+            {[
+              'Incontrare Gesù attraverso i racconti evangelici',
+              'Riconoscere la tua storia nella storia dei personaggi biblici',
+              'Crescere interiormente attraverso la contemplazione e la pratica',
+            ].map((t) => (
+              <p key={t} className="flex items-start gap-3 text-[15px] text-ink-soft leading-relaxed">
+                <span className="w-1.5 h-1.5 rounded-full bg-gold mt-2.5 flex-shrink-0" />
+                <span>{t}</span>
+              </p>
+            ))}
           </div>
-          <p className="text-stone-600 mt-6 italic font-serif">
-            Questo percorso nasce per aiutarti a lasciarti toccare<br/>
-            dalla Parola in modo più profondo, più vero.
+          <p className="text-muted mt-6 italic font-serif text-lg leading-snug">
+            Non per diventare perfetti.<br/>Per diventare più veri.
           </p>
         </div>
       )
@@ -79,41 +78,37 @@ export default function OnboardingPage() {
 
     // SLIDE 2
     {
-      title: "Un cammino fatto di piccoli passi",
-      subtitle: "",
+      eyebrow: 'Come funziona',
+      title: 'Un cammino fatto di piccoli passi',
       content: (
-        <div className="max-w-2xl mx-auto space-y-4">
+        <div className="space-y-3">
           {[
             {
               Icon: BookOpen,
               title: 'Passi progressivi',
-              body: 'I passi si sbloccano uno alla volta. Completa uno per passare al successivo. Non è una corsa. È un invito a darti tempo con la Parola.',
+              body: 'I passi si aprono uno alla volta. Non è una corsa. È un invito a darti tempo con la Parola.',
             },
             {
               Icon: Eye,
-              title: 'Lectio + Riflessione personale',
-              body: "Ogni passo ha una mini-lezione, una guida all'osservazione e una domanda riflessiva. Leggi, osserva, lasciati interrogare.",
+              title: 'Lectio e riflessione personale',
+              body: "Ogni passo ha una mini-lezione, una guida all'osservazione e una domanda. Leggi, osserva, lasciati interrogare.",
             },
             {
               Icon: Calendar,
               title: 'Settimane tematiche',
-              body: "Ogni coppia di settimane esplori un tema evangelico: l'Annunciazione, il Battesimo, il deserto, la chiamata dei discepoli...",
+              body: "Ogni settimana esplora un tema evangelico: la voce nel deserto, il silenzio di Nazaret, la chiamata…",
             },
             {
               Icon: Leaf,
               title: 'Pratiche concrete',
-              body: 'Ogni settimana ha pratiche semplici e un versetto da portare con sé — semi da piantare nella vita quotidiana.',
+              body: 'Ogni settimana ha pratiche semplici e un versetto da portare con sé: semi da piantare nella vita quotidiana.',
             },
           ].map(({ Icon, title, body }) => (
-            <div key={title} className="bg-stone-50 border border-stone-200 rounded-xl p-5">
-              <div className="flex items-start gap-4">
-                <div className="w-11 h-11 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-5 h-5 text-amber-700" strokeWidth={1.75} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-serif font-bold text-slate-900 mb-1">{title}</h3>
-                  <p className="text-sm text-stone-700 leading-relaxed">{body}</p>
-                </div>
+            <div key={title} className={`${listCard} flex items-start gap-4`}>
+              <IconBadge size="md"><Icon strokeWidth={1.8} /></IconBadge>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-serif text-xl font-semibold text-ink leading-tight mb-1">{title}</h3>
+                <p className="text-sm text-ink-soft leading-relaxed">{body}</p>
               </div>
             </div>
           ))}
@@ -123,126 +118,111 @@ export default function OnboardingPage() {
 
     // SLIDE 3
     {
-      title: "Questo cammino ha un ritmo lento",
-      subtitle: "E lo fa di proposito",
+      eyebrow: 'Il ritmo',
+      title: 'Questo cammino è lento. Di proposito.',
       content: (
-        <div className="max-w-xl mx-auto text-center">
-          <p className="text-base md:text-lg text-stone-700 mb-6 leading-relaxed font-serif italic">
+        <div className="text-center">
+          <p className="font-serif text-[24px] text-ink leading-[1.3] mb-6">
             Capire qualcosa è veloce.<br/>
-            <strong className="not-italic font-bold text-slate-900">Lasciarsi trasformare, no.</strong>
+            <span className="italic">Lasciarsi trasformare, no.</span>
           </p>
 
-          <div className="bg-stone-50 border border-stone-200 rounded-xl p-5 mb-6 text-left">
-            <p className="text-stone-700 mb-3 leading-relaxed text-sm">
-              È come il seme nel Vangelo: caduto nella terra, cresce <strong className="text-slate-900">nel silenzio e nel tempo</strong>.
+          <div className={`${listCard} text-left mb-6`}>
+            <p className="text-ink-soft mb-4 leading-relaxed text-[15px]">
+              È come il seme nel Vangelo: caduto nella terra, cresce <strong className="text-ink font-semibold">nel silenzio e nel tempo</strong>.
               Non puoi affrettare la sua crescita.
             </p>
-            <p className="text-stone-500 text-sm italic font-serif border-l-2 border-amber-400 pl-3">
-              &ldquo;La terra produce spontaneamente prima l&apos;erba, poi la spiga, poi il grano pieno nella spiga.&rdquo;
-              <span className="not-italic text-xs ml-1 text-amber-700">— Mc 4,28</span>
-            </p>
+            <Verse size="sm" reference="Marco 4,28">
+              La terra produce spontaneamente prima l&apos;erba, poi la spiga, poi il grano pieno nella spiga.
+            </Verse>
           </div>
 
-          <p className="text-stone-700 mb-7 font-medium">
+          <p className="text-ink-soft mb-6 text-[15px] leading-relaxed">
             Qui non stiamo correndo verso un risultato.<br/>
             Stiamo imparando ad ascoltare.
           </p>
 
-          <div className="bg-stone-50 border border-stone-200 rounded-xl p-5 text-left">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                <MessageCircle className="w-5 h-5 text-amber-700" strokeWidth={1.75} />
-              </div>
-              <h3 className="font-serif font-bold text-slate-900">Il tuo alleato: La Guida</h3>
+          <div className={`${listCard} text-left flex items-start gap-4`}>
+            <IconBadge tone="night"><MessageCircle strokeWidth={1.8} /></IconBadge>
+            <div>
+              <h3 className="font-serif text-xl font-semibold text-ink leading-tight mb-1">Il tuo alleato: La Guida</h3>
+              <p className="text-sm text-ink-soft leading-relaxed">
+                Conosce dove sei nel cammino. Ti accompagna senza anticipare, ti aiuta a riflettere e a portare la Parola nella vita.
+              </p>
             </div>
-            <p className="text-sm text-stone-700 leading-relaxed">
-              Il chatbot conosce dove sei nel cammino. Ti accompagna senza anticipare,
-              ti aiuta a riflettere e a portare la Parola nella vita.
-            </p>
           </div>
         </div>
       )
     },
 
-    // SLIDE 4 - Telegram (facoltativo)
+    // SLIDE 4 - Telegram
     {
-      title: "La Guida anche su Telegram",
-      subtitle: "Facoltativo, ma comodo",
+      eyebrow: 'Facoltativo',
+      title: 'La Guida anche su Telegram',
       content: (
-        <div className="max-w-xl mx-auto text-center">
-          <div className="w-14 h-14 rounded-full bg-amber-100 mx-auto mb-5 flex items-center justify-center">
-            <Smartphone className="w-7 h-7 text-amber-700" strokeWidth={1.75} />
-          </div>
-          <p className="text-base md:text-lg text-stone-700 mb-6 leading-relaxed">
-            Puoi parlare con La Guida direttamente su Telegram,
-            in qualsiasi momento della giornata — anche senza aprire l&apos;app.
+        <div className="text-center">
+          <IconBadge size="lg" className="mx-auto mb-5"><Smartphone strokeWidth={1.6} /></IconBadge>
+          <p className="text-[16px] text-ink-soft mb-6 leading-relaxed">
+            Puoi parlare con La Guida direttamente su Telegram, in qualsiasi momento della giornata, anche senza aprire l&apos;app.
           </p>
 
-          <div className="bg-stone-50 border border-stone-200 rounded-xl p-5 text-left mb-4">
-            <p className="font-serif font-bold text-slate-900 mb-4">Come collegarlo in 4 passi:</p>
+          <div className={`${listCard} text-left mb-4`}>
+            <p className="font-serif text-lg font-semibold text-ink mb-4">Come collegarla, in quattro passi</p>
             <div className="space-y-3">
               {[
-                <>Apri Telegram e cerca <strong>@getidsbot</strong></>,
-                <>Scrivili qualsiasi messaggio — ti risponde con il tuo ID numerico</>,
-                <>Vai su <strong>Profilo</strong> nell&apos;app e incolla il numero nel campo &laquo;Collega Telegram&raquo;</>,
+                <>Apri Telegram e cerca <strong className="text-ink">@getidsbot</strong></>,
+                <>Scrivigli qualsiasi messaggio: ti risponde con il tuo ID numerico</>,
+                <>Vai su <strong className="text-ink">Profilo</strong> nell&apos;app e incolla il numero nel campo «La Guida su Telegram»</>,
                 <>Cerca il bot The Way su Telegram e inizia a parlare con La Guida</>,
               ].map((line, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  <span className="bg-amber-500 text-slate-900 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
-                    {i + 1}
-                  </span>
-                  <p className="text-stone-700 text-sm leading-relaxed">{line}</p>
+                  <span className="font-serif text-gold text-xl leading-none w-4 flex-shrink-0 mt-[-1px]">{i + 1}</span>
+                  <p className="text-ink-soft text-sm leading-relaxed">{line}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-stone-50 border border-stone-200 rounded-xl p-4">
-            <p className="text-sm text-stone-500 italic">
-              Puoi farlo ora o in qualsiasi momento dal tuo profilo.
-              Non è necessario per iniziare il percorso.
-            </p>
-          </div>
+          <p className="text-sm text-muted italic font-serif text-base">
+            Puoi farlo ora o in qualsiasi momento dal tuo profilo. Non serve per iniziare.
+          </p>
         </div>
       )
     },
 
-    // SLIDE 5 - Ultimo slide: prima settimana
+    // SLIDE 5
     {
-      title: "Sei pronto per iniziare?",
-      subtitle: "",
+      eyebrow: 'Sei pronto?',
+      title: 'Il primo passo è sempre l’ascolto.',
       content: (
-        <div className="max-w-xl mx-auto">
-          <div className="bg-slate-900 text-white rounded-xl p-7 mb-5 border border-slate-700 shadow-md">
-            <p className="text-xs text-amber-400 mb-2 uppercase tracking-[0.2em] font-semibold">Week 1</p>
-            <h3 className="text-2xl md:text-3xl font-serif font-bold mb-4">La voce nel deserto</h3>
-            <p className="text-slate-300 mb-5 leading-relaxed text-sm">
-              Il cammino inizia dall&apos;origine: Giovanni che prepara la Via, Gesù che entra nella storia.
-              Chi siamo noi in questo incontro?
+        <div>
+          <div className="relative overflow-hidden bg-night text-night-text rounded-2xl p-6 sm:p-7 mb-4 border border-night-line">
+            <div className="absolute -top-16 -right-10 w-48 h-48 rounded-full bg-gold-light/10 blur-2xl pointer-events-none" aria-hidden />
+            <Eyebrow tone="night" className="mb-2">Settimana 1</Eyebrow>
+            <h3 className="font-serif text-[30px] font-semibold leading-tight mb-3">La voce nel deserto</h3>
+            <p className="text-night-muted mb-5 leading-relaxed text-sm">
+              Il cammino inizia dall&apos;origine: un sì detto nel buio, una nascita nella semplicità, un Dio che entra piano nella storia.
             </p>
-            <div className="space-y-2.5 text-sm bg-white/[0.05] rounded-lg p-4 border border-white/10">
-              <p className="flex items-start gap-2.5">
-                <BookOpen className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" strokeWidth={1.75} />
-                <span className="text-slate-200">7 passi: 6 Lectio + 1 Integrazione</span>
+            <Ornament tone="night" className="mb-5" />
+            <div className="space-y-3 text-sm">
+              <p className="flex items-start gap-3">
+                <BookOpen className="w-4 h-4 text-gold-light flex-shrink-0 mt-0.5" strokeWidth={1.8} />
+                <span className="text-night-text">7 passi: 6 letture e 1 integrazione</span>
               </p>
-              <p className="flex items-start gap-2.5">
-                <Target className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" strokeWidth={1.75} />
-                <span className="text-slate-200">Tema: Essere chiamati per nome — l&apos;amore che precede</span>
-              </p>
-              <p className="flex items-start gap-2.5 font-serif italic">
-                <span className="text-amber-400 flex-shrink-0 mt-0.5">&ldquo;</span>
-                <span className="text-slate-200">Tu sei il mio figlio amato, in te ho posto il mio compiacimento.<span className="not-italic font-sans text-xs text-amber-400/80 ml-1">— Mc 1,11</span></span>
+              <p className="flex items-start gap-3">
+                <Leaf className="w-4 h-4 text-gold-light flex-shrink-0 mt-0.5" strokeWidth={1.8} />
+                <span className="text-night-text">Tema: essere chiamati per nome, l&apos;amore che precede</span>
               </p>
             </div>
           </div>
 
-          <div className="bg-stone-50 border border-stone-200 rounded-xl p-5">
-            <p className="text-stone-700 leading-relaxed text-sm">
+          <div className={`${listCard}`}>
+            <p className="text-ink-soft leading-relaxed text-[15px]">
               Questo percorso non ti chiede di diventare perfetto.
-              Ti chiede di <strong className="text-slate-900">lasciarti guardare</strong>.
+              Ti chiede di <strong className="text-ink font-semibold">lasciarti guardare</strong>.
             </p>
-            <p className="text-stone-500 mt-3 text-sm italic font-serif">
-              Il primo passo è sempre l&apos;ascolto: fermarsi, respirare, aprire il cuore.
+            <p className="text-muted mt-3 italic font-serif text-lg leading-snug">
+              Fermarsi, respirare, aprire il cuore.
             </p>
           </div>
         </div>
@@ -255,83 +235,63 @@ export default function OnboardingPage() {
 
   return (
     <main
-      className="min-h-screen bg-slate-900 overflow-y-auto"
+      className="min-h-screen bg-parchment"
       style={{
         paddingTop: 'max(1rem, env(safe-area-inset-top))',
         paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))',
       }}
     >
-      <div className="max-w-3xl w-full mx-auto px-4">
+      <div className="max-w-xl w-full mx-auto px-4">
 
-        {/* Progress dots */}
-        <div className="flex justify-center gap-2 mb-6 sticky top-0 py-3 bg-gradient-to-b from-slate-900 via-slate-900/95 to-transparent z-10">
+        {/* Progress */}
+        <div className="flex justify-center gap-1.5 py-4 sticky top-0 z-10 bg-gradient-to-b from-parchment via-parchment/95 to-transparent">
           {slides.map((_, i) => (
             <div
               key={i}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                i + 1 === currentSlide
-                  ? 'w-8 bg-amber-400'
-                  : 'w-2 bg-white/30'
+              className={`h-1 rounded-full transition-all duration-300 ${
+                i + 1 === currentSlide ? 'w-8 bg-gold' : i + 1 < currentSlide ? 'w-2 bg-gold/50' : 'w-2 bg-line-strong'
               }`}
             />
           ))}
         </div>
 
-        {/* Card — niente min-height, scroll naturale */}
-        <div className="bg-white rounded-xl shadow-md border border-stone-200/60 p-6 md:p-10 mb-5">
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 text-center mb-2 font-serif leading-tight">
+        {/* Card */}
+        <div key={currentSlide} className="bg-paper rounded-3xl border border-line shadow-[var(--shadow-card)] p-6 sm:p-9 mb-5 animate-rise">
+          <Eyebrow className="justify-center mb-3">{currentContent.eyebrow}</Eyebrow>
+          <h1 className="font-serif text-[32px] sm:text-[36px] font-semibold text-ink text-center leading-[1.1] mb-7">
             {currentContent.title}
           </h1>
-          {currentContent.subtitle && (
-            <p className="text-center text-stone-500 mb-6 italic text-sm md:text-base">{currentContent.subtitle}</p>
-          )}
-          <div className="mt-6">
-            {currentContent.content}
-          </div>
+          {currentContent.content}
         </div>
 
-        {/* Navigation */}
+        {/* Navigazione */}
         <div className="flex gap-3">
           {currentSlide > 1 && (
-            <button
-              onClick={() => setCurrentSlide(s => s - 1)}
-              className="flex-1 bg-white/10 border border-white/20 text-white font-semibold py-4 rounded-xl hover:bg-white/20 transition-all"
-            >
-              ← Indietro
-            </button>
+            <Button variant="secondary" size="lg" className="flex-1" onClick={() => setCurrentSlide(s => s - 1)}>
+              <ArrowLeft strokeWidth={2} />
+              Indietro
+            </Button>
           )}
 
           {!isLastSlide ? (
-            <button
-              onClick={() => setCurrentSlide(s => s + 1)}
-              className="flex-1 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-900 font-bold py-4 rounded-xl transition-all shadow-sm"
-            >
-              Continua →
-            </button>
+            <Button size="lg" className="flex-1" onClick={() => setCurrentSlide(s => s + 1)}>
+              Continua
+              <ArrowRight strokeWidth={2.2} />
+            </Button>
           ) : (
-            <button
-              onClick={handleComplete}
-              disabled={completing}
-              className="flex-1 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-900 font-bold py-4 rounded-xl transition-all shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {completing ? (
-                <>
-                  <span className="animate-spin">⏳</span> Preparazione...
-                </>
-              ) : (
-                <>Inizia il cammino</>
-              )}
-            </button>
+            <Button variant="gold" size="lg" className="flex-1" onClick={handleComplete} disabled={completing}>
+              {completing ? <Loader2 className="animate-spin" /> : null}
+              {completing ? 'Preparo…' : 'Inizia il cammino'}
+            </Button>
           )}
         </div>
 
-        {/* Skip link */}
         {!isLastSlide && (
           <button
             onClick={handleComplete}
-            className="w-full text-center text-sm text-white/50 hover:text-white/80 mt-4 transition-colors"
+            className="w-full text-center text-sm text-muted hover:text-ink mt-4 py-2 transition-colors"
           >
-            Salta introduzione →
+            Salta l&apos;introduzione
           </button>
         )}
 

@@ -25,6 +25,7 @@
 | AI | Anthropic Claude Sonnet (`@anthropic-ai/sdk`) |
 | Bot | Telegram (`node-telegram-bot-api`) |
 | Icons | Lucide React |
+| Design system | `components/ui.tsx` + token in `app/globals.css` (palette "Pergamena e Oro", Cormorant Garamond + DM Sans) |
 
 ---
 
@@ -71,6 +72,7 @@ naruto-inner-path/
 │   ├── EveningCheckinCard.tsx     # Card check-in serale in home (3 stati)
 │   ├── EveningReminderBanner.tsx  # Banner sticky alle 21 se check-in non fatto
 │   ├── SavePassageButton.tsx      # Bottone "Custodisci" + modal tag (in Step 5 passo)
+│   ├── ui.tsx                     # Primitive UI: Card, Button, Eyebrow, PageHeader, Verse, Field, LoadingScreen…
 │   └── Navigation.tsx             # (non in uso attivo)
 ├── lib/
 │   ├── supabase.ts                # Client Supabase pubblico (browser)
@@ -391,6 +393,10 @@ Messaggio Telegram → POST /api/telegram (webhook)
 ---
 
 ## Pattern e Convenzioni
+
+### Design system ("Pergamena e Oro")
+I colori sono token Tailwind definiti in `app/globals.css` (`@theme`): `parchment` (sfondo), `paper` (card), `ink`/`ink-soft`/`muted` (testo), `line` (bordi), `gold`/`gold-deep`/`gold-soft`/`gold-wash` (unico accento), `night`/`night-text`/`night-muted` (momenti sacri: versetto, meditazione, celebrazione), `sage` (completato), `rose` (errori). Font: `font-serif` = Cormorant Garamond (titoli, versetti), `font-sans` = DM Sans (corpo).
+Le schermate compongono le primitive di `components/ui.tsx` (`Card`, `Button`, `Eyebrow`, `PageHeader`, `SectionTitle`, `Verse`, `Field`/`inputClass`, `Notice`, `Chip`, `Tag`, `IconBadge`, `LoadingScreen`, `Ornament`). Niente emoji come etichette: icone Lucide sottili. Bottoni a pillola, card con filo sottile.
 
 ### Fetch dati Notion
 Tutti i dati di contenuto passano per le API routes (BFF pattern). Il client non chiama mai Notion direttamente:

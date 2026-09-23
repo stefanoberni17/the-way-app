@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { Card, Eyebrow, Button } from '@/components/ui';
+import { Flame, Check } from 'lucide-react';
 
 interface InvitationData {
   date: string;
@@ -35,7 +37,6 @@ export default function DailyInvitationCard() {
         if (cancelled) return;
         setData(json);
 
-        // Mark "seen" se non ancora visto
         if (!json.invitation_seen_at) {
           fetch('/api/daily-invitation', {
             method: 'POST',
@@ -83,38 +84,30 @@ export default function DailyInvitationCard() {
   const done = !!data.invitation_done_at;
 
   return (
-    <div
-      className={`bg-white rounded-2xl shadow-sm border overflow-hidden mb-5 transition-colors ${
-        done ? 'border-green-300' : 'border-stone-200'
-      }`}
-    >
-      <div className={`h-1 ${done ? 'bg-green-400' : 'bg-gradient-to-r from-amber-500 to-amber-400'}`} />
-      <div className="p-6">
-        <p className="text-xs font-bold text-amber-700 uppercase tracking-widest mb-2 flex items-center gap-2">
-          <span>🕯️</span> Invito di oggi
-        </p>
-        <p className="text-xs text-stone-500 mb-4 italic">
-          Dal Passo {data.episode_number} · porta questo nella giornata
-        </p>
-
-        <p className="text-gray-800 text-base font-serif italic leading-relaxed mb-5">
-          {data.invitation_text}
-        </p>
-
-        {done ? (
-          <div className="w-full bg-green-50 border border-green-200 rounded-xl px-4 py-2.5 text-sm font-medium text-green-800 text-center flex items-center justify-center gap-2">
-            <span>✓</span> Lo hai vissuto, grazie
-          </div>
-        ) : (
-          <button
-            onClick={markDone}
-            disabled={marking}
-            className="w-full border-2 border-amber-300 text-amber-700 hover:bg-amber-50 active:bg-amber-100 font-semibold py-2.5 rounded-xl text-sm transition-all disabled:opacity-50"
-          >
-            ✓ L&apos;ho vissuto
-          </button>
-        )}
+    <Card tone={done ? 'sage' : 'paper'} className="animate-rise delay-1">
+      <div className="flex items-start justify-between gap-3 mb-1">
+        <Eyebrow tone={done ? 'sage' : 'gold'} icon={<Flame strokeWidth={2} />}>
+          Invito di oggi
+        </Eyebrow>
+        <span className="text-[11px] text-muted whitespace-nowrap">Dal passo {data.episode_number}</span>
       </div>
-    </div>
+      <p className="text-xs text-muted mb-4">Porta questo nella giornata.</p>
+
+      <p className="font-serif text-[22px] leading-[1.35] text-ink mb-5">
+        {data.invitation_text}
+      </p>
+
+      {done ? (
+        <p className="inline-flex items-center gap-2 text-sm font-medium text-sage">
+          <Check className="w-4 h-4" strokeWidth={2.5} />
+          Lo hai vissuto. Grazie.
+        </p>
+      ) : (
+        <Button variant="secondary" size="sm" onClick={markDone} disabled={marking}>
+          <Check strokeWidth={2.5} />
+          L&apos;ho vissuto
+        </Button>
+      )}
+    </Card>
   );
 }

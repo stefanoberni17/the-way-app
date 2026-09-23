@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import BrandCross from '@/components/BrandCross';
+import { Button, Field, inputClass, Notice, Ornament } from '@/components/ui';
+import { ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,77 +50,70 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-900 flex flex-col items-center justify-center px-5 py-10 overflow-y-auto">
+    <main className="min-h-screen bg-night relative overflow-hidden flex flex-col items-center justify-center px-5 py-10">
+      <div className="absolute top-[-120px] left-1/2 -translate-x-1/2 w-[520px] h-[520px] rounded-full bg-gold-light/10 blur-3xl pointer-events-none animate-breathe" aria-hidden />
 
-      {/* ── Hero brand ── */}
-      <div className="text-center mb-7 w-full max-w-sm">
-        <BrandCross className="mx-auto mb-3" />
-        <h1 className="text-3xl font-serif font-bold text-white tracking-tight">
+      {/* ── Brand ── */}
+      <div className="relative text-center mb-8 w-full max-w-sm animate-rise">
+        <BrandCross tone="night" className="mx-auto mb-4" size={64} />
+        <h1 className="font-serif text-[44px] leading-none font-semibold text-night-text tracking-tight">
           The Way
         </h1>
-        <p className="text-amber-400 font-semibold text-[11px] mt-1 uppercase tracking-[0.2em]">
+        <p className="text-gold-light font-semibold text-[11px] mt-2 uppercase tracking-[0.28em]">
           La Via del Cuore
         </p>
 
-        <div className="mt-5 bg-white/[0.06] backdrop-blur-sm rounded-xl px-5 py-4 border border-white/10">
-          <p className="text-slate-300 text-sm leading-relaxed italic font-serif">
-            &ldquo;Io sono la Via, la Verità e la Vita.&rdquo;
-            <br />
-            <span className="text-amber-400 text-xs not-italic font-sans tracking-wide">— Giovanni 14,6</span>
-          </p>
-        </div>
+        <Ornament tone="night" className="my-6 max-w-[200px] mx-auto" />
+
+        <p className="font-serif italic text-night-text text-xl leading-snug">
+          «Io sono la via, la verità e la vita.»
+        </p>
+        <p className="text-[11px] text-night-muted mt-2 uppercase tracking-[0.18em]">Giovanni 14,6</p>
       </div>
 
-      {/* ── Form card ── */}
-      <div className="bg-white rounded-xl shadow-md border border-stone-200/60 p-6 w-full max-w-sm">
-        <h2 className="text-xl font-serif font-bold text-slate-900 mb-0.5">Bentornato</h2>
-        <p className="text-stone-500 text-sm mb-6 italic">Il tuo percorso ti aspetta.</p>
+      {/* ── Form ── */}
+      <div className="relative bg-paper rounded-3xl shadow-[var(--shadow-float)] p-6 sm:p-7 w-full max-w-sm animate-rise delay-2">
+        <h2 className="font-serif text-3xl font-semibold text-ink leading-none mb-1.5">Bentornato</h2>
+        <p className="text-muted text-sm mb-6">Il tuo cammino ti aspetta.</p>
 
-        <form onSubmit={handleLogin} className="space-y-5">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
-              {error}
-            </div>
-          )}
+        <form onSubmit={handleLogin} className="space-y-4">
+          {error && <Notice tone="error">{error}</Notice>}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+          <Field label="Email">
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none transition-all text-sm bg-stone-50"
+              className={inputClass}
               placeholder="tua@email.com"
+              autoComplete="email"
               required
             />
-          </div>
+          </Field>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+          <Field label="Password">
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2.5 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none transition-all text-sm bg-stone-50"
+              className={inputClass}
               placeholder="••••••••"
+              autoComplete="current-password"
               required
             />
-          </div>
+          </Field>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-white font-bold py-3 px-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-          >
-            {loading ? 'Accesso in corso…' : 'Accedi'}
-          </button>
+          <Button type="submit" full size="lg" disabled={loading} className="mt-2">
+            {loading ? 'Accesso in corso…' : 'Entra'}
+            {!loading && <ArrowRight strokeWidth={2.2} />}
+          </Button>
         </form>
 
-        <p className="mt-5 text-center text-sm text-stone-500">
+        <p className="mt-6 text-center text-sm text-muted">
           Non hai un account?{' '}
           <button
             onClick={() => router.push('/register')}
-            className="text-amber-700 hover:text-amber-800 font-semibold"
+            className="text-gold-deep hover:text-ink font-semibold underline underline-offset-4 decoration-gold/40"
           >
             Registrati
           </button>

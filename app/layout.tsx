@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { DM_Sans, Playfair_Display } from "next/font/google";
+import { DM_Sans, Cormorant_Garamond } from "next/font/google";
 import BottomTabBar from "@/components/BottomTabBar";
 import GlobalMeditationWrapper from "@/components/GlobalMeditationWrapper";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
@@ -13,11 +13,12 @@ const dmSans = DM_Sans({
   variable: "--font-dm-sans",
 });
 
-const playfair = Playfair_Display({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-playfair",
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-cormorant",
 });
 
 export const metadata: Metadata = {
@@ -40,7 +41,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0f172a",
+  themeColor: "#f4efe6",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -52,7 +53,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="it" className={`${dmSans.variable} ${playfair.variable} ${dmSans.className}`}>
+    <html lang="it" className={`${dmSans.variable} ${cormorant.variable} ${dmSans.className}`}>
       <body className="pb-tabbar">
         <ServiceWorkerRegistration />
         <GlobalMeditationWrapper>

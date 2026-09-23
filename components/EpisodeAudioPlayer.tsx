@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { Play, Pause, Square, Volume2 } from 'lucide-react';
 
 interface Props {
   /** URL pubblico di un file audio (mp3/m4a). Se assente, fallback a TTS Web Speech API. */
@@ -19,6 +20,12 @@ function formatTime(seconds: number): string {
   const s = Math.floor(seconds % 60);
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
+
+const shellCls = 'bg-paper-warm rounded-2xl p-3 border border-line';
+const playCls =
+  'w-11 h-11 rounded-full bg-ink text-paper hover:bg-night flex items-center justify-center transition-all flex-shrink-0 [&>svg]:w-4 [&>svg]:h-4';
+const speedCls =
+  'text-xs font-semibold text-ink-soft bg-paper px-2.5 h-9 min-w-[46px] rounded-full border border-line hover:border-gold hover:text-gold-deep transition-all flex-shrink-0';
 
 export default function EpisodeAudioPlayer({ audioUrl, fallbackText, episodeNumber }: Props) {
   const hasFile = Boolean(audioUrl?.trim());
@@ -102,21 +109,18 @@ function FilePlayer({ audioUrl, episodeNumber }: { audioUrl: string; episodeNumb
     setSpeed(SPEEDS[(i + 1) % SPEEDS.length]);
   };
 
+  const pct = duration > 0 ? (current / duration) * 100 : 0;
+
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 border border-blue-100">
+    <div className={shellCls}>
       <audio ref={audioRef} src={audioUrl} preload="metadata" />
 
       <div className="flex items-center gap-3">
-        <button
-          onClick={toggle}
-          className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center text-sm shadow-sm transition-all flex-shrink-0"
-          aria-label={playing ? 'Pausa' : 'Ascolta'}
-        >
-          {playing ? '⏸' : '▶'}
+        <button onClick={toggle} className={playCls} aria-label={playing ? 'Pausa' : 'Ascolta'}>
+          {playing ? <Pause strokeWidth={2.2} /> : <Play strokeWidth={2.2} className="ml-0.5" />}
         </button>
 
         <div className="flex-1 min-w-0">
-          {/* Wrapper con padding verticale per aumentare l'hit-area touch (iOS richiede ~44px) */}
           <div className="py-2 -my-2">
             <input
               type="range"
@@ -125,20 +129,17 @@ function FilePlayer({ audioUrl, episodeNumber }: { audioUrl: string; episodeNumb
               step={0.1}
               value={current}
               onChange={seek}
-              className="w-full h-1.5 accent-blue-600 cursor-pointer"
+              className="range-gold cursor-pointer"
+              style={{ ['--range-pct' as string]: `${pct}%` }}
             />
           </div>
-          <div className="flex items-center justify-between mt-1 text-[11px] text-blue-700/70 font-medium tabular-nums">
+          <div className="flex items-center justify-between mt-1.5 text-[11px] text-muted tabular-nums">
             <span>{formatTime(current)}</span>
             <span>{formatTime(duration)}</span>
           </div>
         </div>
 
-        <button
-          onClick={cycleSpeed}
-          className="text-xs font-bold text-blue-700 bg-white px-2.5 py-2 rounded-md border border-blue-200 hover:bg-blue-50 transition-all flex-shrink-0 min-w-[44px]"
-          aria-label="Velocità riproduzione"
-        >
+        <button onClick={cycleSpeed} className={speedCls} aria-label="Velocità riproduzione">
           {speed}×
         </button>
       </div>
@@ -220,7 +221,6 @@ function TTSPlayer({ text }: { text: string }) {
     const i = SPEEDS.indexOf(speed);
     const next = SPEEDS[(i + 1) % SPEEDS.length];
     setSpeed(next);
-    // Se sta già parlando, riavvia con la nuova velocità (Web Speech non supporta rate dinamico)
     if (speaking) {
       const wasPaused = paused;
       window.speechSynthesis.cancel();
@@ -240,37 +240,30 @@ function TTSPlayer({ text }: { text: string }) {
   const isActive = speaking && !paused;
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 border border-blue-100">
+    <div className={shellCls}>
       <div className="flex items-center gap-3">
-        <button
-          onClick={toggle}
-          className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center text-sm shadow-sm transition-all flex-shrink-0"
-          aria-label={isActive ? 'Pausa' : 'Ascolta'}
-        >
-          {isActive ? '⏸' : '▶'}
+        <button onClick={toggle} className={playCls} aria-label={isActive ? 'Pausa' : 'Ascolta'}>
+          {isActive ? <Pause strokeWidth={2.2} /> : <Play strokeWidth={2.2} className="ml-0.5" />}
         </button>
 
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold text-blue-700 leading-tight">
-            {speaking ? (paused ? 'In pausa' : 'In lettura...') : '🔊 Audiolettura'}
+          <p className="text-sm font-medium text-ink leading-tight flex items-center gap-1.5">
+            <Volume2 className="w-3.5 h-3.5 text-gold" strokeWidth={2} />
+            {speaking ? (paused ? 'In pausa' : 'In lettura…') : 'Audiolettura'}
           </p>
-          <p className="text-[10px] text-blue-600/60 italic">Voce sintetica del browser</p>
+          <p className="text-[11px] text-muted mt-0.5">Voce sintetica del browser</p>
         </div>
 
         {showStop && (
           <button
             onClick={stop}
-            className="text-[11px] font-bold text-gray-500 bg-white px-2 py-1 rounded-md border border-gray-200 hover:bg-gray-50 transition-all flex-shrink-0"
+            className="w-9 h-9 rounded-full bg-paper border border-line text-muted hover:text-ink flex items-center justify-center transition-all flex-shrink-0"
             aria-label="Ferma"
           >
-            ⬛
+            <Square className="w-3.5 h-3.5" strokeWidth={2.2} />
           </button>
         )}
-        <button
-          onClick={cycleSpeed}
-          className="text-[11px] font-bold text-blue-700 bg-white px-2 py-1 rounded-md border border-blue-200 hover:bg-blue-50 transition-all flex-shrink-0"
-          aria-label="Velocità riproduzione"
-        >
+        <button onClick={cycleSpeed} className={speedCls} aria-label="Velocità riproduzione">
           {speed}×
         </button>
       </div>

@@ -1,5 +1,8 @@
 'use client';
 
+import { Card, Eyebrow, Button, IconBadge } from '@/components/ui';
+import { HandHeart, Footprints, BookOpen, Loader2 } from 'lucide-react';
+
 interface WeekDeepDiveProps {
   preghiera: string;
   integrazione: string;
@@ -19,56 +22,40 @@ export default function WeekDeepDive({
   return (
     <div className="space-y-4 mb-6">
 
-      {/* Card Preghiera (visibile solo se popolata su Notion) */}
       {hasPreghiera && (
-        <div className="bg-gradient-to-br from-amber-50 to-stone-50 rounded-2xl shadow-sm border border-amber-200 overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-amber-500 to-amber-400" />
-          <div className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-lg flex-shrink-0">🙏</div>
-              <div>
-                <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">Preghiera della Settimana</p>
-                <p className="text-xs text-amber-600">Da tenere accanto al cuore</p>
-              </div>
+        <Card tone="gold">
+          <div className="flex items-center gap-3 mb-4">
+            <IconBadge size="sm"><HandHeart strokeWidth={1.8} /></IconBadge>
+            <div>
+              <Eyebrow>Preghiera della settimana</Eyebrow>
+              <p className="text-xs text-muted mt-0.5">Da tenere accanto al cuore</p>
             </div>
-            <div className="w-full h-px bg-amber-100 mb-4" />
-            <p className="text-gray-800 text-base font-serif italic leading-relaxed whitespace-pre-line">
-              {preghiera}
-            </p>
           </div>
-        </div>
+          <p className="font-serif italic text-[21px] leading-[1.4] text-ink whitespace-pre-line">
+            {preghiera}
+          </p>
+        </Card>
       )}
 
-      {/* Card Integrazione (visibile solo se popolata su Notion) */}
       {hasIntegrazione && (
-        <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
-          <div className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-lg flex-shrink-0">✨</div>
-              <div>
-                <p className="text-xs font-bold text-blue-700 uppercase tracking-wider">Passi di Integrazione</p>
-                <p className="text-xs text-blue-500">Portare il tema nella vita quotidiana</p>
-              </div>
+        <Card>
+          <div className="flex items-center gap-3 mb-4">
+            <IconBadge size="sm" tone="muted"><Footprints strokeWidth={1.8} /></IconBadge>
+            <div>
+              <Eyebrow tone="muted">Passi di integrazione</Eyebrow>
+              <p className="text-xs text-muted mt-0.5">Portare il tema nella vita quotidiana</p>
             </div>
-            <div className="w-full h-px bg-stone-100 mb-4" />
-            <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
-              {integrazione}
-            </p>
           </div>
-        </div>
+          <p className="text-[15px] text-ink-soft leading-relaxed whitespace-pre-line">
+            {integrazione}
+          </p>
+        </Card>
       )}
 
-      {/* Bottone approfondimento esteso (sempre visibile: la pagina Notion ha sempre blocchi) */}
-      <button
-        onClick={onOpenExtended}
-        disabled={loadingExtended}
-        className="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-50 text-sm"
-      >
-        {loadingExtended
-          ? <><span className="animate-spin inline-block">⏳</span> Caricamento...</>
-          : <>📚 Apri approfondimento completo →</>
-        }
-      </button>
+      <Button variant="secondary" full size="lg" onClick={onOpenExtended} disabled={loadingExtended}>
+        {loadingExtended ? <Loader2 className="animate-spin" /> : <BookOpen strokeWidth={1.8} />}
+        {loadingExtended ? 'Caricamento…' : 'Apri l’approfondimento completo'}
+      </Button>
 
     </div>
   );

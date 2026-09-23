@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { Card, Eyebrow, Verse, Button } from '@/components/ui';
+import { Sun } from 'lucide-react';
 
-interface Verse {
+interface VerseData {
   delivery_date: string;
   text: string;
   reference: string | null;
@@ -19,7 +21,7 @@ async function getAccessToken(): Promise<string | null> {
 }
 
 export default function DailyVerseCard({ name }: DailyVerseCardProps) {
-  const [verse, setVerse] = useState<Verse | null>(null);
+  const [verse, setVerse] = useState<VerseData | null>(null);
   const [dismissing, setDismissing] = useState(false);
   const [hidden, setHidden] = useState(false);
 
@@ -58,44 +60,30 @@ export default function DailyVerseCard({ name }: DailyVerseCardProps) {
     } catch (err) {
       console.error('Errore mark as read daily verse:', err);
     }
-    // fade-out poi nasconde
     setTimeout(() => setHidden(true), 250);
   };
 
   if (!verse || hidden) return null;
 
   return (
-    <div
-      className={`bg-gradient-to-br from-amber-50 via-stone-50 to-amber-50 rounded-2xl shadow-sm border border-amber-200 overflow-hidden mb-5 transition-opacity duration-200 ${
-        dismissing ? 'opacity-0' : 'opacity-100'
-      }`}
+    <Card
+      tone="gold"
+      className={`transition-opacity duration-200 animate-rise ${dismissing ? 'opacity-0' : 'opacity-100'}`}
     >
-      <div className="h-1 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500" />
-      <div className="p-6">
-        <p className="text-xs font-bold text-amber-800 uppercase tracking-widest mb-2 flex items-center gap-2">
-          <span>☀️</span> Buongiorno{name ? `, ${name}` : ''}
-        </p>
-        <p className="text-xs text-amber-700 mb-4 italic">
-          La frase del giorno è qui per te
-        </p>
+      <Eyebrow icon={<Sun strokeWidth={2} />} className="mb-1">
+        Frase del giorno
+      </Eyebrow>
+      <p className="text-xs text-muted mb-4">
+        {name ? `Per te, ${name}.` : 'Per te, oggi.'}
+      </p>
 
-        <blockquote className="text-gray-800 text-base font-serif italic leading-relaxed mb-3 whitespace-pre-line">
-          &ldquo;{verse.text}&rdquo;
-        </blockquote>
-        {verse.reference && (
-          <p className="text-amber-700 text-sm font-semibold text-right mb-5">
-            — {verse.reference}
-          </p>
-        )}
+      <Verse size="sm" reference={verse.reference || undefined} className="mb-5">
+        {verse.text}
+      </Verse>
 
-        <button
-          onClick={markAsRead}
-          disabled={dismissing}
-          className="w-full bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-sm disabled:opacity-50"
-        >
-          Grazie 🙏
-        </button>
-      </div>
-    </div>
+      <Button variant="secondary" size="sm" onClick={markAsRead} disabled={dismissing}>
+        Grazie, l&apos;ho letta
+      </Button>
+    </Card>
   );
 }

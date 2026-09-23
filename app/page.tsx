@@ -10,6 +10,8 @@ import EveningCheckinCard from '@/components/EveningCheckinCard';
 import EveningReminderBanner from '@/components/EveningReminderBanner';
 import { WEEK_IDS, WEEK_NAMES } from '@/lib/weekIds';
 import { BETA_MAX_EPISODE } from '@/lib/weekUnlockLogic';
+import { Card, Eyebrow, Button, Verse, LoadingScreen, ProgressBar, SectionTitle, Ornament, CrossMark } from '@/components/ui';
+import { ArrowRight, Check, ChevronDown, ChevronUp, Leaf, Wind } from 'lucide-react';
 
 const DAY_KEYS = [
   'day1','day2','day3','day4','day5','day6','day7',
@@ -17,8 +19,19 @@ const DAY_KEYS = [
 type DayKey = typeof DAY_KEYS[number];
 
 const DAY_LABELS: Record<string, string> = {
-  day1:'Lun', day2:'Mar', day3:'Mer', day4:'Gio', day5:'Ven', day6:'Sab', day7:'Dom',
+  day1:'L', day2:'M', day3:'M', day4:'G', day5:'V', day6:'S', day7:'D',
 };
+const DAY_FULL: Record<string, string> = {
+  day1:'Lunedì', day2:'Martedì', day3:'Mercoledì', day4:'Giovedì', day5:'Venerdì', day6:'Sabato', day7:'Domenica',
+};
+
+function greeting(): string {
+  const h = new Date().getHours();
+  if (h < 6) return 'Buonanotte';
+  if (h < 13) return 'Buongiorno';
+  if (h < 18) return 'Buon pomeriggio';
+  return 'Buonasera';
+}
 
 export default function HomePage() {
   const router = useRouter();
@@ -124,14 +137,7 @@ export default function HomePage() {
   };
 
   if (loading) {
-    return (
-      <main className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-4">✝️</div>
-          <p className="text-xl text-slate-300 font-serif">Caricamento...</p>
-        </div>
-      </main>
-    );
+    return <LoadingScreen label="Preparo il tuo cammino…" />;
   }
 
   const currentWeek = profile?.current_week || 1;
@@ -145,122 +151,104 @@ export default function HomePage() {
   const nextEpisode = completedEpisodes + 1;
   const isAllDone = completedEpisodes >= BETA_MAX_EPISODE;
 
-  return (
-    <main className="min-h-screen bg-stone-50 pb-24">
+  const goToNext = () => {
+    // Primo passo di ogni settimana → prima la pagina panoramica della settimana
+    const isWeekFirst = (nextEpisode - 1) % 7 === 0;
+    if (isWeekFirst) {
+      router.push(`/settimana/${WEEK_IDS[currentWeek]}?week=${currentWeek}`);
+    } else {
+      router.push(`/episodio/${nextEpisode}`);
+    }
+  };
 
-      {/* ── Banner serale alle 21 (se check-in non fatto) ── */}
+  return (
+    <main className="min-h-screen bg-parchment">
+
       <EveningReminderBanner />
 
-      {/* ── Toast "Custodito ✓" post check-in ── */}
       {showCheckinToast && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-green-600 text-white text-sm font-bold px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 animate-fade-in">
-          <span>✓</span> Giornata custodita
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-ink text-paper text-sm font-medium px-5 py-2.5 rounded-full shadow-[var(--shadow-float)] flex items-center gap-2 animate-rise">
+          <Check className="w-4 h-4 text-gold-light" strokeWidth={2.5} />
+          Giornata custodita
         </div>
       )}
 
-      {/* ── Top header ── */}
-      <div className="bg-slate-900 px-5 pt-10 pb-8">
+      {/* ── Testata ── */}
+      <header className="px-5 pt-9 pb-5">
         <div className="max-w-2xl mx-auto">
-          <p className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-1">✝ The Way</p>
-          <h1 className="text-2xl font-bold text-white mb-0.5">
-            Ciao, {profile?.name || 'pellegrino'} 🙏
+          <div className="flex items-center justify-between mb-4">
+            <Eyebrow icon={<CrossMark />}>The Way</Eyebrow>
+            <span className="text-[11px] font-medium text-muted tracking-wide">
+              Settimana {currentWeek}
+            </span>
+          </div>
+          <h1 className="font-serif text-[36px] sm:text-[42px] leading-[1.02] font-medium text-ink">
+            {greeting()},{' '}
+            <span className="italic font-normal">{profile?.name || 'pellegrino'}</span>
           </h1>
-          <p className="text-slate-400 text-sm">
-            Week {currentWeek} · {WEEK_NAMES[currentWeek] || `Week ${currentWeek}`}
+          <p className="text-ink-soft text-sm mt-2">
+            {WEEK_NAMES[currentWeek] || `Settimana ${currentWeek}`}
           </p>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-2xl mx-auto px-4 -mt-3">
+      <div className="max-w-2xl mx-auto px-4 space-y-5">
 
-        {/* ── Versetto del giorno (push del mattino, persistito) ── */}
         <DailyVerseCard name={profile?.name} />
 
-        {/* ── Vita Quotidiana: invito del giorno + check-in serale ── */}
+        {/* ── Versetto della settimana + prossimo passo (card notte) ── */}
+        <Card tone="night" className="relative overflow-hidden animate-rise">
+          <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-gold-light/10 blur-2xl pointer-events-none" aria-hidden />
+          <Eyebrow tone="night" className="mb-4">Versetto della settimana</Eyebrow>
+
+          {mantra ? (
+            <Verse tone="night" size="md" className="mb-6">
+              {mantra}
+            </Verse>
+          ) : (
+            <p className="font-serif italic text-night-muted text-xl mb-6">Versetto in arrivo.</p>
+          )}
+
+          <Ornament tone="night" className="mb-5" />
+
+          {isAllDone ? (
+            <div className="rounded-xl border border-gold-light/30 bg-gold-light/10 px-4 py-3 text-sm text-night-text text-center">
+              Hai completato tutti i passi della Beta. Il cammino continua presto.
+            </div>
+          ) : (
+            <Button variant="night" size="lg" full onClick={goToNext}>
+              {completedEpisodes === 0 ? 'Inizia il primo passo' : `Continua: passo ${nextEpisode}`}
+              <ArrowRight strokeWidth={2.2} />
+            </Button>
+          )}
+
+          <button
+            onClick={openMeditation}
+            className="mt-3 w-full inline-flex items-center justify-center gap-2 text-sm text-night-muted hover:text-night-text py-2 transition-colors"
+          >
+            <Wind className="w-4 h-4" strokeWidth={1.8} />
+            Momento di preghiera e respiro
+          </button>
+        </Card>
+
         <DailyInvitationCard />
         <EveningCheckinCard />
 
-        {/* ── Versetto hero ── */}
-        {mantra ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden mb-5">
-            {/* Decorazione top amber */}
-            <div className="h-1 bg-gradient-to-r from-amber-500 to-amber-400" />
-            <div className="p-6">
-              <p className="text-xs font-bold text-amber-700 uppercase tracking-widest mb-3 flex items-center gap-2">
-                <span>📖</span> Versetto della Settimana
-              </p>
-              <blockquote className="text-gray-800 text-lg font-serif leading-relaxed italic mb-4 whitespace-pre-line">
-                &ldquo;{mantra}&rdquo;
-              </blockquote>
-
-              {/* CTA Passo */}
-              {isAllDone ? (
-                <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm font-medium text-amber-800 text-center">
-                  🏆 Hai completato tutti i passi della Beta — stay tuned ✝️
-                </div>
-              ) : (
-                <button
-                  onClick={() => {
-                    // First episode of each week → show week overview page first
-                    const WEEK_FIRST_EPISODES = new Set([1, 8, 15, 22]);
-                    if (WEEK_FIRST_EPISODES.has(nextEpisode)) {
-                      router.push(`/settimana/${WEEK_IDS[currentWeek]}?week=${currentWeek}`);
-                    } else {
-                      router.push(`/episodio/${nextEpisode}`);
-                    }
-                  }}
-                  className="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-white font-bold py-3 px-5 rounded-xl transition-all text-sm flex items-center justify-center gap-2 shadow-sm mb-3"
-                >
-                  <span>▶</span>
-                  <span>{completedEpisodes === 0 ? 'Inizia: Passo 1' : `Continua: Passo ${nextEpisode}`}</span>
-                </button>
-              )}
-
-              <button
-                onClick={openMeditation}
-                className="w-full flex items-center justify-center gap-2 border-2 border-amber-300 text-amber-700 hover:bg-amber-50 font-semibold py-2.5 px-5 rounded-xl transition-all text-sm"
-              >
-                <span>🙏</span>
-                <span>Momento di preghiera e respiro</span>
-              </button>
-            </div>
-          </div>
-        ) : (
-          /* Fallback se non c'è versetto */
-          !isAllDone && (
-            <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-5 mb-5">
-              <button
-                onClick={() => {
-                  const WEEK_FIRST_EPISODES = new Set([1, 8, 15, 22]);
-                  if (WEEK_FIRST_EPISODES.has(nextEpisode)) {
-                    router.push(`/settimana/${WEEK_IDS[currentWeek]}?week=${currentWeek}`);
-                  } else {
-                    router.push(`/episodio/${nextEpisode}`);
-                  }
-                }}
-                className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-5 rounded-xl transition-all text-sm flex items-center justify-center gap-2"
-              >
-                <span>▶</span>
-                <span>{completedEpisodes === 0 ? 'Inizia: Passo 1' : `Continua: Passo ${nextEpisode}`}</span>
-              </button>
-            </div>
-          )
-        )}
-
         {/* ── Pratiche della settimana ── */}
         {practicheArray.length > 0 && (
-          <div className="mb-5">
+          <section className="pt-2">
             <button
-              className="flex items-center justify-between w-full mb-3 px-1"
+              className="w-full flex items-end justify-between gap-3 mb-3 px-1"
               onClick={() => setPracticesVisible(v => !v)}
+              aria-expanded={practicesVisible}
             >
-              <h2 className="text-sm font-bold text-stone-700 uppercase tracking-wide flex items-center gap-2">
-                🌿 Pratiche della Settimana
-              </h2>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-stone-400">7 giorni</span>
-                <span className="text-stone-400 text-sm">{practicesVisible ? '▲' : '▼'}</span>
+              <div className="text-left">
+                <h2 className="font-serif text-2xl leading-none font-semibold text-ink">Pratiche della settimana</h2>
+                <p className="text-xs text-muted mt-1.5">Solo per te. Non influenzano il percorso.</p>
               </div>
+              <span className="text-muted mb-0.5">
+                {practicesVisible ? <ChevronUp className="w-5 h-5" strokeWidth={1.8} /> : <ChevronDown className="w-5 h-5" strokeWidth={1.8} />}
+              </span>
             </button>
 
             {practicesVisible && (
@@ -269,117 +257,89 @@ export default function HomePage() {
                   const practice = practices.find(p => p.practice_number === index + 1);
                   const completedDays = practice?.completed_days || {};
                   const completedCount = DAY_KEYS.filter(day => completedDays[day]).length;
-                  const percentage = Math.round((completedCount / 7) * 100);
                   const isComplete = completedCount === 7;
 
                   return (
-                    <div
-                      key={index}
-                      className={`bg-white rounded-2xl shadow-sm border transition-all ${
-                        isComplete ? 'border-green-200' : 'border-stone-200'
-                      }`}
-                    >
-                      <div className="flex items-start gap-3 p-4 pb-3">
-                        <span className={`w-7 h-7 rounded-full text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                          isComplete ? 'bg-green-500' : 'bg-amber-600'
-                        }`}>
-                          {isComplete ? '✓' : index + 1}
+                    <Card key={index} tone={isComplete ? 'sage' : 'paper'} className={`animate-rise delay-${Math.min(index + 1, 4)}`}>
+                      <div className="flex items-start gap-3.5">
+                        <span
+                          className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 font-serif text-base font-semibold ${
+                            isComplete ? 'bg-sage text-paper' : 'bg-gold-soft text-gold-deep'
+                          }`}
+                        >
+                          {isComplete ? <Check className="w-4 h-4" strokeWidth={2.5} /> : index + 1}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-gray-800 leading-snug">{praticaText}</p>
-                          <div className="flex items-center gap-2 mt-2">
-                            <div className="flex-1 h-1.5 bg-stone-100 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-500"
-                                style={{ width: `${percentage}%` }}
-                              />
-                            </div>
-                            <span className={`text-xs font-semibold flex-shrink-0 ${
-                              isComplete ? 'text-green-600' : 'text-stone-400'
-                            }`}>
-                              {completedCount}/7
-                            </span>
-                          </div>
+                          <p className="text-[15px] text-ink leading-snug">{praticaText}</p>
+                          <p className={`text-xs mt-1.5 ${isComplete ? 'text-sage' : 'text-muted'}`}>
+                            {completedCount} su 7 giorni
+                          </p>
                         </div>
                       </div>
 
-                      <div className="px-4 pb-4">
-                        <div className="flex gap-1">
-                          {DAY_KEYS.map(day => (
+                      <div className="flex gap-1.5 mt-4">
+                        {DAY_KEYS.map(day => {
+                          const done = !!completedDays[day];
+                          return (
                             <button
                               key={day}
                               onClick={() => togglePracticeDay(index + 1, day)}
                               disabled={loadingPractices}
-                              aria-label={`Pratica ${index + 1}, ${DAY_LABELS[day]}: ${completedDays[day] ? 'fatta' : 'non ancora fatta'}`}
-                              aria-pressed={!!completedDays[day]}
-                              className={`flex-1 flex flex-col items-center gap-0.5 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-95 ${
-                                completedDays[day]
-                                  ? 'bg-amber-500 text-white shadow-sm'
-                                  : 'bg-stone-50 text-stone-400 border border-stone-200 hover:border-amber-300 hover:bg-amber-50'
-                              } disabled:opacity-50`}
+                              aria-label={`Pratica ${index + 1}, ${DAY_FULL[day]}: ${done ? 'fatta' : 'non ancora fatta'}`}
+                              aria-pressed={done}
+                              className={`flex-1 h-10 rounded-lg text-xs font-semibold transition-all active:scale-95 disabled:opacity-50 ${
+                                done
+                                  ? 'bg-gold text-paper shadow-[0_2px_8px_-3px_rgba(184,134,43,0.7)]'
+                                  : 'bg-parchment text-muted hover:bg-gold-soft hover:text-gold-deep'
+                              }`}
                             >
-                              <span className="text-[9px] font-medium opacity-70">{DAY_LABELS[day]}</span>
-                              <span aria-hidden="true">{completedDays[day] ? '✓' : ''}</span>
+                              {done ? <Check className="w-3.5 h-3.5 mx-auto" strokeWidth={3} /> : DAY_LABELS[day]}
                             </button>
-                          ))}
-                        </div>
+                          );
+                        })}
                       </div>
-                    </div>
+                    </Card>
                   );
                 })}
-                <p className="text-xs text-stone-400 mt-2 text-center">
-                  💡 Il tracker è solo per te — non influenza il percorso
-                </p>
               </div>
             )}
-          </div>
+          </section>
         )}
 
-        {/* ── Progresso ── */}
-        <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 mb-6">
-          <div className="h-0.5 w-8 bg-amber-400 rounded-full mb-3" />
-          <h2 className="text-lg font-serif font-bold text-gray-800 mb-1">
-            Il Tuo Cammino
-          </h2>
-          <p className="text-stone-500 text-sm mb-5">
-            Progresso nel percorso Beta
-          </p>
+        {/* ── Il tuo cammino ── */}
+        <section className="pt-2 pb-6">
+          <SectionTitle hint="Il tuo avanzamento nella Beta">Il tuo cammino</SectionTitle>
+          <Card>
+            <div className="flex items-baseline justify-between mb-3">
+              <p className="font-serif text-4xl font-medium text-ink leading-none">
+                {completedEpisodes}
+                <span className="text-lg text-muted font-normal"> / {BETA_MAX_EPISODE}</span>
+              </p>
+              <p className="text-xs text-muted">passi vissuti</p>
+            </div>
+            <ProgressBar value={progressPercentage} height="h-2" className="mb-5" />
 
-          <div className="grid grid-cols-3 gap-3 mb-5">
-            <div className="bg-stone-50 border border-stone-200 border-l-4 border-l-amber-500 p-3 rounded-xl">
-              <div className="text-2xl font-bold text-gray-800">{completedEpisodes}</div>
-              <div className="text-xs text-stone-500">Completati</div>
+            <div className="grid grid-cols-3 divide-x divide-line text-center mb-5">
+              <div className="px-2">
+                <p className="font-serif text-2xl text-ink leading-none">{currentWeek}</p>
+                <p className="text-[11px] text-muted mt-1.5 uppercase tracking-wider">Settimana</p>
+              </div>
+              <div className="px-2">
+                <p className="font-serif text-2xl text-ink leading-none">{progressPercentage}%</p>
+                <p className="text-[11px] text-muted mt-1.5 uppercase tracking-wider">Percorso</p>
+              </div>
+              <div className="px-2">
+                <p className="font-serif text-2xl text-ink leading-none">{Math.max(0, BETA_MAX_EPISODE - completedEpisodes)}</p>
+                <p className="text-[11px] text-muted mt-1.5 uppercase tracking-wider">Da vivere</p>
+              </div>
             </div>
-            <div className="bg-stone-50 border border-stone-200 border-l-4 border-l-slate-500 p-3 rounded-xl">
-              <div className="text-2xl font-bold text-gray-800">{BETA_MAX_EPISODE}</div>
-              <div className="text-xs text-stone-500">Passi Beta</div>
-            </div>
-            <div className="bg-stone-50 border border-stone-200 border-l-4 border-l-green-500 p-3 rounded-xl">
-              <div className="text-2xl font-bold text-gray-800">{progressPercentage}%</div>
-              <div className="text-xs text-stone-500">Progresso</div>
-            </div>
-          </div>
 
-          <div className="mb-5">
-            <div className="flex justify-between text-sm text-stone-500 mb-2">
-              <span>Avanzamento Beta</span>
-              <span>{completedEpisodes}/{BETA_MAX_EPISODE} passi</span>
-            </div>
-            <div className="w-full bg-stone-100 rounded-full h-2">
-              <div
-                className="bg-gradient-to-r from-amber-500 to-amber-400 h-2 rounded-full transition-all duration-500"
-                style={{ width: `${progressPercentage}%` }}
-              />
-            </div>
-          </div>
-
-          <button
-            onClick={() => router.push('/settimane')}
-            className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-xl transition-all text-sm"
-          >
-            📖 Esplora le Settimane
-          </button>
-        </div>
+            <Button variant="secondary" full onClick={() => router.push('/settimane')}>
+              <Leaf strokeWidth={1.8} />
+              Esplora le settimane
+            </Button>
+          </Card>
+        </section>
 
       </div>
     </main>

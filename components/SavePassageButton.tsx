@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { PASSAGE_TAGS, suggestTagsForEpisode } from '@/lib/savedPassageTags';
+import { Button, Eyebrow } from '@/components/ui';
+import { Bookmark, BookmarkCheck, Check, X } from 'lucide-react';
 
 interface SavePassageButtonProps {
   episodeNumber: number;
@@ -20,7 +22,6 @@ export default function SavePassageButton({ episodeNumber }: SavePassageButtonPr
   const [draftTags, setDraftTags] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
 
-  // Carica stato iniziale
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
@@ -50,7 +51,6 @@ export default function SavePassageButton({ episodeNumber }: SavePassageButtonPr
   }, [episodeNumber]);
 
   const openModal = () => {
-    // Apri con i tag attuali se gia' salvato, altrimenti con i suggeriti
     setDraftTags(saved ? currentTags : suggestTagsForEpisode(episodeNumber));
     setShowModal(true);
   };
@@ -109,91 +109,81 @@ export default function SavePassageButton({ episodeNumber }: SavePassageButtonPr
 
   return (
     <>
-      <button
+      <Button
+        variant={saved ? 'gold' : 'secondary'}
+        full
+        className="mb-3"
         onClick={openModal}
-        className={`w-full flex items-center justify-center gap-2 border-2 font-semibold py-2.5 rounded-xl text-sm transition-all mb-3 ${
-          saved
-            ? 'bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100'
-            : 'bg-white border-stone-300 text-stone-700 hover:bg-stone-50'
-        }`}
       >
-        <span className="text-base">{saved ? '🔖' : '🤍'}</span>
-        <span>
-          {saved ? 'Custodito' : 'Custodisci questo passo'}
-        </span>
-      </button>
+        {saved ? <BookmarkCheck strokeWidth={2} /> : <Bookmark strokeWidth={2} />}
+        {saved ? 'Custodito' : 'Custodisci questo passo'}
+      </Button>
 
       {showModal && (
         <div
-          // z-[70] per stare SOPRA la BottomTabBar (che usa z-50)
-          className="fixed inset-0 z-[70] bg-slate-900/60 flex items-end sm:items-center justify-center backdrop-blur-sm"
+          className="fixed inset-0 z-[70] bg-night/70 backdrop-blur-sm flex items-end sm:items-center justify-center animate-fade-in"
           onClick={() => setShowModal(false)}
         >
           <div
-            // flex column: header fisso, body scrollabile, footer fisso
-            // max-h calcolato lasciando margine in alto su mobile
-            className="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl w-full sm:max-w-md flex flex-col max-h-[92vh] sm:max-h-[85vh] sm:m-4"
+            className="bg-paper rounded-t-3xl sm:rounded-3xl shadow-[var(--shadow-float)] w-full sm:max-w-md flex flex-col max-h-[92vh] sm:max-h-[85vh] sm:m-4 animate-rise"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* HEADER fisso */}
-            <div className="px-5 pt-5 pb-4 border-b border-stone-100 shrink-0">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-bold text-amber-700 uppercase tracking-widest">
-                  Custodisci il passo
-                </p>
+            {/* HEADER */}
+            <div className="px-6 pt-5 pb-4 border-b border-line shrink-0">
+              <div className="flex items-center justify-between mb-1">
+                <Eyebrow>Custodisci il passo</Eyebrow>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="text-stone-400 hover:text-stone-600 text-2xl leading-none w-8 h-8 flex items-center justify-center -mr-2"
+                  className="w-9 h-9 -mr-2 rounded-full text-muted hover:text-ink hover:bg-parchment flex items-center justify-center transition-colors"
                   aria-label="Chiudi"
                 >
-                  ×
+                  <X className="w-4 h-4" strokeWidth={2} />
                 </button>
               </div>
-              <p className="text-sm text-stone-600 italic">
-                Scegli i momenti in cui ti piacerebbe ritrovarlo. Te lo suggerisco io — modifica come vuoi.
-              </p>
+              <p className="font-serif text-2xl font-semibold text-ink leading-tight">Quando vorrai ritrovarlo?</p>
+              <p className="text-xs text-muted mt-1.5">Ti suggerisco alcuni momenti. Modifica come vuoi.</p>
             </div>
 
-            {/* BODY scrollabile */}
-            <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4 space-y-2">
+            {/* BODY */}
+            <div className="flex-1 overflow-y-auto overscroll-contain scroll-quiet px-6 py-4 space-y-2">
               {PASSAGE_TAGS.map(tag => {
                 const selected = draftTags.includes(tag.id);
                 return (
                   <button
                     key={tag.id}
                     onClick={() => toggleTag(tag.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-all ${
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all ${
                       selected
-                        ? 'border-amber-400 bg-amber-50'
-                        : 'border-stone-200 bg-white hover:bg-stone-50'
+                        ? 'border-gold bg-gold-wash'
+                        : 'border-line bg-paper hover:border-line-strong'
                     }`}
                   >
-                    <span className="text-xl">{tag.icon}</span>
-                    <span className={`flex-1 text-sm font-medium ${
-                      selected ? 'text-amber-900' : 'text-stone-700'
-                    }`}>
+                    <span className="text-lg leading-none w-6 text-center">{tag.icon}</span>
+                    <span className={`flex-1 text-sm ${selected ? 'text-ink font-medium' : 'text-ink-soft'}`}>
                       {tag.label}
                     </span>
-                    {selected && <span className="text-amber-600 text-lg">✓</span>}
+                    <span
+                      className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${
+                        selected ? 'bg-gold border-gold text-paper' : 'border-line-strong'
+                      }`}
+                    >
+                      {selected && <Check className="w-3 h-3" strokeWidth={3} />}
+                    </span>
                   </button>
                 );
               })}
             </div>
 
-            {/* FOOTER fisso — non sticky, parte del flex container */}
-            <div className="px-5 py-4 border-t border-stone-100 bg-white space-y-2 shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
-              <button
-                onClick={confirm}
-                disabled={busy}
-                className="w-full bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-white font-bold py-3 rounded-xl text-sm transition-all disabled:opacity-50"
-              >
+            {/* FOOTER */}
+            <div className="px-6 py-4 border-t border-line bg-paper space-y-2 shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
+              <Button full size="lg" onClick={confirm} disabled={busy}>
                 {busy ? 'Custodisco…' : saved ? 'Aggiorna' : 'Custodisci'}
-              </button>
+              </Button>
               {saved && (
                 <button
                   onClick={remove}
                   disabled={busy}
-                  className="w-full text-xs text-stone-500 hover:text-red-600 py-2 transition-colors disabled:opacity-50"
+                  className="w-full text-xs text-muted hover:text-rose py-2 transition-colors disabled:opacity-50"
                 >
                   Rimuovi dai custoditi
                 </button>

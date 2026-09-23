@@ -1,6 +1,9 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { ChevronLeft, ChevronRight, HelpCircle, Sparkles, Leaf, KeyRound } from 'lucide-react';
+import { Eyebrow, Ornament, IconBadge } from '@/components/ui';
+import type { ReactNode } from 'react';
 
 interface WeekCarouselProps {
   domandaGuida: string;
@@ -11,12 +14,16 @@ interface WeekCarouselProps {
 }
 
 const SLIDES = [
-  { id: 'domanda',  label: 'Domanda Guida',  emoji: '💭' },
-  { id: 'essenza',  label: 'Essenza',         emoji: '✨' },
-  { id: 'mantra',   label: 'Versetto',         emoji: '✝️' },
-  { id: 'pratiche', label: 'Pratiche',         emoji: '🌿' },
-  { id: 'scoperta', label: 'Scoperta Chiave',  emoji: '🔑' },
+  { id: 'domanda',  label: 'Domanda guida' },
+  { id: 'essenza',  label: 'Essenza' },
+  { id: 'mantra',   label: 'Versetto' },
+  { id: 'pratiche', label: 'Pratiche' },
+  { id: 'scoperta', label: 'Scoperta chiave' },
 ];
+
+function Empty({ children = 'Contenuto non ancora disponibile.' }: { children?: ReactNode }) {
+  return <p className="text-muted italic font-serif text-lg">{children}</p>;
+}
 
 export default function WeekCarousel({
   domandaGuida,
@@ -56,10 +63,11 @@ export default function WeekCarousel({
     }
   };
 
-  return (
-    <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+  const slideBase = 'w-full flex-shrink-0 min-h-64 p-6 sm:p-7 flex flex-col';
 
-      {/* Track scorrevole */}
+  return (
+    <div className="bg-paper rounded-2xl border border-line shadow-[var(--shadow-card)] overflow-hidden">
+
       <div
         className="relative overflow-hidden"
         onTouchStart={handleTouchStart}
@@ -71,144 +79,127 @@ export default function WeekCarousel({
           style={{ transform: `translateX(-${current * 100}%)` }}
         >
 
-          {/* SLIDE 1 — Domanda Guida */}
-          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-gradient-to-br from-stone-50 to-blue-50">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center text-lg flex-shrink-0">💭</div>
+          {/* 1 — Domanda guida */}
+          <div className={slideBase}>
+            <div className="flex items-center gap-3 mb-5">
+              <IconBadge size="sm"><HelpCircle strokeWidth={1.8} /></IconBadge>
               <div>
-                <p className="text-xs font-bold text-blue-700 uppercase tracking-wider">Domanda Guida</p>
-                <p className="text-xs text-blue-500">Tienila con te questa settimana</p>
+                <Eyebrow>Domanda guida</Eyebrow>
+                <p className="text-xs text-muted mt-0.5">Tienila con te questa settimana</p>
               </div>
             </div>
-            <div className="w-full h-px bg-blue-100 mb-5" />
-            <p className="text-gray-800 text-base font-serif leading-relaxed italic text-center px-2">
-              {domandaGuida
-                ? `"${domandaGuida}"`
-                : <span className="text-gray-400 not-italic text-sm font-sans">Contenuto non ancora disponibile.</span>
-              }
-            </p>
+            <div className="flex-1 flex items-center">
+              {domandaGuida ? (
+                <p className="font-serif text-[26px] leading-[1.3] text-ink italic">
+                  {domandaGuida}
+                </p>
+              ) : <Empty />}
+            </div>
           </div>
 
-          {/* SLIDE 2 — Essenza */}
-          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-gradient-to-br from-amber-50 to-stone-50">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-lg flex-shrink-0">✨</div>
+          {/* 2 — Essenza */}
+          <div className={slideBase}>
+            <div className="flex items-center gap-3 mb-5">
+              <IconBadge size="sm"><Sparkles strokeWidth={1.8} /></IconBadge>
               <div>
-                <p className="text-xs font-bold text-amber-700 uppercase tracking-wider">Essenza</p>
-                <p className="text-xs text-amber-600">Il cuore di questa settimana</p>
+                <Eyebrow>Essenza</Eyebrow>
+                <p className="text-xs text-muted mt-0.5">Il cuore di questa settimana</p>
               </div>
             </div>
-            <div className="w-full h-px bg-amber-100 mb-4" />
-            <p className="text-gray-700 text-sm leading-relaxed">
-              {essenza || <span className="text-gray-400 italic">Contenuto non ancora disponibile.</span>}
-            </p>
+            {essenza ? (
+              <p className="text-[15px] text-ink-soft leading-relaxed whitespace-pre-line">{essenza}</p>
+            ) : <Empty />}
           </div>
 
-          {/* SLIDE 3 — Versetto (dark navy, gold accents) */}
-          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-slate-900 flex flex-col justify-center">
-            <p className="text-amber-400 text-xs font-bold uppercase tracking-widest text-center mb-3">
-              ✝️ Versetto della settimana
-            </p>
-            <div className="text-white text-5xl leading-none text-center mb-2 opacity-20 font-serif select-none">❝</div>
-            <p className="text-white text-base font-serif font-medium leading-relaxed text-center px-2">
-              {mantra
-                ? mantra.split('\n').map((line, i, arr) => (
-                    <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
-                  ))
-                : <span className="opacity-60 text-sm font-normal font-sans">Versetto non ancora disponibile.</span>
-              }
-            </p>
-            <div className="text-white text-5xl leading-none text-center mt-2 opacity-20 font-serif select-none">❞</div>
+          {/* 3 — Versetto (notte) */}
+          <div className={`${slideBase} bg-night text-night-text justify-center items-center text-center relative overflow-hidden`}>
+            <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full bg-gold-light/10 blur-3xl pointer-events-none" aria-hidden />
+            <Eyebrow tone="night" className="justify-center mb-5">Versetto della settimana</Eyebrow>
+            {mantra ? (
+              <p className="font-serif italic text-[26px] leading-[1.3] text-night-text whitespace-pre-line max-w-sm">
+                {mantra}
+              </p>
+            ) : <p className="font-serif italic text-night-muted text-lg">Versetto non ancora disponibile.</p>}
+            <Ornament tone="night" className="w-24 mt-6" />
           </div>
 
-          {/* SLIDE 4 — Pratiche */}
-          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-gradient-to-br from-green-50 to-stone-50">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-green-100 flex items-center justify-center text-lg flex-shrink-0">🌿</div>
+          {/* 4 — Pratiche */}
+          <div className={slideBase}>
+            <div className="flex items-center gap-3 mb-5">
+              <IconBadge size="sm"><Leaf strokeWidth={1.8} /></IconBadge>
               <div>
-                <p className="text-xs font-bold text-green-700 uppercase tracking-wider">Le Tue Pratiche</p>
-                <p className="text-xs text-green-600">Da portare con te questa settimana</p>
+                <Eyebrow>Le tue pratiche</Eyebrow>
+                <p className="text-xs text-muted mt-0.5">Da portare con te questa settimana</p>
               </div>
             </div>
-            <div className="w-full h-px bg-green-100 mb-4" />
             {pratiche.length > 0 ? (
-              <ol className="space-y-3">
+              <ol className="space-y-3.5">
                 {pratiche.map((p, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
-                      {i + 1}
-                    </span>
-                    <p className="text-gray-700 text-sm leading-relaxed">{p}</p>
+                  <li key={i} className="flex items-start gap-3.5">
+                    <span className="font-serif text-2xl leading-none text-gold w-6 flex-shrink-0 mt-[-2px]">{i + 1}</span>
+                    <p className="text-[15px] text-ink-soft leading-relaxed">{p}</p>
                   </li>
                 ))}
               </ol>
-            ) : (
-              <p className="text-stone-400 text-sm italic">Pratiche non ancora disponibili.</p>
-            )}
+            ) : <Empty>Pratiche non ancora disponibili.</Empty>}
           </div>
 
-          {/* SLIDE 5 — Scoperta Chiave */}
-          <div className="w-full flex-shrink-0 min-h-56 p-6 bg-gradient-to-br from-stone-50 to-amber-50">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-lg flex-shrink-0">🔑</div>
+          {/* 5 — Scoperta chiave */}
+          <div className={slideBase}>
+            <div className="flex items-center gap-3 mb-5">
+              <IconBadge size="sm"><KeyRound strokeWidth={1.8} /></IconBadge>
               <div>
-                <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">Scoperta Chiave</p>
-                <p className="text-xs text-amber-600">Cosa porterai con te</p>
+                <Eyebrow>Scoperta chiave</Eyebrow>
+                <p className="text-xs text-muted mt-0.5">Cosa porterai con te</p>
               </div>
             </div>
-            <div className="w-full h-px bg-amber-100 mb-4" />
-            <p className="text-gray-700 text-sm leading-relaxed mb-3">
-              {scopertaChiave || <span className="text-stone-400 italic">Contenuto non ancora disponibile.</span>}
-            </p>
-            <p className="text-xs text-stone-400 text-center italic mt-4">
-              ↓ Continua sotto per la preghiera e l'approfondimento
-            </p>
+            {scopertaChiave ? (
+              <p className="text-[15px] text-ink-soft leading-relaxed whitespace-pre-line">{scopertaChiave}</p>
+            ) : <Empty />}
+            <p className="text-xs text-faint mt-5">Continua sotto per la preghiera e l&apos;approfondimento.</p>
           </div>
 
         </div>
       </div>
 
-      {/* Barra navigazione */}
-      <div className="flex items-center justify-between px-5 py-3 border-t border-stone-100">
+      {/* Navigazione */}
+      <div className="flex items-center justify-between px-4 py-3 border-t border-line">
         <button
           onClick={() => goTo(current - 1)}
           disabled={current === 0}
-          className="w-8 h-8 flex items-center justify-center rounded-full text-xl text-stone-400 hover:text-amber-600 hover:bg-amber-50 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+          className="w-9 h-9 flex items-center justify-center rounded-full text-muted hover:text-gold-deep hover:bg-gold-wash transition-all disabled:opacity-20"
           aria-label="Precedente"
         >
-          ‹
+          <ChevronLeft className="w-5 h-5" strokeWidth={2} />
         </button>
 
-        <div className="flex items-center gap-2">
-          {SLIDES.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => goTo(i)}
-              className={`rounded-full transition-all duration-300 ${
-                i === current
-                  ? 'w-5 h-2 bg-amber-500'
-                  : 'w-2 h-2 bg-stone-200 hover:bg-stone-300'
-              }`}
-            />
-          ))}
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            {SLIDES.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goTo(i)}
+                aria-label={SLIDES[i].label}
+                className={`rounded-full transition-all duration-300 ${
+                  i === current ? 'w-5 h-1.5 bg-gold' : 'w-1.5 h-1.5 bg-line-strong hover:bg-gold-light'
+                }`}
+              />
+            ))}
+          </div>
+          <span className="text-[11px] text-muted tracking-wide">
+            {SLIDES[current].label} · {current + 1} di {SLIDES.length}
+          </span>
         </div>
 
         <button
           onClick={() => goTo(current + 1)}
           disabled={current === SLIDES.length - 1}
-          className="w-8 h-8 flex items-center justify-center rounded-full text-xl text-stone-400 hover:text-amber-600 hover:bg-amber-50 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+          className="w-9 h-9 flex items-center justify-center rounded-full text-muted hover:text-gold-deep hover:bg-gold-wash transition-all disabled:opacity-20"
           aria-label="Successivo"
         >
-          ›
+          <ChevronRight className="w-5 h-5" strokeWidth={2} />
         </button>
       </div>
-
-      <div className="text-center pb-3">
-        <span className="text-xs text-stone-400">
-          {SLIDES[current].emoji} {SLIDES[current].label} · {current + 1} di {SLIDES.length}
-        </span>
-      </div>
-
     </div>
   );
 }

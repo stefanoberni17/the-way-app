@@ -8,6 +8,8 @@ import WeekCarousel from '@/components/WeekCarousel';
 import WeekDeepDive from '@/components/WeekDeepDive';
 import { isWeekUnlockedInBeta } from '@/lib/weekUnlockLogic';
 import { WEEK_IDS as WEEK_IDS_MAP } from '@/lib/weekIds';
+import { PageHeader, LoadingScreen, Card, Button, Eyebrow, SectionTitle, Notice, Ornament, CrossMark } from '@/components/ui';
+import { ArrowRight, ArrowDown, Check } from 'lucide-react';
 
 // 7 passi per settimana singola (6 Lectio + 1 Integrazione)
 const WEEK_EPISODES: Record<string, number[]> = {
@@ -15,8 +17,10 @@ const WEEK_EPISODES: Record<string, number[]> = {
   '2': [8,  9,  10, 11, 12, 13, 14],
   '3': [15, 16, 17, 18, 19, 20, 21],
   '4': [22, 23, 24, 25, 26, 27, 28],
-  '5': [29, 30, 31, 32, 33, 34, 35], // future
-  '6': [36, 37, 38, 39, 40, 41, 42], // future
+  '5': [29, 30, 31, 32, 33, 34, 35],
+  '6': [36, 37, 38, 39, 40, 41, 42],
+  '7': [43, 44, 45, 46, 47, 48, 49],
+  '8': [50, 51, 52, 53, 54, 55, 56],
 };
 
 const EPISODE_TITLES: Record<number, string> = {
@@ -91,13 +95,13 @@ function renderBlock(block: any) {
   switch (type) {
     case 'paragraph': {
       const texts = block.paragraph?.rich_text || [];
-      if (texts.length === 0) return <br />;
+      if (texts.length === 0) return <div className="h-3" />;
       return (
-        <p className="text-gray-700 leading-relaxed text-sm mb-3">
+        <p className="text-ink-soft leading-relaxed text-[15px] mb-4">
           {texts.map((t: any, i: number) => {
             const ann = t.annotations || {};
             let el: React.ReactNode = t.plain_text;
-            if (ann.bold) el = <strong key={i}>{el}</strong>;
+            if (ann.bold) el = <strong key={i} className="font-semibold text-ink">{el}</strong>;
             if (ann.italic) el = <em key={i}>{el}</em>;
             return <span key={i}>{el}</span>;
           })}
@@ -110,51 +114,49 @@ function renderBlock(block: any) {
       const texts = block[type]?.rich_text || [];
       const content = texts.map((t: any) => t.plain_text).join('');
       const cls = type === 'heading_1'
-        ? 'text-xl font-bold text-gray-800 mt-6 mb-2'
+        ? 'font-serif text-3xl font-semibold text-ink mt-8 mb-3'
         : type === 'heading_2'
-        ? 'text-lg font-bold text-gray-800 mt-5 mb-2'
-        : 'text-base font-bold text-gray-700 mt-4 mb-1';
+        ? 'font-serif text-2xl font-semibold text-ink mt-7 mb-2'
+        : 'font-serif text-xl font-semibold text-ink mt-5 mb-2';
       const Tag = type === 'heading_1' ? 'h2' : type === 'heading_2' ? 'h3' : 'h4';
       return <Tag className={cls}>{content}</Tag>;
     }
     case 'bulleted_list_item': {
       const texts = block.bulleted_list_item?.rich_text || [];
       return (
-        <div className="flex gap-2 mb-1">
-          <span className="text-blue-500 mt-1 flex-shrink-0">•</span>
-          <p className="text-gray-700 text-sm leading-relaxed">{texts.map((t: any) => t.plain_text).join('')}</p>
+        <div className="flex gap-3 mb-2">
+          <span className="text-gold mt-2 w-1 h-1 rounded-full bg-gold flex-shrink-0" />
+          <p className="text-ink-soft text-[15px] leading-relaxed">{texts.map((t: any) => t.plain_text).join('')}</p>
         </div>
       );
     }
     case 'numbered_list_item': {
       const texts = block.numbered_list_item?.rich_text || [];
       return (
-        <div className="flex gap-2 mb-1">
-          <span className="text-blue-600 font-bold text-sm flex-shrink-0">›</span>
-          <p className="text-gray-700 text-sm leading-relaxed">{texts.map((t: any) => t.plain_text).join('')}</p>
+        <div className="flex gap-3 mb-2">
+          <span className="text-gold font-serif text-lg leading-none mt-0.5 flex-shrink-0">›</span>
+          <p className="text-ink-soft text-[15px] leading-relaxed">{texts.map((t: any) => t.plain_text).join('')}</p>
         </div>
       );
     }
     case 'quote': {
       const texts = block.quote?.rich_text || [];
       return (
-        <blockquote className="border-l-4 border-blue-400 bg-blue-50 px-4 py-3 my-3 rounded-r-lg">
-          <p className="text-gray-700 italic text-sm leading-relaxed">{texts.map((t: any) => t.plain_text).join('')}</p>
+        <blockquote className="border-l-2 border-gold pl-5 my-5">
+          <p className="font-serif italic text-xl leading-[1.4] text-ink">{texts.map((t: any) => t.plain_text).join('')}</p>
         </blockquote>
       );
     }
     case 'callout': {
       const texts = block.callout?.rich_text || [];
-      const emoji = block.callout?.icon?.emoji || '💡';
       return (
-        <div className="bg-blue-50 border-l-4 border-blue-400 p-4 my-3 rounded flex items-start gap-3">
-          <span className="text-xl flex-shrink-0">{emoji}</span>
-          <p className="text-gray-700 text-sm leading-relaxed">{texts.map((t: any) => t.plain_text).join('')}</p>
+        <div className="bg-gold-wash border border-gold-soft rounded-xl p-4 my-4">
+          <p className="text-ink-soft text-[15px] leading-relaxed">{texts.map((t: any) => t.plain_text).join('')}</p>
         </div>
       );
     }
     case 'divider':
-      return <hr className="border-blue-100 my-4" />;
+      return <Ornament className="my-6" />;
     default:
       return null;
   }
@@ -172,13 +174,12 @@ export default function SettimanaPage() {
   const [userId, setUserId] = useState<string>('');
   const [completedEpisodes, setCompletedEpisodes] = useState<number[]>([]);
   const [weekNumber, setWeekNumber] = useState<number>(1);
-  const [allSettimane, setAllSettimane] = useState<any[]>([]);
+  const [, setAllSettimane] = useState<any[]>([]);
   const [isWeekComplete, setIsWeekComplete] = useState(false);
   const [showWeekCompletePopup, setShowWeekCompletePopup] = useState(false);
   const [nextWeekId, setNextWeekId] = useState<string | null>(null);
   const [nextWeekNumber, setNextWeekNumber] = useState<number | null>(null);
 
-  // Versione estesa
   const [showExtended, setShowExtended] = useState(false);
   const [extendedBlocks, setExtendedBlocks] = useState<any[]>([]);
   const [loadingExtended, setLoadingExtended] = useState(false);
@@ -265,24 +266,15 @@ export default function SettimanaPage() {
   };
 
   if (loading) {
-    return (
-      <main className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-4">✝️</div>
-          <p className="text-xl text-slate-300 font-serif">Caricamento settimana...</p>
-        </div>
-      </main>
-    );
+    return <LoadingScreen label="Apro la settimana…" />;
   }
 
   if (!data || data.error) {
     return (
-      <main className="min-h-screen bg-stone-50 flex items-center justify-center">
+      <main className="min-h-screen bg-parchment flex items-center justify-center px-6">
         <div className="text-center">
-          <p className="text-xl text-red-600">Errore nel caricamento</p>
-          <button onClick={() => router.push('/')} className="mt-4 bg-slate-900 text-white px-6 py-2 rounded-full">
-            Torna alla home
-          </button>
+          <p className="font-serif text-2xl text-ink mb-4">Qualcosa non ha risposto.</p>
+          <Button onClick={() => router.push('/')}>Torna alla home</Button>
         </div>
       </main>
     );
@@ -292,9 +284,7 @@ export default function SettimanaPage() {
   const settimana = properties.Settimana?.title?.[0]?.plain_text || '';
   const titolo = properties.Titolo?.rich_text?.[0]?.plain_text || '';
   const tema = properties['Tema principale']?.rich_text?.[0]?.plain_text || '';
-  const episodi = properties.Episodi?.rich_text?.[0]?.plain_text || '';
 
-  // Properties per il carousel
   const domandaGuida = (properties['Domanda guida']?.rich_text?.[0]?.plain_text || '').replace(/<br>/g, '\n');
   const essenza = (properties.Essenza?.rich_text?.[0]?.plain_text || '').replace(/<br>/g, '\n');
   const mantra = (properties.Mantra?.rich_text?.[0]?.plain_text || '').replace(/<br>/g, '\n');
@@ -308,6 +298,8 @@ export default function SettimanaPage() {
 
   const weekEpisodes = WEEK_EPISODES[weekNumber.toString()] || [];
   const nextWeekInBeta = nextWeekNumber !== null && isWeekUnlockedInBeta(nextWeekNumber);
+  const weekLabel = settimana.replace(/^Week\s+/i, 'Settimana ');
+  const completedInWeek = weekEpisodes.filter(ep => completedEpisodes.includes(ep)).length;
 
   const handleEpisodeComplete = async () => {
     const completed = await loadProgress(userId);
@@ -317,31 +309,22 @@ export default function SettimanaPage() {
   // — VISTA VERSIONE ESTESA —
   if (showExtended) {
     return (
-      <main className="min-h-screen bg-stone-50 py-6 px-4 pb-28">
-        <div className="max-w-2xl mx-auto">
-          <button
-            onClick={() => setShowExtended(false)}
-            className="flex items-center gap-2 text-sm text-stone-500 font-medium mb-5 hover:text-amber-700 transition-colors"
-          >
-            ← Torna alla settimana
-          </button>
-
-          <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 mb-4">
-            <span className="text-xs font-bold text-amber-800 bg-amber-100 px-3 py-1 rounded-full">
-              {settimana} · Approfondimento completo
-            </span>
-            <h1 className="text-xl font-serif font-extrabold text-gray-800 mt-3 mb-1">{titolo}</h1>
-            <p className="text-amber-700 font-semibold text-sm">🎯 {tema}</p>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6">
+      <main className="min-h-screen bg-parchment">
+        <PageHeader
+          eyebrow={`${weekLabel} · Approfondimento`}
+          title={titolo}
+          subtitle={tema}
+          onBack={() => setShowExtended(false)}
+        />
+        <div className="max-w-2xl mx-auto px-4 pb-10">
+          <Card className="animate-rise">
             {extendedBlocks.length > 0
               ? extendedBlocks.map((block: any, i: number) => (
                   <div key={block.id || i}>{renderBlock(block)}</div>
                 ))
-              : <p className="text-sm text-stone-400 italic">Nessun contenuto aggiuntivo disponibile.</p>
+              : <p className="font-serif italic text-lg text-muted">Nessun contenuto aggiuntivo disponibile.</p>
             }
-          </div>
+          </Card>
         </div>
       </main>
     );
@@ -349,91 +332,71 @@ export default function SettimanaPage() {
 
   // — VISTA PRINCIPALE —
   return (
-    <main className="min-h-screen bg-stone-50 pb-24">
+    <main className="min-h-screen bg-parchment">
 
       {/* Popup settimana completata */}
       {showWeekCompletePopup && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl animate-scaleIn border-t-4 border-amber-500">
-            <div className="text-7xl mb-4 animate-bounce">🏆</div>
-            <h2 className="text-2xl font-serif font-bold text-gray-800 mb-2">Settimana completata!</h2>
-            <p className="text-amber-700 font-semibold text-sm mb-1">{settimana}</p>
-            <p className="text-stone-600 text-sm mb-6 leading-relaxed">
-              Hai completato tutti i passi. Porta con te la Parola di questa settimana. 🙏
+        <div className="fixed inset-0 bg-night/80 backdrop-blur-sm flex items-center justify-center z-[60] p-5 animate-fade-in">
+          <div className="bg-paper rounded-3xl p-8 max-w-sm w-full text-center shadow-[var(--shadow-float)] animate-scale-in">
+            <div className="relative w-16 h-16 mx-auto mb-5">
+              <div className="absolute inset-0 rounded-full bg-gold/20 animate-breathe" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <CrossMark className="w-6 h-6 text-gold" />
+              </div>
+            </div>
+            <Eyebrow className="justify-center mb-2">{weekLabel}</Eyebrow>
+            <h2 className="font-serif text-3xl font-semibold text-ink mb-3">Settimana completata</h2>
+            <p className="text-ink-soft text-sm leading-relaxed mb-7">
+              Hai vissuto tutti i passi. Porta con te la Parola di questa settimana.
             </p>
             {nextWeekId && nextWeekInBeta ? (
               <>
-                <button
-                  onClick={() => { setShowWeekCompletePopup(false); router.push(`/settimana/${nextWeekId}?week=${nextWeekNumber}`); }}
-                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-2xl mb-3 transition-all shadow-md"
-                >
-                  Passa alla settimana successiva →
-                </button>
-                <button
-                  onClick={() => setShowWeekCompletePopup(false)}
-                  className="w-full text-stone-400 hover:text-stone-600 text-sm py-2 transition-colors"
-                >
+                <Button full size="lg" onClick={() => { setShowWeekCompletePopup(false); router.push(`/settimana/${nextWeekId}?week=${nextWeekNumber}`); }}>
+                  Passa alla settimana successiva
+                  <ArrowRight strokeWidth={2.2} />
+                </Button>
+                <Button variant="ghost" full className="mt-2" onClick={() => setShowWeekCompletePopup(false)}>
                   Rimani qui
-                </button>
+                </Button>
               </>
             ) : nextWeekNumber !== null && !nextWeekInBeta ? (
               <>
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 text-xs text-amber-800">
-                  🔒 La prossima settimana sarà disponibile nella versione completa. Stay tuned!
-                </div>
-                <button
-                  onClick={() => setShowWeekCompletePopup(false)}
-                  className="w-full bg-slate-900 text-white font-bold py-3 rounded-2xl transition-all"
-                >
-                  Continua 🌅
-                </button>
+                <Notice tone="gold" className="mb-4 text-xs">
+                  La prossima settimana arriverà con la versione completa.
+                </Notice>
+                <Button full size="lg" onClick={() => setShowWeekCompletePopup(false)}>Continua</Button>
               </>
             ) : (
-              <button
-                onClick={() => setShowWeekCompletePopup(false)}
-                className="w-full bg-slate-900 text-white font-bold py-3 rounded-2xl transition-all"
-              >
-                Continua il percorso 🌅
-              </button>
+              <Button full size="lg" onClick={() => setShowWeekCompletePopup(false)}>Continua il percorso</Button>
             )}
           </div>
         </div>
       )}
 
-      {/* Header navy */}
-      <div className="bg-slate-900 px-5 pt-10 pb-8">
-        <div className="max-w-4xl mx-auto">
-          <button
-            onClick={() => router.back()}
-            className="text-slate-400 hover:text-white text-sm mb-4 flex items-center gap-1 transition-colors"
-          >
-            ← Indietro
-          </button>
-          <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="text-xs font-bold text-amber-400 bg-amber-400/20 px-3 py-1 rounded-full">
-              {settimana}
-            </span>
-            {isWeekComplete && (
-              <span className="text-xs font-bold text-green-400 bg-green-400/20 px-3 py-1 rounded-full">
-                ✅ Completata
-              </span>
-            )}
-          </div>
-          <h1 className="text-3xl font-serif font-bold text-white mb-1">{titolo}</h1>
-          <p className="text-slate-400 text-sm mb-4">{tema}</p>
+      <PageHeader
+        eyebrow={
+          <>
+            {weekLabel}
+            {isWeekComplete && <span className="text-sage"> · Completata</span>}
+          </>
+        }
+        title={titolo}
+        subtitle={tema}
+        onBack={() => router.back()}
+        right={
           <button
             onClick={scrollToEpisodes}
-            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-white text-sm font-bold px-5 py-2.5 rounded-full transition-all shadow-md"
+            className="w-11 h-11 rounded-full border border-line-strong text-ink-soft hover:border-gold hover:text-gold-deep flex items-center justify-center transition-colors"
+            aria-label="Vai ai passi"
           >
-            📖 Vai ai passi ↓
+            <ArrowDown className="w-4 h-4" strokeWidth={2} />
           </button>
-        </div>
-      </div>
+        }
+      />
 
-      <div className="max-w-4xl mx-auto px-4 -mt-3">
+      <div className="max-w-2xl mx-auto px-4 pb-10">
 
-        {/* Carousel insegnamento */}
-        <div className="mb-6">
+        <div className="mb-6 animate-rise">
           <WeekCarousel
             domandaGuida={domandaGuida}
             essenza={essenza}
@@ -443,7 +406,6 @@ export default function SettimanaPage() {
           />
         </div>
 
-        {/* Approfondimento: preghiera + integrazione + versione estesa */}
         <WeekDeepDive
           preghiera={preghiera}
           integrazione={integrazione}
@@ -451,64 +413,58 @@ export default function SettimanaPage() {
           loadingExtended={loadingExtended}
         />
 
-        {/* Episodi */}
-        <div className="mb-6" ref={episodesRef}>
-          <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6">
-            <div className="h-0.5 w-8 bg-amber-400 rounded-full mb-3" />
-            <h2 className="text-xl font-serif font-bold text-gray-800 mb-4">Passi della settimana</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {weekEpisodes.map((epNum) => {
-                const isCompleted = completedEpisodes.includes(epNum);
-                const isLocked = epNum > 1 && !completedEpisodes.includes(epNum - 1);
-                return (
-                  <EpisodeCard
-                    key={epNum}
-                    episodeNumber={epNum}
-                    title={EPISODE_TITLES[epNum] || `Passo ${epNum}`}
-                    isCompleted={isCompleted}
-                    isLocked={isLocked}
-                    weekNumber={weekNumber}
-                    userId={userId}
-                    settimanaId={params.id as string}
-                    onComplete={handleEpisodeComplete}
-                  />
-                );
-              })}
-            </div>
+        {/* Passi */}
+        <section ref={episodesRef} className="pt-2 scroll-mt-4">
+          <SectionTitle
+            hint={`${completedInWeek} di ${weekEpisodes.length} vissuti`}
+            right={
+              isWeekComplete ? (
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-sage mb-1">
+                  <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> Completa
+                </span>
+              ) : null
+            }
+          >
+            Passi della settimana
+          </SectionTitle>
+          <div className="space-y-2.5">
+            {weekEpisodes.map((epNum) => {
+              const isCompleted = completedEpisodes.includes(epNum);
+              const isLocked = epNum > 1 && !completedEpisodes.includes(epNum - 1);
+              return (
+                <EpisodeCard
+                  key={epNum}
+                  episodeNumber={epNum}
+                  title={EPISODE_TITLES[epNum] || `Passo ${epNum}`}
+                  isCompleted={isCompleted}
+                  isLocked={isLocked}
+                  weekNumber={weekNumber}
+                  userId={userId}
+                  settimanaId={params.id as string}
+                  onComplete={handleEpisodeComplete}
+                />
+              );
+            })}
           </div>
-        </div>
+        </section>
 
-        {/* Bottone prossima settimana */}
         {isWeekComplete && nextWeekId && nextWeekInBeta && (
-          <div className="mb-6">
-            <button
-              onClick={() => router.push(`/settimana/${nextWeekId}?week=${nextWeekNumber}`)}
-              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 text-sm"
-            >
-              ✝️ Passa alla settimana successiva →
-            </button>
+          <div className="mt-6">
+            <Button full size="lg" onClick={() => router.push(`/settimana/${nextWeekId}?week=${nextWeekNumber}`)}>
+              Passa alla settimana successiva
+              <ArrowRight strokeWidth={2.2} />
+            </Button>
           </div>
         )}
         {isWeekComplete && nextWeekNumber !== null && !nextWeekInBeta && (
-          <div className="mb-6">
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-              <p className="text-amber-800 font-semibold text-sm">
-                🔒 Hai completato tutte le settimane disponibili in Beta! La versione completa arriva presto. 🙏
-              </p>
-            </div>
+          <div className="mt-6">
+            <Notice tone="gold" className="text-center">
+              Hai completato tutte le settimane disponibili in Beta. La versione completa arriva presto.
+            </Notice>
           </div>
         )}
 
-      </div>{/* end max-w-4xl */}
-
-      <style jsx global>{`
-        @keyframes scaleIn {
-          from { transform: scale(0.9); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-        .animate-scaleIn { animation: scaleIn 0.4s ease-out; }
-      `}</style>
-
+      </div>
     </main>
   );
 }

@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import ChatBot, { ChatBotRef } from '@/components/ChatBot';
+import { LoadingScreen } from '@/components/ui';
 
 const suggestions = [
   "Come posso entrare nella Parola di oggi?",
@@ -29,27 +30,16 @@ export default function ChatPage() {
     checkAuth();
   }, [router]);
 
-  const handleSuggestionClick = (text: string) => {
-    chatBotRef.current?.sendSuggestion(text);
-  };
-
   if (loading) {
-    return (
-      <main className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-4">✝️</div>
-          <p className="text-xl text-slate-300 font-serif">Caricamento...</p>
-        </div>
-      </main>
-    );
+    return <LoadingScreen label="Chiamo La Guida…" />;
   }
 
   return (
     <div
-      className="flex flex-col bg-stone-50"
-      style={{ height: 'calc(100dvh - 4rem - env(safe-area-inset-bottom))' }}
+      className="flex flex-col bg-parchment"
+      style={{ height: 'calc(100dvh - 4.25rem - env(safe-area-inset-bottom))' }}
     >
-      <div className="flex-1 flex flex-col min-h-0 max-w-4xl w-full mx-auto px-3 sm:px-4 pt-3 pb-2">
+      <div className="flex-1 flex flex-col min-h-0 max-w-2xl w-full mx-auto px-3 sm:px-4 pt-3 pb-3">
         <ChatBot ref={chatBotRef} suggestions={suggestions} />
       </div>
     </div>

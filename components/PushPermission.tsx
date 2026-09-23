@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { Card, IconBadge, Button } from '@/components/ui';
+import { Bell, BellOff, BellRing } from 'lucide-react';
 
 type Status = 'loading' | 'unsupported' | 'denied' | 'inactive' | 'active';
 
-// Converte la chiave VAPID base64-url nel formato richiesto da pushManager.subscribe.
-// Costruisce esplicitamente un ArrayBuffer (non SharedArrayBuffer) per soddisfare
-// il tipo BufferSource richiesto dalle DOM lib di TS 5+.
 function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -25,13 +24,11 @@ async function getAccessToken(): Promise<string | null> {
 
 /**
  * Toggle in /profilo per attivare/disattivare le notifiche push.
- * Mostra stati distinti: non supportato, permesso negato, attivo, inattivo.
  */
 export default function PushPermission() {
   const [status, setStatus] = useState<Status>('loading');
   const [busy, setBusy] = useState(false);
 
-  // Determina lo stato corrente al mount
   useEffect(() => {
     const init = async () => {
       if (typeof window === 'undefined') return;
@@ -125,60 +122,71 @@ export default function PushPermission() {
     }
   };
 
-  // ---- Render ----
-
   if (status === 'loading') {
     return (
-      <div className="bg-white rounded-2xl p-4 border border-stone-200 animate-pulse">
-        <p className="text-sm text-gray-400">Carico stato notifiche...</p>
-      </div>
+      <Card tone="warm" className="animate-pulse">
+        <p className="text-sm text-muted">Controllo le notifiche…</p>
+      </Card>
     );
   }
 
   if (status === 'unsupported') {
     return (
-      <div className="bg-white rounded-2xl p-4 border border-stone-200">
-        <p className="text-sm font-bold text-gray-700 mb-1">🔕 Notifiche non supportate</p>
-        <p className="text-xs text-gray-500 leading-relaxed">
-          Il tuo browser non supporta le notifiche push. Su iPhone, aggiungi prima The Way alla schermata Home, poi torna qui.
-        </p>
-      </div>
+      <Card tone="warm">
+        <div className="flex items-start gap-3.5">
+          <IconBadge tone="muted" size="sm"><BellOff strokeWidth={1.8} /></IconBadge>
+          <div>
+            <p className="text-sm font-medium text-ink mb-1">Notifiche non disponibili</p>
+            <p className="text-xs text-muted leading-relaxed">
+              Il tuo browser non supporta le notifiche push. Su iPhone, aggiungi prima The Way alla schermata Home, poi torna qui.
+            </p>
+          </div>
+        </div>
+      </Card>
     );
   }
 
   if (status === 'denied') {
     return (
-      <div className="bg-amber-50 rounded-2xl p-4 border border-amber-200">
-        <p className="text-sm font-bold text-amber-800 mb-1">⚠️ Notifiche bloccate</p>
-        <p className="text-xs text-amber-700 leading-relaxed">
-          Hai negato il permesso. Per ricevere la frase del giorno, riattiva le notifiche dalle impostazioni del browser.
-        </p>
-      </div>
+      <Card tone="gold">
+        <div className="flex items-start gap-3.5">
+          <IconBadge size="sm"><BellOff strokeWidth={1.8} /></IconBadge>
+          <div>
+            <p className="text-sm font-medium text-ink mb-1">Notifiche bloccate</p>
+            <p className="text-xs text-ink-soft leading-relaxed">
+              Hai negato il permesso. Per ricevere la frase del giorno, riattiva le notifiche dalle impostazioni del browser.
+            </p>
+          </div>
+        </div>
+      </Card>
     );
   }
 
+  const active = status === 'active';
+
   return (
-    <div className="bg-white rounded-2xl p-4 border border-stone-200 flex items-center gap-3">
-      <div className="text-2xl flex-shrink-0">🕊️</div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-bold text-gray-800">Frase del giorno</p>
-        <p className="text-xs text-gray-500 leading-relaxed">
-          {status === 'active'
-            ? 'Ricevi una frase ogni mattina per accompagnare il tuo cammino.'
-            : 'Attiva le notifiche per ricevere una frase ogni mattina.'}
-        </p>
+    <Card>
+      <div className="flex items-center gap-3.5">
+        <IconBadge size="sm" tone={active ? 'gold' : 'muted'}>
+          {active ? <BellRing strokeWidth={1.8} /> : <Bell strokeWidth={1.8} />}
+        </IconBadge>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-ink">Frase del giorno</p>
+          <p className="text-xs text-muted leading-relaxed">
+            {active
+              ? 'Ogni mattina, una frase per accompagnare il cammino.'
+              : 'Ricevi una frase ogni mattina.'}
+          </p>
+        </div>
+        <Button
+          size="sm"
+          variant={active ? 'secondary' : 'gold'}
+          onClick={active ? disable : enable}
+          disabled={busy}
+        >
+          {busy ? '…' : active ? 'Disattiva' : 'Attiva'}
+        </Button>
       </div>
-      <button
-        onClick={status === 'active' ? disable : enable}
-        disabled={busy}
-        className={`text-xs font-bold px-3 py-2 rounded-lg transition-all flex-shrink-0 disabled:opacity-50 ${
-          status === 'active'
-            ? 'bg-stone-100 text-gray-700 hover:bg-stone-200'
-            : 'bg-amber-500 text-white hover:bg-amber-600'
-        }`}
-      >
-        {busy ? '...' : status === 'active' ? 'Disattiva' : 'Attiva'}
-      </button>
-    </div>
+    </Card>
   );
 }

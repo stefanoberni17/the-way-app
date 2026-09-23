@@ -1,159 +1,127 @@
+import { Eyebrow, Rule } from '@/components/ui';
+
+function Section({ n, title, children }: { n: string; title: string; children: React.ReactNode }) {
+  return (
+    <section>
+      <div className="flex items-baseline gap-3 mb-3">
+        <span className="font-serif text-2xl text-gold leading-none">{n}</span>
+        <h2 className="font-serif text-2xl font-semibold text-ink leading-none">{title}</h2>
+      </div>
+      <div className="space-y-3 text-[15px] text-ink-soft leading-relaxed">{children}</div>
+    </section>
+  );
+}
+
+function Item({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-paper-warm border border-line rounded-xl p-4">
+      <p className="font-medium text-ink mb-1">{title}</p>
+      <p className="text-sm">{children}</p>
+    </div>
+  );
+}
+
+function Bullet({ children }: { children: React.ReactNode }) {
+  return (
+    <li className="flex items-start gap-3">
+      <span className="w-1.5 h-1.5 rounded-full bg-gold mt-2.5 flex-shrink-0" />
+      <span>{children}</span>
+    </li>
+  );
+}
+
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50 py-10 px-5">
+    <main className="min-h-screen bg-parchment py-10 px-5">
       <div className="w-full max-w-2xl mx-auto">
 
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="text-4xl mb-2">🔒</div>
-          <h1 className="text-2xl font-bold text-gray-800">Privacy Policy</h1>
-          <p className="text-gray-500 text-sm mt-1">The Way — La Via del Cuore — ultimo aggiornamento: febbraio 2026</p>
-        </div>
+        <header className="text-center mb-8">
+          <Eyebrow className="justify-center mb-2">The Way · La Via del Cuore</Eyebrow>
+          <h1 className="font-serif text-[40px] font-semibold text-ink leading-none">Privacy Policy</h1>
+          <p className="text-muted text-sm mt-3">Ultimo aggiornamento: febbraio 2026</p>
+          <Rule className="mx-auto mt-5" />
+        </header>
 
-        <div className="bg-white rounded-2xl shadow-xl p-7 space-y-8 text-sm text-gray-700 leading-relaxed">
+        <div className="bg-paper rounded-3xl border border-line shadow-[var(--shadow-card)] p-6 sm:p-8 space-y-9">
 
-          {/* Intro */}
-          <section>
-            <p>
-              The Way — La Via del Cuore è un&apos;app di crescita personale ispirata agli insegnamenti del Vangelo.
-              Rispettiamo la tua privacy e vogliamo essere trasparenti su come raccogliamo e utilizziamo i tuoi dati.
-            </p>
-          </section>
+          <p className="text-[15px] text-ink-soft leading-relaxed">
+            The Way — La Via del Cuore è un&apos;app di crescita personale ispirata agli insegnamenti del Vangelo.
+            Rispettiamo la tua privacy e vogliamo essere trasparenti su come raccogliamo e utilizziamo i tuoi dati.
+          </p>
 
-          {/* 1. Dati raccolti */}
-          <section>
-            <h2 className="text-base font-bold text-gray-800 mb-3">1. Dati che raccogliamo</h2>
-            <div className="space-y-3">
-              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                <p className="font-semibold text-gray-800 mb-1">👤 Profilo personale</p>
-                <p className="text-gray-600">Nome, età, email, intenzione di percorso, passioni, sogno e situazione attuale. Forniti volontariamente durante la registrazione o dal profilo.</p>
-              </div>
-              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                <p className="font-semibold text-gray-800 mb-1">📖 Progressi nel cammino</p>
-                <p className="text-gray-600">Passi completati, settimana corrente e tracker delle pratiche settimanali.</p>
-              </div>
-              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                <p className="font-semibold text-gray-800 mb-1">✍️ Riflessioni</p>
-                <p className="text-gray-600">Le risposte alle domande riflessive dei passi (max 500 caratteri ciascuna).</p>
-              </div>
-              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                <p className="font-semibold text-gray-800 mb-1">💬 Conversazioni Telegram</p>
-                <p className="text-gray-600">I messaggi scambiati con La Guida tramite il bot Telegram, necessari per mantenere il contesto della conversazione.</p>
-              </div>
-            </div>
-          </section>
+          <Section n="1" title="Dati che raccogliamo">
+            <Item title="Profilo personale">
+              Nome, età, email, intenzione di percorso, passioni, sogno e situazione attuale. Forniti volontariamente durante la registrazione o dal profilo.
+            </Item>
+            <Item title="Progressi nel cammino">
+              Passi completati, settimana corrente e tracker delle pratiche settimanali.
+            </Item>
+            <Item title="Riflessioni">
+              Le risposte alle domande riflessive dei passi (max 500 caratteri ciascuna).
+            </Item>
+            <Item title="Conversazioni Telegram">
+              I messaggi scambiati con La Guida tramite il bot Telegram, necessari per mantenere il contesto della conversazione.
+            </Item>
+          </Section>
 
-          {/* 2. Come usiamo i dati */}
-          <section>
-            <h2 className="text-base font-bold text-gray-800 mb-3">2. Come utilizziamo i tuoi dati</h2>
+          <Section n="2" title="Come utilizziamo i tuoi dati">
             <ul className="space-y-2">
-              <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">•</span>
-                <span>Personalizzare le risposte de La Guida in base al tuo percorso e alla tua storia</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">•</span>
-                <span>Tenere traccia dei tuoi progressi e sbloccare i contenuti in sequenza</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">•</span>
-                <span>Migliorare l&apos;esperienza nel tempo tramite pattern anonimi (mai dati personali identificabili)</span>
-              </li>
+              <Bullet>Personalizzare le risposte de La Guida in base al tuo percorso e alla tua storia</Bullet>
+              <Bullet>Tenere traccia dei tuoi progressi e sbloccare i contenuti in sequenza</Bullet>
+              <Bullet>Migliorare l&apos;esperienza nel tempo tramite pattern anonimi (mai dati personali identificabili)</Bullet>
             </ul>
-            <div className="mt-4 bg-green-50 border border-green-100 rounded-xl p-4">
-              <p className="font-semibold text-green-800 mb-1">✅ Non vendiamo i tuoi dati</p>
-              <p className="text-green-700">I tuoi dati non vengono mai venduti, ceduti o condivisi con terze parti a scopo commerciale.</p>
+            <div className="bg-sage-soft border border-sage/20 rounded-xl p-4 mt-2">
+              <p className="font-medium text-sage mb-1">Non vendiamo i tuoi dati</p>
+              <p className="text-sm text-ink-soft">I tuoi dati non vengono mai venduti, ceduti o condivisi con terze parti a scopo commerciale.</p>
             </div>
-          </section>
+          </Section>
 
-          {/* 3. Retention */}
-          <section>
-            <h2 className="text-base font-bold text-gray-800 mb-3">3. Conservazione dei dati</h2>
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <span className="text-lg">🗓️</span>
-                <div>
-                  <p className="font-semibold text-gray-800">Conversazioni Telegram</p>
-                  <p className="text-gray-600">Eliminate automaticamente dopo <strong>90 giorni</strong>. Un riassunto anonimo dei temi emersi può essere conservato nel profilo per mantenere la continuità del percorso.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-lg">📁</span>
-                <div>
-                  <p className="font-semibold text-gray-800">Profilo, progressi e riflessioni</p>
-                  <p className="text-gray-600">Conservati finché il tuo account è attivo o fino a richiesta di cancellazione.</p>
-                </div>
-              </div>
-            </div>
-          </section>
+          <Section n="3" title="Conservazione dei dati">
+            <Item title="Conversazioni Telegram">
+              Eliminate automaticamente dopo <strong className="text-ink">90 giorni</strong>. Un riassunto anonimo dei temi emersi può essere conservato nel profilo per mantenere la continuità del percorso.
+            </Item>
+            <Item title="Profilo, progressi e riflessioni">
+              Conservati finché il tuo account è attivo o fino a richiesta di cancellazione.
+            </Item>
+          </Section>
 
-          {/* 4. Tecnologie */}
-          <section>
-            <h2 className="text-base font-bold text-gray-800 mb-3">4. Tecnologie utilizzate</h2>
-            <div className="space-y-2">
-              <div className="flex items-start gap-3">
-                <span className="text-lg">🗄️</span>
-                <div>
-                  <p className="font-semibold text-gray-800">Supabase</p>
-                  <p className="text-gray-600">Database sicuro hosted in Europa per la conservazione dei dati.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-lg">🤖</span>
-                <div>
-                  <p className="font-semibold text-gray-800">Anthropic (Claude AI)</p>
-                  <p className="text-gray-600">I tuoi messaggi vengono inviati ad Anthropic per generare le risposte de La Guida. Anthropic non conserva i dati oltre l&apos;elaborazione della richiesta.</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-lg">✈️</span>
-                <div>
-                  <p className="font-semibold text-gray-800">Telegram</p>
-                  <p className="text-gray-600">Usato come canale opzionale per interagire con La Guida. L&apos;ID Telegram è l&apos;unico dato condiviso con Telegram.</p>
-                </div>
-              </div>
-            </div>
-          </section>
+          <Section n="4" title="Tecnologie utilizzate">
+            <Item title="Supabase">Database sicuro hosted in Europa per la conservazione dei dati.</Item>
+            <Item title="Anthropic (Claude AI)">
+              I tuoi messaggi vengono inviati ad Anthropic per generare le risposte de La Guida. Anthropic non conserva i dati oltre l&apos;elaborazione della richiesta.
+            </Item>
+            <Item title="Telegram">
+              Usato come canale opzionale per interagire con La Guida. L&apos;ID Telegram è l&apos;unico dato condiviso con Telegram.
+            </Item>
+          </Section>
 
-          {/* 5. Diritti */}
-          <section>
-            <h2 className="text-base font-bold text-gray-800 mb-3">5. I tuoi diritti</h2>
-            <p className="mb-3">Hai il diritto di:</p>
-            <ul className="space-y-2 mb-4">
-              <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">•</span>
-                <span>Accedere ai dati che conserviamo su di te</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">•</span>
-                <span>Richiedere la correzione di dati errati</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">•</span>
-                <span>Richiedere la cancellazione del tuo account e di tutti i dati associati</span>
-              </li>
+          <Section n="5" title="I tuoi diritti">
+            <p>Hai il diritto di:</p>
+            <ul className="space-y-2">
+              <Bullet>Accedere ai dati che conserviamo su di te</Bullet>
+              <Bullet>Richiedere la correzione di dati errati</Bullet>
+              <Bullet>Richiedere la cancellazione del tuo account e di tutti i dati associati</Bullet>
             </ul>
-            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-              <p className="font-semibold text-blue-800 mb-1">📧 Contatto</p>
-              <p className="text-blue-700">Per qualsiasi richiesta relativa ai tuoi dati, scrivi a:{' '}
-                <a href="mailto:foryou.innerpath@gmail.com" className="underline font-semibold">
+            <div className="bg-gold-wash border border-gold-soft rounded-xl p-4 mt-2">
+              <p className="font-medium text-ink mb-1">Contatto</p>
+              <p className="text-sm">
+                Per qualsiasi richiesta relativa ai tuoi dati, scrivi a{' '}
+                <a href="mailto:foryou.innerpath@gmail.com" className="text-gold-deep underline underline-offset-2 font-medium">
                   foryou.innerpath@gmail.com
                 </a>
               </p>
             </div>
-          </section>
+          </Section>
 
-          {/* Footer */}
-          <section className="border-t border-gray-100 pt-6 text-center text-xs text-gray-400">
-            <p>The Way — La Via del Cuore è un progetto indipendente.</p>
-          </section>
+          <p className="border-t border-line pt-6 text-center text-xs text-muted">
+            The Way — La Via del Cuore è un progetto indipendente.
+          </p>
 
         </div>
 
-        {/* Back link */}
         <div className="text-center mt-6">
-          <a href="/login" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-            ← Torna al login
+          <a href="/login" className="text-sm text-muted hover:text-ink underline underline-offset-4">
+            Torna all&apos;accesso
           </a>
         </div>
 

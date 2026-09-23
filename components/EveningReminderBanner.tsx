@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { Moon, X } from 'lucide-react';
 
 const REMINDER_HOUR = 21;
 const DISMISS_KEY = 'evening_reminder_dismissed_session';
@@ -19,10 +20,7 @@ export default function EveningReminderBanner() {
   useEffect(() => {
     let cancelled = false;
     const run = async () => {
-      // Solo dopo le 21 locali
       if (new Date().getHours() < REMINDER_HOUR) return;
-
-      // Dismissed per questa sessione?
       if (sessionStorage.getItem(DISMISS_KEY) === '1') return;
 
       try {
@@ -52,25 +50,25 @@ export default function EveningReminderBanner() {
   };
 
   return (
-    <div className="sticky top-0 z-40 bg-gradient-to-r from-slate-800 to-slate-900 text-white shadow-lg">
+    <div className="sticky top-0 z-40 bg-night text-night-text border-b border-night-line">
       <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
-        <span className="text-xl">🌙</span>
+        <Moon className="w-4 h-4 text-gold-light flex-shrink-0" strokeWidth={2} />
         <p className="flex-1 text-sm leading-snug">
-          <span className="font-bold">È l&apos;ora del check-in.</span>{' '}
-          <span className="text-slate-300 italic">Uno sguardo sulla giornata?</span>
+          <span className="font-semibold">È l&apos;ora del check-in.</span>{' '}
+          <span className="text-night-muted font-serif italic text-base">Uno sguardo sulla giornata?</span>
         </p>
         <button
           onClick={() => router.push('/cammino-oggi')}
-          className="bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-900 font-bold text-xs px-3 py-1.5 rounded-lg whitespace-nowrap"
+          className="bg-gold-light text-night font-semibold text-xs px-3.5 py-1.5 rounded-full whitespace-nowrap hover:bg-gold-soft transition-colors"
         >
           Andiamo
         </button>
         <button
           onClick={dismiss}
           aria-label="Chiudi"
-          className="text-slate-400 hover:text-white text-lg leading-none px-1"
+          className="text-night-muted hover:text-night-text p-1"
         >
-          ×
+          <X className="w-4 h-4" strokeWidth={2} />
         </button>
       </div>
     </div>

@@ -20,9 +20,9 @@ export default function BottomTabBar() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 z-50 shadow-[0_-1px_12px_rgba(0,0,0,0.06)] safe-bottom">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-around items-stretch h-16">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-paper/90 backdrop-blur-md border-t border-line safe-bottom">
+      <div className="max-w-2xl mx-auto">
+        <div className="flex justify-around items-stretch h-[68px]">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive =
@@ -34,22 +34,23 @@ export default function BottomTabBar() {
               <Link
                 key={tab.href}
                 href={tab.href}
-                className={`relative flex flex-col items-center justify-center flex-1 gap-1 pt-1.5 transition-colors duration-200 ${
-                  isActive
-                    ? 'text-amber-700'
-                    : 'text-stone-500 hover:text-stone-700'
+                aria-current={isActive ? 'page' : undefined}
+                className={`relative flex flex-col items-center justify-center flex-1 gap-1.5 transition-colors duration-200 ${
+                  isActive ? 'text-ink' : 'text-muted hover:text-ink-soft'
                 }`}
               >
-                {/* Indicatore attivo — linea oro in cima */}
-                {isActive && (
-                  <span className="absolute top-0 left-4 right-4 h-[2px] rounded-b-full bg-amber-600" />
-                )}
-                <Icon
-                  className={`w-6 h-6 transition-all ${
-                    isActive ? 'stroke-[2.5]' : 'stroke-[1.75]'
+                <span
+                  className={`flex items-center justify-center w-11 h-7 rounded-full transition-all duration-300 ${
+                    isActive ? 'bg-gold-soft' : 'bg-transparent'
                   }`}
-                />
-                <span className={`text-[11px] leading-none ${isActive ? 'font-bold' : 'font-medium'}`}>
+                >
+                  <Icon
+                    className={`w-[22px] h-[22px] transition-all ${
+                      isActive ? 'text-gold-deep stroke-[2.2]' : 'stroke-[1.7]'
+                    }`}
+                  />
+                </span>
+                <span className={`text-[10.5px] leading-none tracking-wide ${isActive ? 'font-semibold' : 'font-medium'}`}>
                   {tab.label}
                 </span>
               </Link>

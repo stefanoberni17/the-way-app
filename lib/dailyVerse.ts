@@ -16,8 +16,10 @@ export interface DailyVerse {
   notionPageId: string;
 }
 
-const getTitle = (prop: any): string => prop?.title?.[0]?.plain_text || '';
-const getText = (prop: any): string => prop?.rich_text?.[0]?.plain_text || '';
+import { tidy } from './notionText';
+
+const getTitle = (prop: any): string => tidy(prop?.title?.[0]?.plain_text || '');
+const getText = (prop: any): string => tidy(prop?.rich_text?.[0]?.plain_text || '');
 const getCheckbox = (prop: any): boolean => Boolean(prop?.checkbox);
 
 /**

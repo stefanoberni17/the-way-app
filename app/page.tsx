@@ -10,6 +10,7 @@ import EveningCheckinCard from '@/components/EveningCheckinCard';
 import EveningReminderBanner from '@/components/EveningReminderBanner';
 import { WEEK_IDS, WEEK_NAMES } from '@/lib/weekIds';
 import { BETA_MAX_EPISODE } from '@/lib/weekUnlockLogic';
+import { propText, splitList } from '@/lib/notionText';
 import { Card, Eyebrow, Button, Verse, LoadingScreen, ProgressBar, SectionTitle, Ornament, CrossMark } from '@/components/ui';
 import { ArrowRight, Check, ChevronDown, ChevronUp, Leaf, Wind } from 'lucide-react';
 
@@ -19,8 +20,14 @@ const DAY_KEYS = [
 type DayKey = typeof DAY_KEYS[number];
 
 const DAY_LABELS: Record<string, string> = {
-  day1:'L', day2:'M', day3:'M', day4:'G', day5:'V', day6:'S', day7:'D',
+  day1:'Lu', day2:'Ma', day3:'Me', day4:'Gi', day5:'Ve', day6:'Sa', day7:'Do',
 };
+
+// Chiave del giorno corrente (lunedì = day1 … domenica = day7), fuso del browser
+function todayKey(): DayKey {
+  const js = new Date().getDay(); // 0 = domenica
+  return DAY_KEYS[(js + 6) % 7];
+}
 const DAY_FULL: Record<string, string> = {
   day1:'Lunedì', day2:'Martedì', day3:'Mercoledì', day4:'Giovedì', day5:'Venerdì', day6:'Sabato', day7:'Domenica',
 };
@@ -144,9 +151,9 @@ export default function HomePage() {
   const progressPercentage = Math.round((completedEpisodes / BETA_MAX_EPISODE) * 100);
 
   const properties = weekData?.page?.properties || {};
-  const pratiche = (properties.Pratiche?.rich_text?.[0]?.plain_text || '').replace(/<br>/g, '\n');
-  const mantra = (properties.Mantra?.rich_text?.[0]?.plain_text || '').replace(/<br>/g, '\n');
-  const practicheArray = pratiche.split('\n').filter((p: string) => p.trim().length > 0);
+  const mantra = propText(properties.Mantra);
+  const practicheArray = splitList(propText(properties.Pratiche));
+  const today = todayKey();
 
   const nextEpisode = completedEpisodes + 1;
   const isAllDone = completedEpisodes >= BETA_MAX_EPISODE;
@@ -280,20 +287,26 @@ export default function HomePage() {
                       <div className="flex gap-1.5 mt-4">
                         {DAY_KEYS.map(day => {
                           const done = !!completedDays[day];
+                          const isToday = day === today;
                           return (
                             <button
                               key={day}
                               onClick={() => togglePracticeDay(index + 1, day)}
                               disabled={loadingPractices}
-                              aria-label={`Pratica ${index + 1}, ${DAY_FULL[day]}: ${done ? 'fatta' : 'non ancora fatta'}`}
+                              aria-label={`Pratica ${index + 1}, ${DAY_FULL[day]}${isToday ? ' (oggi)' : ''}: ${done ? 'fatta' : 'non ancora fatta'}`}
                               aria-pressed={done}
-                              className={`flex-1 h-10 rounded-lg text-xs font-semibold transition-all active:scale-95 disabled:opacity-50 ${
+                              className={`relative flex-1 h-11 rounded-lg text-[11px] font-semibold tracking-wide transition-all active:scale-95 disabled:opacity-50 ${
                                 done
                                   ? 'bg-gold text-paper shadow-[0_2px_8px_-3px_rgba(184,134,43,0.7)]'
+                                  : isToday
+                                  ? 'bg-paper text-gold-deep ring-1 ring-gold/60 hover:bg-gold-soft'
                                   : 'bg-parchment text-muted hover:bg-gold-soft hover:text-gold-deep'
                               }`}
                             >
                               {done ? <Check className="w-3.5 h-3.5 mx-auto" strokeWidth={3} /> : DAY_LABELS[day]}
+                              {isToday && !done && (
+                                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-gold" aria-hidden />
+                              )}
                             </button>
                           );
                         })}

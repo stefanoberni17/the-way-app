@@ -82,6 +82,7 @@ naruto-inner-path/
 │   ├── savedPassageTags.ts        # Catalogo tag tematici + auto-suggest passi
 │   ├── episodeMetadata.ts         # Metadata statici 28 passi MVP (title/ref/week)
 │   ├── weekStart.ts               # getMondayRome / getTodayRome / subtractDays
+│   ├── notionText.ts              # cleanText / tidy / propText / splitList: pulizia testi Notion (unico punto)
 │   └── maestro-ai.ts             # System prompt + buildUserContext + callClaude
 ├── public/
 │   └── audio/
@@ -414,10 +415,13 @@ import { Client } from '@notionhq/client';
 Un singolo client pubblico in `lib/supabase.ts`. Per operazioni server-side privilegiate (come in `maestro-ai.ts`) si usa il `SUPABASE_SERVICE_ROLE_KEY`.
 
 ### Parsing testo Notion
-I ritorni a capo nel CMS Notion vengono scritti come `<br>` → convertire sempre:
+Tutto il testo che arriva da Notion passa da [lib/notionText.ts](lib/notionText.ts). Non riscrivere regex locali:
 ```typescript
-const text = (properties.Mantra?.rich_text?.[0]?.plain_text || '').replace(/<br>/g, '\n');
+import { propText, splitList } from '@/lib/notionText';
+const mantra = propText(properties.Mantra);            // pulisce + converte <br>, <br/>, <br /> in \n
+const pratiche = splitList(propText(properties.Pratiche)); // toglie "1.", "1️⃣", "-" e splitta per riga
 ```
+`cleanText` decodifica gli escape unicode letterali (`pu00f2` → `può`) **solo** nei range U+00A0–00FF e U+2000–20FF: la vecchia regex `/u[0-9a-f]{4}/` corrompeva parole vere ("succederà" → "s\ucced…"). Le API `/api/episodio` e `/api/settimana` applicano `cleanText` a properties e blocchi; `isSeparatorLine` trasforma le righe "---" dei blocchi in un ornamento.
 
 ### Autenticazione nelle page
 Ogni pagina protetta fa il check manualmente (non c'è middleware):

@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import MeditationPopup from './MeditationPopup';
 import { MeditationContext } from './MeditationContext';
 import { WEEK_IDS, WEEK_NAMES as WEEK_NAMES_BASE } from '@/lib/weekIds';
+import { propText } from '@/lib/notionText';
 
 const formatWeekName = (n: number): string => {
   const name = WEEK_NAMES_BASE[n];
@@ -44,8 +45,7 @@ export default function GlobalMeditationWrapper({ children }: { children: React.
         const data = await response.json();
 
         const properties = data?.page?.properties || {};
-        const mantraText = (properties.Mantra?.rich_text?.[0]?.plain_text || '')
-          .replace(/<br>/g, '\n');
+        const mantraText = propText(properties.Mantra);
 
         setMantra(mantraText);
         setWeekName(formatWeekName(currentWeek));

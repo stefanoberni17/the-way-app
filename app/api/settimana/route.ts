@@ -1,22 +1,7 @@
 import { NextResponse } from 'next/server';
+import { cleanText } from '@/lib/notionText';
 
 export const dynamic = 'force-dynamic';
-
-// Decodifica sequenze unicode letterali (es. u00f2 → ò) prodotte da copia-incolla
-// errata in Notion. Allineato a app/api/episodio/route.ts.
-function decodeUnicodeEscapes(text: string): string {
-  return text.replace(/u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
-}
-
-// Strip di tag HTML letterali escapati (es. "\<i\>", "\</em\>") apparsi in
-// alcuni testi generati con copia-incolla da AI.
-function stripEscapedHtmlTags(text: string): string {
-  return text.replace(/\\<\/?([a-zA-Z]{1,8})\\>/g, '');
-}
-
-function cleanText(text: string): string {
-  return stripEscapedHtmlTags(decodeUnicodeEscapes(text));
-}
 
 // Applica la decodifica ai rich_text di un singolo blocco
 function decodeBlockRichText(block: any): any {

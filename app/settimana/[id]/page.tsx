@@ -8,6 +8,7 @@ import WeekCarousel from '@/components/WeekCarousel';
 import WeekDeepDive from '@/components/WeekDeepDive';
 import { isWeekUnlockedInBeta } from '@/lib/weekUnlockLogic';
 import { WEEK_IDS as WEEK_IDS_MAP } from '@/lib/weekIds';
+import { propText, splitList, isSeparatorLine } from '@/lib/notionText';
 import { PageHeader, LoadingScreen, Card, Button, Eyebrow, SectionTitle, Notice, Ornament, CrossMark } from '@/components/ui';
 import { ArrowRight, ArrowDown, Check } from 'lucide-react';
 
@@ -96,6 +97,7 @@ function renderBlock(block: any) {
     case 'paragraph': {
       const texts = block.paragraph?.rich_text || [];
       if (texts.length === 0) return <div className="h-3" />;
+      if (isSeparatorLine(texts.map((t: any) => t.plain_text).join(''))) return <Ornament className="my-6" />;
       return (
         <p className="text-ink-soft leading-relaxed text-[15px] mb-4">
           {texts.map((t: any, i: number) => {
@@ -141,6 +143,9 @@ function renderBlock(block: any) {
     }
     case 'quote': {
       const texts = block.quote?.rich_text || [];
+      const qtext = texts.map((t: any) => t.plain_text).join('');
+      if (!qtext.trim()) return null;
+      if (isSeparatorLine(qtext)) return <Ornament className="my-6" />;
       return (
         <blockquote className="border-l-2 border-gold pl-5 my-5">
           <p className="font-serif italic text-xl leading-[1.4] text-ink">{texts.map((t: any) => t.plain_text).join('')}</p>
@@ -281,20 +286,18 @@ export default function SettimanaPage() {
   }
 
   const properties = data.page?.properties || {};
-  const settimana = properties.Settimana?.title?.[0]?.plain_text || '';
-  const titolo = properties.Titolo?.rich_text?.[0]?.plain_text || '';
-  const tema = properties['Tema principale']?.rich_text?.[0]?.plain_text || '';
+  const settimana = propText(properties.Settimana);
+  const titolo = propText(properties.Titolo);
+  const tema = propText(properties['Tema principale']);
 
-  const domandaGuida = (properties['Domanda guida']?.rich_text?.[0]?.plain_text || '').replace(/<br>/g, '\n');
-  const essenza = (properties.Essenza?.rich_text?.[0]?.plain_text || '').replace(/<br>/g, '\n');
-  const mantra = (properties.Mantra?.rich_text?.[0]?.plain_text || '').replace(/<br>/g, '\n');
-  const pratiche = (properties.Pratiche?.rich_text?.[0]?.plain_text || '')
-    .split('\n')
-    .map((p: string) => p.trim())
-    .filter(Boolean);
-  const scopertaChiave = (properties['Scoperta chiave']?.rich_text?.[0]?.plain_text || '').replace(/<br>/g, '\n');
-  const preghiera = (properties.Preghiera?.rich_text?.[0]?.plain_text || '').replace(/<br>/g, '\n');
-  const integrazione = (properties.Integrazione?.rich_text?.[0]?.plain_text || '').replace(/<br>/g, '\n');
+  const domandaGuida = propText(properties['Domanda guida']);
+  const essenza = propText(properties.Essenza);
+  const mantra = propText(properties.Mantra);
+  const pratiche = splitList(propText(properties.Pratiche));
+  const scopertaChiave = propText(properties['Scoperta chiave']);
+  const preghiera = propText(properties.Preghiera);
+  const integrazione = propText(properties.Integrazione);
+  const hasExtended = Array.isArray(data?.blocks) && data.blocks.length > 0;
 
   const weekEpisodes = WEEK_EPISODES[weekNumber.toString()] || [];
   const nextWeekInBeta = nextWeekNumber !== null && isWeekUnlockedInBeta(nextWeekNumber);
@@ -411,6 +414,7 @@ export default function SettimanaPage() {
           integrazione={integrazione}
           onOpenExtended={handleLoadExtended}
           loadingExtended={loadingExtended}
+          hasExtended={hasExtended}
         />
 
         {/* Passi */}

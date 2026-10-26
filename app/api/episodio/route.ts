@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getWeekFromEpisode, getNotionEpisodeRef, isEpisodeInMVP } from '@/lib/episodeMapping';
 import { getAuthUser } from '@/lib/auth';
+import { cleanText } from '@/lib/notionText';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -26,25 +27,6 @@ const WEEK_LAST_EPISODES: Record<number, number> = {
   7: 49,
   8: 56,
 };
-
-// Decodifica sequenze unicode letterali (es. u00f2 → ò) prodotte da copia-incolla errata in Notion
-function decodeUnicodeEscapes(text: string): string {
-  return text.replace(/u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
-}
-
-// Strip di tag HTML letterali escapati (es. "\<i\>", "\</em\>") apparsi in
-// alcuni Approfondimenti generati con copia-incolla da AI. Il testo finale è
-// renderizzato come plain (whitespace-pre-line), quindi questi marker
-// uscirebbero letterali. Manteniamo il contenuto, perdiamo solo l'enfasi.
-function stripEscapedHtmlTags(text: string): string {
-  // \<tag\> oppure \</tag\> con tag = sequenza alfanumerica corta (i, b, em, strong, code, u)
-  return text.replace(/\\<\/?([a-zA-Z]{1,8})\\>/g, '');
-}
-
-// Pulisce un testo prima di restituirlo al client (encoding + tag escapati).
-function cleanText(text: string): string {
-  return stripEscapedHtmlTags(decodeUnicodeEscapes(text));
-}
 
 // Applica la decodifica ai rich_text di un singolo blocco
 function decodeBlockRichText(block: any): any {

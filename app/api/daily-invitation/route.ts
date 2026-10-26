@@ -4,6 +4,7 @@ import { getAuthUser } from '@/lib/auth';
 import { getTodayRome } from '@/lib/weekStart';
 import { getNotionEpisodeRef, getWeekFromEpisode } from '@/lib/episodeMapping';
 import { pickInvitation, parseNotionInvitations } from '@/lib/dailyInvitation';
+import { cleanText } from '@/lib/notionText';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -76,7 +77,7 @@ async function fetchNotionInvitations(episodeNumber: number): Promise<string[]> 
       props['Inviti del giorno']?.text?.[0]?.plain_text ||
       '';
 
-    return parseNotionInvitations(raw);
+    return parseNotionInvitations(cleanText(raw));
   } catch {
     return [];
   }

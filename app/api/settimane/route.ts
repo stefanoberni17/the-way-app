@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { propText } from '@/lib/notionText';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,12 +29,12 @@ export async function GET() {
     const settimane = (data.results || []).map((page: any) => ({
       id: page.id,
       numero: page.properties?.Numero?.number || 0,
-      settimana: page.properties?.Settimana?.title?.[0]?.plain_text || '',
-      titolo: page.properties?.Titolo?.rich_text?.[0]?.plain_text || '',
-      tema: page.properties?.['Tema principale']?.rich_text?.[0]?.plain_text || '',
-      mantra: page.properties?.Mantra?.rich_text?.[0]?.plain_text || '',
-      versettosGuida: page.properties?.['Versetto guida']?.rich_text?.[0]?.plain_text || '',
-      pratiche: page.properties?.Pratiche?.rich_text?.[0]?.plain_text || '',
+      settimana: propText(page.properties?.Settimana),
+      titolo: propText(page.properties?.Titolo),
+      tema: propText(page.properties?.['Tema principale']),
+      mantra: propText(page.properties?.Mantra),
+      versettoGuida: propText(page.properties?.['Versetto guida']),
+      pratiche: propText(page.properties?.Pratiche),
       fase: page.properties?.Fase?.select?.name || '',
       stato: page.properties?.Stato?.select?.name || 'Da fare',
     }));

@@ -8,6 +8,8 @@ interface WeekDeepDiveProps {
   integrazione: string;
   onOpenExtended: () => void;
   loadingExtended: boolean;
+  /** false quando la pagina Notion non ha blocchi: il bottone sparisce */
+  hasExtended?: boolean;
 }
 
 export default function WeekDeepDive({
@@ -15,6 +17,7 @@ export default function WeekDeepDive({
   integrazione,
   onOpenExtended,
   loadingExtended,
+  hasExtended = true,
 }: WeekDeepDiveProps) {
   const hasPreghiera = preghiera.trim().length > 0;
   const hasIntegrazione = integrazione.trim().length > 0;
@@ -52,10 +55,12 @@ export default function WeekDeepDive({
         </Card>
       )}
 
-      <Button variant="secondary" full size="lg" onClick={onOpenExtended} disabled={loadingExtended}>
-        {loadingExtended ? <Loader2 className="animate-spin" /> : <BookOpen strokeWidth={1.8} />}
-        {loadingExtended ? 'Caricamento…' : 'Apri l’approfondimento completo'}
-      </Button>
+      {hasExtended && (
+        <Button variant="secondary" full size="lg" onClick={onOpenExtended} disabled={loadingExtended}>
+          {loadingExtended ? <Loader2 className="animate-spin" /> : <BookOpen strokeWidth={1.8} />}
+          {loadingExtended ? 'Caricamento…' : 'Apri l’approfondimento completo'}
+        </Button>
+      )}
 
     </div>
   );

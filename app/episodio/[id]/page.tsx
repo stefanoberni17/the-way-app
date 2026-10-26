@@ -7,6 +7,7 @@ import EpisodeAudioPlayer from '@/components/EpisodeAudioPlayer';
 import SavePassageButton from '@/components/SavePassageButton';
 import { BookOpen, Pencil, Heart, Eye, Check, ArrowLeft, ArrowRight, Loader2, ChevronDown, Type } from 'lucide-react';
 import { Button, Eyebrow, LoadingScreen, Ornament, IconBadge, Notice, Verse, Tag, CrossMark } from '@/components/ui';
+import { isSeparatorLine } from '@/lib/notionText';
 
 interface EpisodeData {
   number: number;
@@ -54,10 +55,12 @@ function getBlocksPlainText(blocks: any[]): string {
       ];
       if (!richTextTypes.includes(type)) return '';
       const richText: any[] = block[type]?.rich_text || [];
-      return richText.map((t: any) => t.plain_text).join('');
+      const text = richText.map((t: any) => t.plain_text).join('').trim();
+      if (!text || isSeparatorLine(text)) return '';
+      return text;
     })
     .filter(Boolean)
-    .join('. ');
+    .join('\n');
 }
 
 // Renderizza un singolo rich_text con le sue annotazioni (bold/italic/code)
@@ -115,7 +118,12 @@ function renderBlocks(blocks: any[], fontSize: FontSize = 'M'): React.ReactNode[
         if (b.type === 'quote') {
           const rt: any[] = b.quote?.rich_text || [];
           const text = rt.map((t: any) => t.plain_text || '').join('');
-          if (text.trim().length > 0) {
+          if (isSeparatorLine(text)) {
+            runItems.push({
+              key: b.id,
+              node: <span key={b.id} className="block w-8 h-px bg-gold/50 my-3" aria-hidden />,
+            });
+          } else if (text.trim().length > 0) {
             runItems.push({ key: b.id, node: renderQuoteLikeText(rt, b.id) });
           }
           j++;
@@ -129,6 +137,11 @@ function renderBlocks(blocks: any[], fontSize: FontSize = 'M'): React.ReactNode[
             runItems.push({
               key: b.id,
               node: <span key={b.id} className="block h-1" aria-hidden />,
+            });
+          } else if (isSeparatorLine(text)) {
+            runItems.push({
+              key: b.id,
+              node: <span key={b.id} className="block w-8 h-px bg-gold/50 my-3" aria-hidden />,
             });
           } else {
             runItems.push({ key: b.id, node: renderQuoteLikeText(rt, b.id) });
@@ -189,6 +202,7 @@ function renderBlock(block: any, fontSize: FontSize = 'M'): React.ReactNode {
       const texts = block.paragraph?.rich_text || [];
       const content = texts.map((t: any) => t.plain_text).join('');
       if (!content.trim()) return <div key={id} className="h-3" />;
+      if (isSeparatorLine(content)) return <Ornament key={id} className="my-7" />;
 
       const isAllItalic = texts.every((t: any) => t.annotations?.italic);
       if (isAllItalic && texts.length > 0) {

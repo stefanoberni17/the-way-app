@@ -83,12 +83,13 @@ const base: ReelProps = {
 export const eliaGrafica: ReelProps = base;
 
 // Prova B: le scene dove Elia conta di più (1, 2, 7) diventano immagini generate.
-const IMMAGINI: Record<number, string> = {
-  0: "media/elia/scena-01.png",
-  1: "media/elia/scena-02.png",
-  6: "media/elia/scena-07.png",
+// Nano Banana 2, 2K, una versione per scena, tutte dal "Riferimento Elia" sul flow.
+const IMMAGINI: Record<number, Pick<Scena, "movimento"> & { file: string }> = {
+  0: { file: "media/elia/scena-01.png", movimento: "avvicina" }, // sotto il ginepro
+  1: { file: "media/elia/scena-02.png", movimento: "allontana" }, // la caverna sul monte Oreb
+  6: { file: "media/elia/scena-07.png", movimento: "su" }, // si copre il volto
 };
 export const eliaMista: ReelProps = {
   ...base,
-  scene: sceneGrafica.map((s, i) => (IMMAGINI[i] ? { da: s.da, file: IMMAGINI[i] } : s)),
+  scene: sceneGrafica.map((s, i) => (IMMAGINI[i] ? { da: s.da, ...IMMAGINI[i] } : s)),
 };

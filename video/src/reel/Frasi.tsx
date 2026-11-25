@@ -63,7 +63,7 @@ const UnaFrase: React.FC<{ frase: TipoFrase; inizio: number; durata: number }> =
                 opacity: s,
                 filter: `blur(${(1 - s) * 10}px)`,
                 transform: `translateY(${(1 - s) * 26}px)`,
-                textShadow: "0 6px 30px rgba(0,0,0,0.55)",
+                textShadow: "0 2px 6px rgba(0,0,0,0.7), 0 8px 34px rgba(0,0,0,0.75)",
               }}
             >
               {testo}

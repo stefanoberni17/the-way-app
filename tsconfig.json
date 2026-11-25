@@ -37,6 +37,7 @@
     "**/*.mts"
 , "app/page.tsx.backup", "app/settimana/[id]/page.tsx.backup", "components/EpisodeCard.tsx.backup", "lib/weekUnlockLogic.ts.backup", "components/ChatBot.tsx.bacup2"  ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "video"
   ]
 }

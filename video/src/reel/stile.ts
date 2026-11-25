@@ -3,7 +3,7 @@ import { loadFont as loadCormorant } from "@remotion/google-fonts/CormorantGaram
 // Un solo linguaggio: immagini dipinte e testo da libro. Cormorant Garamond
 // (il font dei titoli e dei versetti dell'app), crema con ombra morbida,
 // parole chiave in corsivo oro. Colori dalla palette "Pergamena e Oro".
-const cormorant = loadCormorant("normal", { weights: ["600"], subsets: ["latin"] });
+const cormorant = loadCormorant("normal", { weights: ["600", "700"], subsets: ["latin"] });
 loadCormorant("italic", { weights: ["600"], subsets: ["latin"] });
 
 export const stile = {

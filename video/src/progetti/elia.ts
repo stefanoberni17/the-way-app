@@ -80,11 +80,13 @@ export const eliaLettura: ReelProps = {
       ],
     },
     // «Dopo il fuoco, il sussurro… si coprì il volto con il mantello»
-    { da: 26.21, file: "media/elia/scena-07.png", inquadratura: { x: 0.45, y: 0.4, zoom: 1.1 } },
+    // Inquadratura un po' bassa: il cappuccio resta sotto il logo.
+    { da: 26.21, file: "media/elia/scena-07.png", inquadratura: { x: 0.45, y: 0.2, zoom: 1.35 } },
     // «Elia era esausto e voleva solo sparire…»
     { da: 35.52, file: "media/elia/scena-01.png", inquadratura: { x: 0.5, y: 0.55, zoom: 1.08 } },
     // «Invece Dio arriva in un sussurro… bisogna fermarsi»: Elia fermo, guarda lontano.
-    { da: 42.4, file: "media/elia/riferimento-elia.png", inquadratura: { x: 0.5, y: 0.4, zoom: 1.06 } },
+    // Inquadratura stretta e bassa: la testa scende sotto il logo.
+    { da: 42.4, file: "media/elia/riferimento-elia.png", inquadratura: { x: 0.5, y: 0.15, zoom: 1.6 } },
   ],
 };
 

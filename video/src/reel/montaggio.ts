@@ -10,6 +10,10 @@ export const ALTEZZA = 1920;
 // I sottotitoli stanno poco sotto la metà dello schermo.
 export const SOTTOTITOLI_TOP_Y = 0.6;
 
+// Il logo della pagina sta in alto al centro, sotto la barra di Instagram.
+export const MARCHIO_TOP_Y = 0.11;
+export const MARCHIO_ALTEZZA = 84;
+
 // Dissolvenza incrociata tra una scena e l'altra, e chiusura al nero.
 export const DISSOLVENZA = 15;
 export const CHIUSURA = 24;

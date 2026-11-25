@@ -1,4 +1,5 @@
 import { AbsoluteFill, Img, staticFile } from "remotion";
+import { Marchio } from "./Marchio";
 import { pulisci } from "./montaggio";
 import { parolaChiave, stile, testo } from "./stile";
 import type { Slide as TipoSlide } from "./tipi";
@@ -39,6 +40,14 @@ export const Slide: React.FC<TipoSlide> = ({
             "linear-gradient(to bottom, rgba(12,12,16,0) 42%, rgba(12,12,16,0.62) 100%)",
         }}
       />
+      <AbsoluteFill
+        style={{
+          background: "linear-gradient(to bottom, rgba(12,12,16,0.4) 0%, rgba(12,12,16,0) 24%)",
+        }}
+      />
+      <AbsoluteFill style={{ alignItems: "center", paddingTop: 64 }}>
+        <Marchio altezza={66} />
+      </AbsoluteFill>
       <AbsoluteFill
         style={{
           justifyContent: "flex-end",

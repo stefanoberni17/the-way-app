@@ -13,8 +13,9 @@ Remotion è gratuito per persone singole e aziende fino a 3 dipendenti (licenza 
 - Immagini: pittura a olio cinematografica, luce calda e dorata, grana leggera, colori un po' spenti, niente volti per i personaggi biblici (di spalle o coperti). Tutte dallo stesso riferimento del personaggio, collegato a ogni scena sul flow. Il meno possibile: un'immagine può raccontare più momenti con il `carrello` (la camera passa da un punto all'altro ai secondi indicati).
 - Remotion fa solo tre cose: movimento lento di camera (`montaggio.ts`), dissolvenze tra le scene e al nero in chiusura, sottotitoli.
 - Sottotitoli poco sotto la metà (`SOTTOTITOLI_TOP_Y = 0.6`): Cormorant Garamond 600 crema `#f3e8cf` con ombra morbida, niente pillola né contorno. A capo sulla punteggiatura, massimo 4-5 parole. Le parole in arrivo restano in trasparenza e si accendono quando la voce le dice. Parole chiave in corsivo oro `#d8b262`. Un velo scuro leggero dietro tiene il testo leggibile sui punti chiari.
+- Logo della pagina sempre presente, in alto al centro (`MARCHIO_TOP_Y = 0.11`), sotto la barra di Instagram: croce, filo, "the way" e "LA VIA DEL CUORE", ridisegnati in `Marchio.tsx` in crema con ombra morbida (il logo originale è scuro su chiaro e sparirebbe sui dipinti). Resta anche sulle dissolvenze al nero. Le inquadrature si scelgono in modo che teste e volti stiano sotto il logo.
 - Niente gancio, schede, icone o linee del tempo.
-- Carosello con le stesse immagini: 1080×1350, una frase breve per slide presa dal testo, stessa tipografia dei sottotitoli su un velo scuro in basso, righe bilanciate. Riferimento biblico piccolo sulla prima slide.
+- Carosello con le stesse immagini: 1080×1350, una frase breve per slide presa dal testo, stessa tipografia dei sottotitoli su un velo scuro in basso, righe bilanciate. Riferimento biblico piccolo sulla prima slide. Logo in alto al centro su ogni slide.
 
 ## Come si fa un video
 

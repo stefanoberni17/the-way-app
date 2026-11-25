@@ -10,14 +10,18 @@ import {
   useVideoConfig,
 } from "remotion";
 import {
+  ALTEZZA,
   camera,
   carrello,
   CHIUSURA,
   DISSOLVENZA,
+  MARCHIO_ALTEZZA,
+  MARCHIO_TOP_Y,
   montaScene,
   paroleInCaptions,
 } from "./montaggio";
 import type { ScenaMontata } from "./montaggio";
+import { Marchio } from "./Marchio";
 import { Sottotitoli } from "./Sottotitoli";
 import { stile, velo } from "./stile";
 import type { ReelProps } from "./tipi";
@@ -80,7 +84,12 @@ export const Reel: React.FC<ReelProps> = ({
           );
         })}
         <AbsoluteFill style={{ background: velo(48, 82) }} />
+        <AbsoluteFill style={{ background: velo(-30, 30) }} />
         <Sottotitoli captions={captions} paroleChiave={paroleChiave} />
+      </AbsoluteFill>
+      {/* Il logo resta per tutto il video, anche sulle dissolvenze al nero. */}
+      <AbsoluteFill style={{ alignItems: "center", paddingTop: MARCHIO_TOP_Y * ALTEZZA }}>
+        <Marchio altezza={MARCHIO_ALTEZZA} />
       </AbsoluteFill>
       <Audio src={staticFile(voce)} />
       {sottofondo ? (

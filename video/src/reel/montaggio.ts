@@ -15,6 +15,11 @@ export const INSERTI_TOP_Y = 0.705;
 export const ZOOM_LARGO = 1.08;
 export const ZOOM_STRETTO = 1.2;
 export const ZOOM_DERIVA = 0.06;
+// Sulle grafiche lo zoom è più leggero: sono disegnate per lo schermo intero.
+export const ZOOM_GRAFICA_LARGO = 1.04;
+export const ZOOM_GRAFICA_STRETTO = 1.1;
+// Fascia delle frasi chiave: in alto, sotto i bottoni di Instagram.
+export const FRASI_TOP_Y = 0.25;
 export const SPOSTAMENTO = 0.03; // per le panoramiche, in frazioni dello schermo
 export const GANCIO_SECONDI = 2.5;
 
@@ -32,9 +37,16 @@ export const montaScene = (scene: Scena[], durata: number): ScenaMontata[] =>
     const inizioFrame = frame(s.da);
     const fineFrame = i + 1 < scene.length ? frame(scene[i + 1].da) : frame(durata);
     const stretto = s.stretto ?? i % 2 === 1;
+    const grafica = "grafica" in s;
     return {
       ...s,
-      zoom: stretto ? ZOOM_STRETTO : ZOOM_LARGO,
+      zoom: grafica
+        ? stretto
+          ? ZOOM_GRAFICA_STRETTO
+          : ZOOM_GRAFICA_LARGO
+        : stretto
+          ? ZOOM_STRETTO
+          : ZOOM_LARGO,
       inizioFrame,
       durataFrame: fineFrame - inizioFrame,
     };

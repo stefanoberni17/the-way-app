@@ -10,11 +10,33 @@ export type Parola = {
 // Movimento di camera dentro la scena: l'immagine non resta mai ferma.
 export type Movimento = "avvicina" | "allontana" | "sinistra" | "destra" | "su" | "giu";
 
+// Grafiche animate disegnate in Remotion (src/reel/Grafica.tsx), zero crediti.
+export type NomeGrafica =
+  | "deserto"
+  | "monte"
+  | "vento"
+  | "terremoto"
+  | "fuoco"
+  | "brezza"
+  | "mantello"
+  | "rumore"
+  | "respiro"
+  | "silenzio";
+
 export type Scena = {
-  file: string; // percorso in public/, es. "media/elia/01.png" o ".mp4"
   da: number; // secondo della voce in cui parte; finisce dove parte la scena dopo
   movimento?: Movimento; // se manca: lento avvicinamento
   stretto?: boolean; // inquadratura stretta; se manca, si alterna larga / stretta
+} & (
+  | { file: string } // immagine o clip in public/, es. "media/elia/scena-01.png"
+  | { grafica: NomeGrafica }
+);
+
+// Frase chiave grande in alto: ogni parola compare quando la voce la dice.
+export type Frase = {
+  parole: [testo: string, quando: number][];
+  a: number; // secondo in cui sparisce
+  oro?: string[]; // parole da colorare in oro
 };
 
 // Inserti grafici legati a quello che si dice.
@@ -46,6 +68,7 @@ export type ReelProps = {
   // Parole in Cormorant corsivo (minuscole, senza punteggiatura).
   paroleChiave?: string[];
   gancio?: string; // frase in alto nei primi secondi
+  frasi?: Frase[];
   inserti?: Inserto[];
   sottofondo?: { file: string; volume: number }; // basso, es. 0.08
 };

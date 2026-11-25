@@ -102,7 +102,7 @@ const Percorso: React.FC<{ tappe: TappaReel[]; inizio: number; durata: number }>
   const { frame, fps, dentro, fuori } = useEntrataUscita(durata);
   const ora = inizio + frame; // frame nel Reel
   const LARGHEZZA = 920;
-  const MARGINE = 150;
+  const MARGINE = 120;
   const passo = tappe.length > 1 ? (LARGHEZZA - 2 * MARGINE) / (tappe.length - 1) : 0;
 
   // La linea oro avanza fino all'ultima tappa raggiunta, con una molla.

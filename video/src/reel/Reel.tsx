@@ -13,6 +13,8 @@ import {
 } from "remotion";
 import { camera, GANCIO_SECONDI, montaScene, paroleInCaptions } from "./montaggio";
 import type { ScenaMontata } from "./montaggio";
+import { Frasi } from "./Frasi";
+import { Grafica, Grana } from "./Grafica";
 import { Inserti } from "./Inserti";
 import { Sottotitoli } from "./Sottotitoli";
 import { stile } from "./stile";
@@ -31,6 +33,16 @@ const Scena: React.FC<{ scena: ScenaMontata }> = ({ scena }) => {
     objectFit: "cover",
     ...camera(scena.movimento ?? "avvicina", scena.zoom, t),
   };
+  if ("grafica" in scena) {
+    // La grafica si muove dentro di sé; la camera aggiunge zoom e deriva.
+    return (
+      <AbsoluteFill style={{ overflow: "hidden", backgroundColor: stile.notte }}>
+        <AbsoluteFill style={camera(scena.movimento ?? "avvicina", scena.zoom, t)}>
+          <Grafica nome={scena.grafica} durata={scena.durataFrame} />
+        </AbsoluteFill>
+      </AbsoluteFill>
+    );
+  }
   const video = /\.(mp4|mov|webm)$/i.test(scena.file);
   return (
     <AbsoluteFill style={{ overflow: "hidden", backgroundColor: stile.notte }}>
@@ -84,6 +96,7 @@ export const Reel: React.FC<ReelProps> = ({
   parole,
   paroleChiave = [],
   gancio,
+  frasi = [],
   inserti = [],
   sottofondo,
 }) => {
@@ -101,7 +114,9 @@ export const Reel: React.FC<ReelProps> = ({
             <Scena scena={s} />
           </Sequence>
         ))}
+        <Grana />
       </AbsoluteFill>
+      <Frasi frasi={frasi} />
       <Audio src={staticFile(voce)} />
       {sottofondo ? (
         <Audio src={staticFile(sottofondo.file)} volume={sottofondo.volume} loop />

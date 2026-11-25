@@ -2,10 +2,13 @@ import { Composition } from "remotion";
 import { Reel } from "./reel/Reel";
 import { FPS } from "./reel/montaggio";
 import type { ReelProps } from "./reel/tipi";
-import { elia } from "./progetti/elia";
+import { eliaGrafica, eliaMista } from "./progetti/elia";
 
 // Ogni video da pubblicare = una Composition con i suoi dati in src/progetti/.
-const progetti: Record<string, ReelProps> = { elia };
+const progetti: Record<string, ReelProps> = {
+  "elia-grafica": eliaGrafica,
+  "elia-mista": eliaMista,
+};
 
 export const RemotionRoot: React.FC = () => {
   return (

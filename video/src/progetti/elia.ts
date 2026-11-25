@@ -1,95 +1,129 @@
-import type { ReelProps, Scena } from "../reel/tipi";
+import type { ReelProps, Slide } from "../reel/tipi";
 
-// Video 1 (prova di stile): Elia e la voce sottile, 1 Re 19:11-13 (settimana 3, passo 16).
-// Voce "Stef" (eleven_v4, versione 1), tempi parola per parola da ElevenLabs Scribe.
-// Due prove con la stessa voce e la stessa grafica:
-//   A "elia-grafica": solo grafica animata in Remotion, zero crediti oltre alla voce;
-//   B "elia-mista": come A, ma le scene 1, 2 e 7 sono immagini Nano Banana 2.
+// Video 1: Elia e la voce sottile, 1 Re 19:11-13 (settimana 3, passo 16).
+// Voce "Stef" (eleven_v4, una versione): la lettura parola per parola dal testo
+// del passo su Notion, poi il significato in cinque frasi. Tempi da ElevenLabs Scribe.
+// Immagini dipinte, tutte dallo stesso riferimento di Elia: le 3 scene della prima
+// prova, il riferimento stesso e una sola immagine nuova per vento, terremoto e fuoco.
 
 const parole: ReelProps["parole"] = (
   [
-    ["Elia", 0.08, 0.64], ["era", 0.72, 0.96], ["esausto.", 1.12, 2.16], ["Aveva", 2.24, 2.48],
-    ["appena", 2.6, 2.8], ["vinto,", 2.88, 3.6], ["eppure", 3.72, 4.24], ["voleva", 4.32, 4.72],
-    ["solo", 4.76, 4.96], ["sparire.", 5.04, 6.16], ["Dio", 6.2, 6.48], ["gli", 6.56, 6.64],
-    ["dà", 6.72, 6.8], ["appuntamento", 6.88, 7.52], ["su", 7.6, 7.68], ["un", 7.72, 7.76],
-    ["monte.", 7.84, 8.72], ["Passa", 8.84, 9.04], ["un", 9.12, 9.2], ["vento", 9.32, 9.52],
-    ["che", 9.56, 9.6], ["spacca", 9.76, 10.16], ["le", 10.2, 10.24], ["rocce.", 10.32, 11.2],
-    ["Ma", 11.28, 11.36], ["Dio", 11.44, 11.84], ["non", 11.92, 12.0], ["è", 12.04, 12.08],
-    ["nel", 12.16, 12.32], ["vento.", 12.52, 13.28], ["Poi", 13.387, 13.6], ["un", 13.68, 13.76],
-    ["terremoto.", 13.84, 14.8], ["Non", 14.88, 14.96], ["è", 15.04, 15.08], ["nel", 15.12, 15.28],
-    ["terremoto.", 15.36, 16.24], ["Poi", 16.293, 16.4], ["un", 16.48, 16.64], ["fuoco.", 16.68, 17.36],
-    ["Non", 17.44, 17.52], ["è", 17.56, 17.6], ["nemmeno", 17.68, 18.0], ["lì.", 18.08, 18.64],
-    ["Poi", 18.773, 19.04], ["arriva", 19.12, 19.44], ["un", 19.48, 19.52], ["sussurro.", 19.6, 20.56],
-    ["Una", 20.64, 20.72], ["brezza", 20.8, 21.12], ["leggera.", 21.24, 22.08], ["E", 22.16, 22.24],
-    ["lì,", 22.32, 22.8], ["Elia", 22.92, 23.12], ["si", 23.2, 23.28], ["copre", 23.36, 23.6],
-    ["il", 23.64, 23.68], ["volto.", 23.76, 24.64], ["Spesso", 24.72, 25.04], ["cerchiamo", 25.12, 25.52],
-    ["le", 25.56, 25.6], ["risposte", 25.72, 26.16], ["nel", 26.24, 26.32], ["rumore,", 26.44, 27.04],
-    ["nelle", 27.12, 27.2], ["cose", 27.28, 27.52], ["grandi.", 27.72, 28.4], ["Ma", 28.44, 28.48],
-    ["la", 28.52, 28.56], ["voce", 28.64, 28.88], ["che", 28.96, 29.04], ["conta", 29.12, 29.52],
-    ["parla", 29.76, 30.08], ["piano.", 30.213, 30.88], ["Per", 30.96, 31.04], ["sentirla,", 31.2, 31.92],
-    ["devi", 32.0, 32.16], ["prima", 32.24, 32.48], ["fermarti.", 32.6, 33.6], ["Oggi,", 33.64, 34.24],
-    ["cinque", 34.32, 34.56], ["minuti", 34.72, 34.96], ["di", 35.04, 35.08], ["silenzio.", 35.12, 36.08],
-    ["Niente", 36.187, 36.4], ["schermi.", 36.48, 37.28], ["Solo", 37.4, 37.52], ["ascolto.", 37.64, 38.4],
+  ["Dal", 0.08, 0.24], ["primo", 0.32, 0.56], ["libro", 0.64, 0.88], ["dei", 0.96, 1.08],
+  ["Re.", 1.12, 1.68], ["Il", 2, 2.08], ["Signore", 2.16, 2.56], ["disse:", 2.68, 3.24],
+  ["«Esci", 3.52, 4.08], ["e", 4.16, 4.24], ["fermati", 4.32, 4.72], ["sul", 4.76, 4.96],
+  ["monte", 5.08, 5.28], ["alla", 5.4, 5.52], ["presenza", 5.64, 6], ["del", 6.08, 6.16],
+  ["Signore.»", 6.32, 7.12], ["Ed", 7.2, 7.28], ["ecco", 7.36, 7.6], ["che", 7.64, 7.68],
+  ["il", 7.76, 7.84], ["Signore", 7.96, 8.24], ["passò.", 8.4, 9.2], ["Ci", 9.28, 9.36],
+  ["fu", 9.4, 9.44], ["un", 9.52, 9.6], ["vento", 9.68, 9.96], ["impetuoso", 10, 10.56],
+  ["e", 10.64, 10.72], ["gagliardo", 10.827, 11.28], ["da", 11.36, 11.44],
+  ["spaccare", 11.52, 11.92], ["i", 11.96, 12], ["monti", 12.08, 12.48], ["e", 12.56, 12.64],
+  ["spezzare", 12.76, 13.12], ["le", 13.2, 13.28], ["rocce", 13.4, 13.6],
+  ["davanti", 13.64, 13.92], ["al", 14, 14.08], ["Signore,", 14.16, 15.04], ["ma", 15.08, 15.12],
+  ["il", 15.2, 15.28], ["Signore", 15.44, 15.92], ["non", 16, 16.16], ["era", 16.28, 16.4],
+  ["nel", 16.48, 16.56], ["vento.", 16.64, 17.44], ["Dopo", 17.493, 17.6], ["il", 17.68, 17.72],
+  ["vento,", 17.76, 18.32], ["un", 18.36, 18.4], ["terremoto,", 18.48, 19.44],
+  ["ma", 19.48, 19.52], ["il", 19.6, 19.68], ["Signore", 19.76, 20.32], ["non", 20.4, 20.56],
+  ["era", 20.68, 20.8], ["nel", 20.88, 20.96], ["terremoto.", 21.04, 21.92],
+  ["Dopo", 21.973, 22.08], ["il", 22.16, 22.2], ["terremoto,", 22.24, 22.96], ["un", 23.04, 23.12],
+  ["fuoco,", 23.2, 23.92], ["ma", 23.96, 24], ["il", 24.08, 24.16], ["Signore", 24.24, 24.72],
+  ["non", 24.8, 24.96], ["era", 25.04, 25.2], ["nel", 25.32, 25.44], ["fuoco.", 25.48, 26.16],
+  ["Dopo", 26.213, 26.32], ["il", 26.4, 26.48], ["fuoco,", 26.56, 27.2], ["il", 27.24, 27.28],
+  ["sussurro", 27.44, 27.92], ["di", 28, 28.04], ["una", 28.08, 28.16], ["brezza", 28.24, 28.56],
+  ["leggera.", 28.68, 29.32], ["Come", 29.52, 29.68], ["l'udì,", 29.72, 30.32],
+  ["Elia", 30.4, 30.64], ["si", 30.72, 30.8], ["coprì", 30.88, 31.04], ["il", 31.08, 31.12],
+  ["volto", 31.2, 31.44], ["con", 31.52, 31.6], ["il", 31.68, 31.72], ["mantello,", 31.76, 32.64],
+  ["uscì", 32.8, 33.04], ["e", 33.36, 33.4], ["si", 33.44, 33.52], ["fermò", 33.6, 33.88],
+  ["all'ingresso", 33.92, 34.44], ["della", 34.48, 34.56], ["caverna.", 34.64, 35.32],
+  ["Elia", 35.52, 35.92], ["era", 36, 36.16], ["esausto", 36.32, 36.8], ["e", 36.96, 37.04],
+  ["voleva", 37.093, 37.36], ["solo", 37.413, 37.52], ["sparire.", 37.6, 38.4],
+  ["Si", 38.44, 38.48], ["aspettava", 38.56, 38.96], ["Dio", 39.04, 39.2], ["nella", 39.24, 39.44],
+  ["forza,", 39.52, 40.16], ["nel", 40.24, 40.32], ["rumore,", 40.4, 41.04],
+  ["nelle", 41.12, 41.2], ["cose", 41.28, 41.44], ["grandi.", 41.52, 42.2],
+  ["Invece", 42.4, 42.88], ["Dio", 43.2, 43.36], ["arriva", 43.44, 43.68], ["in", 43.76, 43.84],
+  ["un", 43.88, 43.92], ["sussurro.", 44, 44.84], ["Parla", 45.04, 45.28],
+  ["piano.", 45.36, 45.84], ["E", 46.16, 46.24], ["per", 46.32, 46.4], ["sentirlo,", 46.48, 47.28],
+  ["bisogna", 47.44, 47.76], ["fermarsi.", 47.84, 48.8],
   ] as [string, number, number][]
 ).map(([text, start, end]) => ({ text, start, end }));
 
-// Le dieci scene, agganciate alla prima parola di ogni frase.
-const sceneGrafica: Scena[] = [
-  { da: 0, grafica: "deserto" }, // Elia era esausto…
-  { da: 6.2, grafica: "monte" }, // Dio gli dà appuntamento su un monte
-  { da: 8.84, grafica: "vento" }, // Passa un vento…
-  { da: 13.387, grafica: "terremoto" }, // Poi un terremoto…
-  { da: 16.293, grafica: "fuoco" }, // Poi un fuoco…
-  { da: 18.773, grafica: "brezza" }, // Poi arriva un sussurro…
-  { da: 22.16, grafica: "mantello" }, // E lì, Elia si copre il volto
-  { da: 24.72, grafica: "rumore" }, // Spesso cerchiamo le risposte nel rumore…
-  { da: 28.44, grafica: "respiro" }, // Ma la voce che conta parla piano… fermarti
-  { da: 33.64, grafica: "silenzio" }, // Oggi, cinque minuti di silenzio…
-];
+const paroleChiave = ["fermati", "vento", "terremoto", "fuoco", "sussurro", "piano", "fermarsi"];
 
-const base: ReelProps = {
-  voce: "media/elia/voce.mp3",
-  durata: 39.6,
-  scene: sceneGrafica,
+export const eliaLettura: ReelProps = {
+  voce: "media/elia/voce-lettura.mp3",
+  durata: 50,
   parole,
-  paroleChiave: ["vento", "terremoto", "fuoco", "sussurro", "piano", "fermarti", "silenzio"],
-  gancio: "Dio non era nel terremoto",
-  frasi: [
-    { parole: [["esausto.", 1.12]], a: 6.0 },
-    { parole: [["non", 11.92], ["nel", 12.16], ["vento.", 12.52]], a: 13.3 },
-    { parole: [["non", 14.88], ["nel", 15.12], ["terremoto.", 15.36]], a: 16.25 },
-    { parole: [["nemmeno", 17.68], ["lì.", 18.08]], a: 18.75 },
-    { parole: [["un", 19.48], ["sussurro.", 19.6]], a: 22.1, oro: ["sussurro"] },
-    { parole: [["nel", 26.24], ["rumore.", 26.44]], a: 28.4 },
-    { parole: [["parla", 29.76], ["piano.", 30.213]], a: 32.5 },
-    { parole: [["fermarti.", 32.6]], a: 33.6, oro: ["fermarti"] },
-  ],
-  inserti: [
-    { tipo: "scheda", da: 6.3, a: 8.75, titolo: "1 Re 19:11-13", sottotitolo: "Elia sul monte Oreb" },
+  paroleChiave,
+  scene: [
+    // «Dal primo libro dei Re… Esci e fermati sul monte… il Signore passò»:
+    // da Elia alla caverna la camera si allarga sul monte.
     {
-      tipo: "percorso",
-      a: 22.1,
-      tappe: [
-        { quando: 9.32, etichetta: "Vento", sotto: "non qui", tenue: true },
-        { quando: 13.84, etichetta: "Terremoto", sotto: "non qui", tenue: true },
-        { quando: 16.68, etichetta: "Fuoco", sotto: "non qui", tenue: true },
-        { quando: 19.6, etichetta: "Sussurro", sotto: "qui" },
+      da: 0,
+      file: "media/elia/scena-02.png",
+      carrello: [
+        { a: 0, x: 0.74, y: 0.44, zoom: 1.55 },
+        { a: 2, x: 0.74, y: 0.44, zoom: 1.5 },
+        { a: 9.3, x: 0.55, y: 0.5, zoom: 1.08 },
       ],
     },
+    // Vento, terremoto, fuoco: una sola immagine, la camera scende dal cielo
+    // (rocce spezzate) alla crepa e poi al fuoco, ognuno sulla sua frase.
+    {
+      da: 9.28,
+      file: "media/elia/scena-tempesta.png",
+      carrello: [
+        { a: 9.28, x: 0.62, y: 0.25, zoom: 1.75 },
+        { a: 16.9, x: 0.64, y: 0.27, zoom: 1.82 },
+        { a: 18.4, x: 0.65, y: 0.52, zoom: 1.75 },
+        { a: 21.4, x: 0.66, y: 0.54, zoom: 1.82 },
+        { a: 22.9, x: 0.55, y: 0.82, zoom: 1.7 },
+        { a: 26.2, x: 0.55, y: 0.84, zoom: 1.78 },
+      ],
+    },
+    // «Dopo il fuoco, il sussurro… si coprì il volto con il mantello»
+    { da: 26.21, file: "media/elia/scena-07.png", inquadratura: { x: 0.45, y: 0.4, zoom: 1.1 } },
+    // «Elia era esausto e voleva solo sparire…»
+    { da: 35.52, file: "media/elia/scena-01.png", inquadratura: { x: 0.5, y: 0.55, zoom: 1.08 } },
+    // «Invece Dio arriva in un sussurro… bisogna fermarsi»: Elia fermo, guarda lontano.
+    { da: 42.4, file: "media/elia/riferimento-elia.png", inquadratura: { x: 0.5, y: 0.4, zoom: 1.06 } },
   ],
 };
 
-// Prova A: solo grafica animata.
-export const eliaGrafica: ReelProps = base;
-
-// Prova B: le scene dove Elia conta di più (1, 2, 7) diventano immagini generate.
-// Nano Banana 2, 2K, una versione per scena, tutte dal "Riferimento Elia" sul flow.
-const IMMAGINI: Record<number, Pick<Scena, "movimento"> & { file: string }> = {
-  0: { file: "media/elia/scena-01.png", movimento: "avvicina" }, // sotto il ginepro
-  1: { file: "media/elia/scena-02.png", movimento: "allontana" }, // la caverna sul monte Oreb
-  6: { file: "media/elia/scena-07.png", movimento: "su" }, // si copre il volto
-};
-export const eliaMista: ReelProps = {
-  ...base,
-  scene: sceneGrafica.map((s, i) => (IMMAGINI[i] ? { da: s.da, ...IMMAGINI[i] } : s)),
-};
+// Carosello con le stesse immagini: una frase per slide, presa dal testo della voce.
+export const eliaCarosello: Slide[] = [
+  {
+    file: "media/elia/scena-02.png",
+    frase: "Esci e fermati sul monte alla presenza del Signore.",
+    inquadratura: { x: 0.7, y: 0.4, zoom: 1.15 },
+    nota: "1 Re 19,11-13",
+  },
+  {
+    file: "media/elia/scena-tempesta.png",
+    frase: "Ma il Signore non era nel vento.",
+    inquadratura: { x: 0.6, y: 0.15, zoom: 1.25 },
+  },
+  {
+    file: "media/elia/scena-tempesta.png",
+    frase: "Ma il Signore non era nel terremoto.",
+    inquadratura: { x: 0.62, y: 0.55, zoom: 1.3 },
+  },
+  {
+    file: "media/elia/scena-tempesta.png",
+    frase: "Ma il Signore non era nel fuoco.",
+    inquadratura: { x: 0.5, y: 0.95, zoom: 1.15 },
+  },
+  {
+    file: "media/elia/scena-07.png",
+    frase: "Dopo il fuoco, il sussurro di una brezza leggera.",
+    inquadratura: { x: 0.5, y: 0.25, zoom: 1 },
+  },
+  {
+    file: "media/elia/scena-01.png",
+    frase: "Si aspettava Dio nella forza, nel rumore, nelle cose grandi.",
+    inquadratura: { x: 0.5, y: 0.6, zoom: 1 },
+  },
+  {
+    file: "media/elia/riferimento-elia.png",
+    frase: "Dio parla piano. E per sentirlo, bisogna fermarsi.",
+    inquadratura: { x: 0.5, y: 0.3, zoom: 1 },
+  },
+].map((s) => ({ ...s, paroleChiave }));

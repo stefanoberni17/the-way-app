@@ -4,87 +4,43 @@ import {
   Audio,
   Img,
   interpolate,
-  OffthreadVideo,
   Sequence,
-  spring,
   staticFile,
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { camera, GANCIO_SECONDI, montaScene, paroleInCaptions } from "./montaggio";
+import {
+  camera,
+  carrello,
+  CHIUSURA,
+  DISSOLVENZA,
+  montaScene,
+  paroleInCaptions,
+} from "./montaggio";
 import type { ScenaMontata } from "./montaggio";
-import { Frasi } from "./Frasi";
-import { Grafica, Grana } from "./Grafica";
-import { Inserti } from "./Inserti";
 import { Sottotitoli } from "./Sottotitoli";
-import { stile } from "./stile";
+import { stile, velo } from "./stile";
 import type { ReelProps } from "./tipi";
 
-const SFUMATURA = 6; // frame di dissolvenza dal nero alla prima scena
-
-const Scena: React.FC<{ scena: ScenaMontata }> = ({ scena }) => {
-  const frame = useCurrentFrame();
-  const t = interpolate(frame, [0, scena.durataFrame], [0, 1], {
-    extrapolateRight: "clamp",
-  });
-  const style: React.CSSProperties = {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    ...camera(scena.movimento ?? "avvicina", scena.zoom, t),
-  };
-  if ("grafica" in scena) {
-    // La grafica si muove dentro di sé; la camera aggiunge zoom e deriva.
-    return (
-      <AbsoluteFill style={{ overflow: "hidden", backgroundColor: stile.notte }}>
-        <AbsoluteFill style={camera(scena.movimento ?? "avvicina", scena.zoom, t)}>
-          <Grafica nome={scena.grafica} durata={scena.durataFrame} />
-        </AbsoluteFill>
-      </AbsoluteFill>
-    );
-  }
-  const video = /\.(mp4|mov|webm)$/i.test(scena.file);
-  return (
-    <AbsoluteFill style={{ overflow: "hidden", backgroundColor: stile.notte }}>
-      {video ? (
-        <OffthreadVideo src={staticFile(scena.file)} muted style={style} />
-      ) : (
-        <Img src={staticFile(scena.file)} style={style} />
-      )}
-    </AbsoluteFill>
-  );
-};
-
-const Gancio: React.FC<{ testo: string }> = ({ testo }) => {
+// Una scena: l'immagine dipinta con un lento movimento di camera.
+// Entra in dissolvenza sopra la scena precedente.
+const Scena: React.FC<{ scena: ScenaMontata; anticipo: number }> = ({ scena, anticipo }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const dentro = spring({ frame, fps, config: { damping: 200 }, durationInFrames: 10 });
-  const fuori = interpolate(frame, [GANCIO_SECONDI * fps - 8, GANCIO_SECONDI * fps], [1, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  const durata = scena.durataFrame + anticipo;
+  const t = interpolate(frame, [0, durata], [0, 1], { extrapolateRight: "clamp" });
+  const entrata = anticipo
+    ? interpolate(frame, [0, anticipo], [0, 1], { extrapolateRight: "clamp" })
+    : 1;
+  const transform = scena.carrello
+    ? carrello(scena.carrello, (scena.inizioFrame - anticipo + frame) / fps)
+    : camera(scena.movimento ?? "avvicina", scena.zoom, t, scena.inquadratura);
   return (
-    <AbsoluteFill style={{ alignItems: "center", paddingTop: 170 }}>
-      <div
-        style={{
-          fontFamily: stile.fontAccento,
-          fontStyle: "italic",
-          fontWeight: 700,
-          fontSize: 66,
-          lineHeight: 1.05,
-          color: stile.inchiostro,
-          background: stile.pergamena,
-          padding: "16px 38px 20px",
-          borderRadius: 22,
-          maxWidth: 900,
-          textAlign: "center",
-          boxShadow: "0 14px 34px rgba(0,0,0,0.35)",
-          opacity: dentro * fuori,
-          transform: `translateY(${(1 - dentro) * -30}px)`,
-        }}
-      >
-        {testo}
-      </div>
+    <AbsoluteFill style={{ overflow: "hidden", opacity: entrata }}>
+      <Img
+        src={staticFile(scena.file)}
+        style={{ width: "100%", height: "100%", objectFit: "cover", transform }}
+      />
     </AbsoluteFill>
   );
 };
@@ -95,38 +51,40 @@ export const Reel: React.FC<ReelProps> = ({
   scene,
   parole,
   paroleChiave = [],
-  gancio,
-  frasi = [],
-  inserti = [],
   sottofondo,
 }) => {
-  const { fps } = useVideoConfig();
   const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
   const montate = useMemo(() => montaScene(scene, durata), [scene, durata]);
   const captions = useMemo(() => paroleInCaptions(parole), [parole]);
-  const apertura = interpolate(frame, [0, SFUMATURA], [0, 1], { extrapolateRight: "clamp" });
+  const luce = interpolate(
+    frame,
+    [0, DISSOLVENZA, durationInFrames - CHIUSURA, durationInFrames],
+    [0, 1, 1, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
 
   return (
     <AbsoluteFill style={{ backgroundColor: stile.notte }}>
-      <AbsoluteFill style={{ opacity: apertura }}>
-        {montate.map((s, i) => (
-          <Sequence key={i} from={s.inizioFrame} durationInFrames={s.durataFrame}>
-            <Scena scena={s} />
-          </Sequence>
-        ))}
-        <Grana />
+      <AbsoluteFill style={{ opacity: luce }}>
+        {montate.map((s, i) => {
+          const anticipo = i === 0 ? 0 : DISSOLVENZA;
+          return (
+            <Sequence
+              key={i}
+              from={s.inizioFrame - anticipo}
+              durationInFrames={s.durataFrame + anticipo}
+            >
+              <Scena scena={s} anticipo={anticipo} />
+            </Sequence>
+          );
+        })}
+        <AbsoluteFill style={{ background: velo(48, 82) }} />
+        <Sottotitoli captions={captions} paroleChiave={paroleChiave} />
       </AbsoluteFill>
-      <Frasi frasi={frasi} />
       <Audio src={staticFile(voce)} />
       {sottofondo ? (
         <Audio src={staticFile(sottofondo.file)} volume={sottofondo.volume} loop />
-      ) : null}
-      <Sottotitoli captions={captions} paroleChiave={paroleChiave} />
-      <Inserti inserti={inserti} />
-      {gancio ? (
-        <Sequence durationInFrames={Math.round(GANCIO_SECONDI * fps)}>
-          <Gancio testo={gancio} />
-        </Sequence>
       ) : null}
     </AbsoluteFill>
   );

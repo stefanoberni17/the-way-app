@@ -53,6 +53,14 @@ export const eliaLettura: ReelProps = {
   durata: 50,
   parole,
   paroleChiave,
+  // Da «Il Signore disse» a «…della caverna»: il testo del passo, tra virgolette.
+  lettura: { da: 2, a: 35.4 },
+  apertura: {
+    percorso: "Settimana 3 · Passo 16",
+    titolo: "Elia e la voce sottile",
+    riferimento: "1 Re 19,11-13",
+    fino: 7,
+  },
   scene: [
     // «Dal primo libro dei Re… Esci e fermati sul monte… il Signore passò»:
     // da Elia alla caverna la camera si allarga sul monte.
@@ -96,7 +104,7 @@ export const eliaCarosello: Slide[] = [
     file: "media/elia/scena-02.png",
     frase: "Esci e fermati sul monte alla presenza del Signore.",
     inquadratura: { x: 0.7, y: 0.4, zoom: 1.15 },
-    nota: "1 Re 19,11-13",
+    nota: "Passo 16 · 1 Re 19,11-13",
   },
   {
     file: "media/elia/scena-tempesta.png",

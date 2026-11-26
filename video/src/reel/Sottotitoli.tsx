@@ -9,7 +9,7 @@ import {
 } from "remotion";
 import type { Caption, TikTokPage } from "@remotion/captions";
 import { ALTEZZA, pulisci, SOTTOTITOLI_TOP_Y } from "./montaggio";
-import { parolaChiave, testo } from "./stile";
+import { parolaChiave, stile, testo } from "./stile";
 
 // Poche parole per volta, ma con il respiro di una lettura: si va a capo
 // sulla punteggiatura, come nel testo, o quando la riga si allunga troppo.
@@ -48,7 +48,15 @@ const impagina = (captions: Caption[]): TikTokPage[] => {
 
 // Le parole già dette sono piene, quelle in arrivo restano in trasparenza:
 // si legge insieme alla voce, senza pillole né contorni.
-const Pagina: React.FC<{ page: TikTokPage; chiave: Set<string> }> = ({ page, chiave }) => {
+// Nella lettura del passo le parole sono in corsivo, tra virgolette:
+// “ apre la prima pagina della lettura, ” chiude l'ultima.
+type Lettura = { corsivo: boolean; apre: boolean; chiude: boolean };
+
+const Pagina: React.FC<{ page: TikTokPage; chiave: Set<string>; lettura: Lettura }> = ({
+  page,
+  chiave,
+  lettura,
+}) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const oraMs = page.startMs + (frame / fps) * 1000;
@@ -76,6 +84,9 @@ const Pagina: React.FC<{ page: TikTokPage; chiave: Set<string> }> = ({ page, chi
         }}
       >
         {page.tokens.map((t, i) => {
+          const parola = t.text.trim();
+          const primo = lettura.apre && i === 0;
+          const ultimo = lettura.chiude && i === page.tokens.length - 1;
           const detta = interpolate(oraMs, [t.fromMs - 60, t.fromMs + 120], [0.45, 1], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
@@ -85,13 +96,16 @@ const Pagina: React.FC<{ page: TikTokPage; chiave: Set<string> }> = ({ page, chi
               key={`${t.fromMs}-${i}`}
               style={{
                 ...testo,
+                ...(lettura.corsivo ? { fontStyle: "italic" } : {}),
                 ...(chiave.has(pulisci(t.text)) ? parolaChiave : {}),
                 fontSize: 86,
                 lineHeight: 1.12,
                 opacity: detta,
               }}
             >
-              {t.text.trim()}
+              {primo ? <span style={{ color: stile.oro }}>“</span> : null}
+              {parola}
+              {ultimo ? <span style={{ color: stile.oro }}>”</span> : null}
             </span>
           );
         })}
@@ -100,13 +114,18 @@ const Pagina: React.FC<{ page: TikTokPage; chiave: Set<string> }> = ({ page, chi
   );
 };
 
-export const Sottotitoli: React.FC<{ captions: Caption[]; paroleChiave: string[] }> = ({
-  captions,
-  paroleChiave,
-}) => {
+export const Sottotitoli: React.FC<{
+  captions: Caption[];
+  paroleChiave: string[];
+  lettura?: { da: number; a: number };
+}> = ({ captions, paroleChiave, lettura }) => {
   const { fps } = useVideoConfig();
   const chiave = useMemo(() => new Set(paroleChiave), [paroleChiave]);
   const pages = useMemo(() => impagina(captions), [captions]);
+  const nellaLettura = (p: TikTokPage) =>
+    !!lettura && p.startMs >= lettura.da * 1000 - 50 && p.startMs < lettura.a * 1000;
+  const primaLettura = pages.findIndex(nellaLettura);
+  const ultimaLettura = pages.reduce((u, p, i) => (nellaLettura(p) ? i : u), -1);
 
   return (
     <AbsoluteFill>
@@ -120,7 +139,15 @@ export const Sottotitoli: React.FC<{ captions: Caption[]; paroleChiave: string[]
         if (durata <= 0) return null;
         return (
           <Sequence key={i} from={from} durationInFrames={durata} layout="none">
-            <Pagina page={page} chiave={chiave} />
+            <Pagina
+              page={page}
+              chiave={chiave}
+              lettura={{
+                corsivo: nellaLettura(page),
+                apre: i === primaLettura,
+                chiude: i === ultimaLettura,
+              }}
+            />
           </Sequence>
         );
       })}

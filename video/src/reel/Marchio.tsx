@@ -1,7 +1,4 @@
-import { loadFont as loadDMSans } from "@remotion/google-fonts/DMSans";
 import { stile } from "./stile";
-
-const dmSans = loadDMSans("normal", { weights: ["500"], subsets: ["latin"] });
 
 // Il logo della pagina, ridisegnato per stare sopra le immagini: croce, filo,
 // "the way" e "LA VIA DEL CUORE", in crema con ombra morbida. Sempre presente,
@@ -55,7 +52,7 @@ export const Marchio: React.FC<{ altezza: number }> = ({ altezza }) => {
           </div>
           <div
             style={{
-              fontFamily: dmSans.fontFamily,
+              fontFamily: stile.fontSans,
               fontWeight: 500,
               fontSize: altezza * 0.13,
               letterSpacing: "0.38em",

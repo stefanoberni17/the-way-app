@@ -21,6 +21,7 @@ import {
   paroleInCaptions,
 } from "./montaggio";
 import type { ScenaMontata } from "./montaggio";
+import { Apertura } from "./Apertura";
 import { Marchio } from "./Marchio";
 import { Sottotitoli } from "./Sottotitoli";
 import { stile, velo } from "./stile";
@@ -56,6 +57,8 @@ export const Reel: React.FC<ReelProps> = ({
   parole,
   paroleChiave = [],
   sottofondo,
+  lettura,
+  apertura,
 }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
@@ -85,7 +88,8 @@ export const Reel: React.FC<ReelProps> = ({
         })}
         <AbsoluteFill style={{ background: velo(48, 82) }} />
         <AbsoluteFill style={{ background: velo(-30, 30) }} />
-        <Sottotitoli captions={captions} paroleChiave={paroleChiave} />
+        {apertura ? <Apertura {...apertura} /> : null}
+        <Sottotitoli captions={captions} paroleChiave={paroleChiave} lettura={lettura} />
       </AbsoluteFill>
       {/* Il logo resta per tutto il video, anche sulle dissolvenze al nero. */}
       <AbsoluteFill style={{ alignItems: "center", paddingTop: MARCHIO_TOP_Y * ALTEZZA }}>

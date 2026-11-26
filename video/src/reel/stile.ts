@@ -1,13 +1,17 @@
 import { loadFont as loadCormorant } from "@remotion/google-fonts/CormorantGaramond";
+import { loadFont as loadDMSans } from "@remotion/google-fonts/DMSans";
 
 // Un solo linguaggio: immagini dipinte e testo da libro. Cormorant Garamond
 // (il font dei titoli e dei versetti dell'app), crema con ombra morbida,
 // parole chiave in corsivo oro. Colori dalla palette "Pergamena e Oro".
 const cormorant = loadCormorant("normal", { weights: ["600", "700"], subsets: ["latin"] });
 loadCormorant("italic", { weights: ["600"], subsets: ["latin"] });
+// DM Sans solo per le righe piccole in maiuscolo (logo, numero del passo).
+const dmSans = loadDMSans("normal", { weights: ["500"], subsets: ["latin"] });
 
 export const stile = {
   font: cormorant.fontFamily,
+  fontSans: dmSans.fontFamily,
   oro: "#d8b262", // gold-light: le parole chiave
   crema: "#f3e8cf", // gold-soft: il testo
   notte: "#1d2028", // night: fondo dietro le immagini

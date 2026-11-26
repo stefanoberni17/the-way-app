@@ -30,6 +30,17 @@ export type ReelProps = {
   parole: Parola[];
   paroleChiave?: string[]; // in corsivo oro (minuscole, senza punteggiatura)
   sottofondo?: { file: string; volume: number }; // basso, es. 0.08
+  // Il tratto della voce che legge il passo: sottotitoli in corsivo, tra virgolette.
+  lettura?: { da: number; a: number };
+  // In apertura, sopra la prima scena: dove siamo nel percorso.
+  apertura?: Apertura;
+};
+
+export type Apertura = {
+  percorso: string; // es. "Settimana 3 · Passo 16"
+  titolo: string; // es. "Elia e la voce sottile"
+  riferimento: string; // es. "1 Re 19,11-13"
+  fino: number; // secondo in cui è già sparita
 };
 
 // Una slide del carosello: un'immagine del video e una frase breve presa dal testo.

@@ -25,6 +25,8 @@ export type Scena = {
 
 export type ReelProps = {
   voce: string; // percorso in public/, es. "media/elia/voce.mp3"
+  // Se la voce è in più pezzi: ognuno parte al secondo `da`, tagliato a `taglio`.
+  voci?: { file: string; da: number; taglio?: number }[];
   durata: number; // secondi totali del Reel
   scene: Scena[];
   parole: Parola[];

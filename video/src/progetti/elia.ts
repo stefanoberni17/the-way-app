@@ -2,7 +2,8 @@ import type { ReelProps, Slide } from "../reel/tipi";
 
 // Video 1: Elia e la voce sottile, 1 Re 19:11-13 (settimana 3, passo 16).
 // Voce "Stef" (eleven_v4, una versione): la lettura parola per parola dal testo
-// del passo su Notion, poi il significato in cinque frasi. Tempi da ElevenLabs Scribe.
+// del passo su Notion, poi il significato: Dio non arriva sempre con gesti grandi,
+// a volte nelle cose più semplici e sottili. Tempi da ElevenLabs Scribe.
 // Immagini dipinte, tutte dallo stesso riferimento di Elia: le 3 scene della prima
 // prova, il riferimento stesso e una sola immagine nuova per vento, terremoto e fuoco.
 
@@ -34,27 +35,60 @@ const parole: ReelProps["parole"] = (
   ["volto", 31.2, 31.44], ["con", 31.52, 31.6], ["il", 31.68, 31.72], ["mantello,", 31.76, 32.64],
   ["uscì", 32.8, 33.04], ["e", 33.36, 33.4], ["si", 33.44, 33.52], ["fermò", 33.6, 33.88],
   ["all'ingresso", 33.92, 34.44], ["della", 34.48, 34.56], ["caverna.", 34.64, 35.32],
-  ["Elia", 35.52, 35.92], ["era", 36, 36.16], ["esausto", 36.32, 36.8], ["e", 36.96, 37.04],
-  ["voleva", 37.093, 37.36], ["solo", 37.413, 37.52], ["sparire.", 37.6, 38.4],
-  ["Si", 38.44, 38.48], ["aspettava", 38.56, 38.96], ["Dio", 39.04, 39.2], ["nella", 39.24, 39.44],
-  ["forza,", 39.52, 40.16], ["nel", 40.24, 40.32], ["rumore,", 40.4, 41.04],
-  ["nelle", 41.12, 41.2], ["cose", 41.28, 41.44], ["grandi.", 41.52, 42.2],
-  ["Invece", 42.4, 42.88], ["Dio", 43.2, 43.36], ["arriva", 43.44, 43.68], ["in", 43.76, 43.84],
-  ["un", 43.88, 43.92], ["sussurro.", 44, 44.84], ["Parla", 45.04, 45.28],
-  ["piano.", 45.36, 45.84], ["E", 46.16, 46.24], ["per", 46.32, 46.4], ["sentirlo,", 46.48, 47.28],
-  ["bisogna", 47.44, 47.76], ["fermarsi.", 47.84, 48.8],
   ] as [string, number, number][]
 ).map(([text, start, end]) => ({ text, start, end }));
 
-const paroleChiave = ["fermati", "vento", "terremoto", "fuoco", "sussurro", "piano", "fermarsi"];
+// Il finale: la fine della lettura e il significato, generato a parte
+// (voce-finale.mp3) e attaccato dopo «…della caverna» a FINALE secondi.
+const FINALE = 35.8;
+const paroleFinale = (
+  [
+  ["Ed", 0.137, 0.16], ["ecco,", 0.24, 0.8], ["sentì", 1.04, 1.36], ["una", 1.44, 1.52],
+  ["voce", 1.6, 1.84], ["che", 1.88, 1.92], ["gli", 2, 2.08], ["diceva:", 2.16, 2.88],
+  ["«Che", 3.12, 3.28], ["fai", 3.36, 3.6], ["qui,", 3.68, 3.88], ["Elia?»", 3.92, 4.8],
+  ["Elia", 5.04, 5.44], ["aveva", 5.52, 5.84], ["appena", 5.96, 6.24], ["vinto", 6.28, 6.56],
+  ["la", 6.6, 6.64], ["sua", 6.72, 6.88], ["battaglia", 6.96, 7.36], ["più", 7.4, 7.52],
+  ["grande,", 7.6, 8.4], ["eppure", 8.52, 9.04], ["era", 9.16, 9.28], ["esausto", 9.44, 9.92],
+  ["e", 10.16, 10.24], ["voleva", 10.28, 10.64], ["solo", 10.72, 10.88], ["sparire.", 10.96, 12.08],
+  ["Si", 12.12, 12.16], ["aspettava", 12.24, 12.64], ["Dio", 12.72, 12.88], ["nella", 12.92, 13.2],
+  ["forza,", 13.32, 13.92], ["nel", 14, 14.08], ["rumore.", 14.24, 15.2], ["Ma", 15.24, 15.28],
+  ["il", 15.36, 15.44], ["Signore", 15.56, 16], ["non", 16.08, 16.16], ["arriva", 16.24, 16.64],
+  ["sempre", 16.72, 16.96], ["con", 17.04, 17.12], ["gesti", 17.2, 17.52], ["grandi.", 17.68, 18.48],
+  ["A", 18.52, 18.56], ["volte", 18.64, 18.96], ["passa", 19.08, 19.24], ["nelle", 19.28, 19.52],
+  ["cose", 19.627, 19.84], ["più", 19.88, 20.08], ["semplici", 20.2, 20.6], ["e", 20.64, 20.72],
+  ["sottili:", 20.8, 21.84], ["una", 21.92, 22], ["brezza", 22.08, 22.32], ["leggera,", 22.4, 23.28],
+  ["un", 23.36, 23.44], ["silenzio,", 23.52, 24.56], ["una", 24.64, 24.72], ["domanda.", 24.8, 25.56],
+  ["È", 25.84, 26], ["così", 26.08, 26.24], ["anche", 26.32, 26.56], ["nella", 26.6, 26.8],
+  ["nostra", 26.84, 27.12], ["vita.", 27.2, 28], ["Dio", 28.04, 28.48], ["parla", 28.56, 28.8],
+  ["piano.", 28.84, 29.68], ["E", 29.76, 29.84], ["per", 29.88, 29.92], ["sentirlo,", 30, 30.96],
+  ["bisogna", 31.08, 31.36], ["fermarsi.", 31.44, 32.32],
+  ] as [string, number, number][]
+).map(([text, start, end]) => ({ text, start: start + FINALE, end: end + FINALE }));
+
+const paroleChiave = [
+  "fermati",
+  "vento",
+  "terremoto",
+  "fuoco",
+  "sussurro",
+  "semplici",
+  "sottili",
+  "piano",
+  "fermarsi",
+];
 
 export const eliaLettura: ReelProps = {
   voce: "media/elia/voce-lettura.mp3",
-  durata: 50,
-  parole,
+  // La lettura si ferma dopo «…della caverna»; poi entra la voce del finale.
+  voci: [
+    { file: "media/elia/voce-lettura.mp3", da: 0, taglio: 35.45 },
+    { file: "media/elia/voce-finale.mp3", da: FINALE },
+  ],
+  durata: 70,
+  parole: [...parole, ...paroleFinale],
   paroleChiave,
-  // Da «Il Signore disse» a «…della caverna»: il testo del passo, tra virgolette.
-  lettura: { da: 2, a: 35.4 },
+  // Da «Il Signore disse» a «Che fai qui, Elia?»: il testo del passo, tra virgolette.
+  lettura: { da: 2, a: FINALE + 4.9 },
   apertura: {
     percorso: "Settimana 3 · Passo 16",
     titolo: "Elia e la voce sottile",
@@ -90,11 +124,23 @@ export const eliaLettura: ReelProps = {
     // «Dopo il fuoco, il sussurro… si coprì il volto con il mantello»
     // Inquadratura un po' bassa: il cappuccio resta sotto il logo.
     { da: 26.21, file: "media/elia/scena-07.png", inquadratura: { x: 0.45, y: 0.2, zoom: 1.35 } },
-    // «Elia era esausto e voleva solo sparire…»
-    { da: 35.52, file: "media/elia/scena-01.png", inquadratura: { x: 0.5, y: 0.55, zoom: 1.08 } },
-    // «Invece Dio arriva in un sussurro… bisogna fermarsi»: Elia fermo, guarda lontano.
-    // Inquadratura stretta e bassa: la testa scende sotto il logo.
-    { da: 42.4, file: "media/elia/riferimento-elia.png", inquadratura: { x: 0.5, y: 0.15, zoom: 1.6 } },
+    // «Elia aveva appena vinto… esausto… si aspettava Dio nella forza, nel rumore»
+    { da: FINALE + 5.04, file: "media/elia/scena-01.png", inquadratura: { x: 0.5, y: 0.55, zoom: 1.08 } },
+    // «Ma il Signore non arriva sempre con gesti grandi… una brezza, un silenzio,
+    // una domanda»: di nuovo il monte, largo e quieto, la camera si allontana piano.
+    {
+      da: FINALE + 15.24,
+      file: "media/elia/scena-02.png",
+      movimento: "allontana",
+      inquadratura: { x: 0.55, y: 0.5, zoom: 1.1 },
+    },
+    // «È così anche nella nostra vita. Dio parla piano… bisogna fermarsi»:
+    // Elia fermo, guarda lontano. Testa sotto il logo.
+    {
+      da: FINALE + 25.84,
+      file: "media/elia/riferimento-elia.png",
+      inquadratura: { x: 0.5, y: 0.15, zoom: 1.6 },
+    },
   ],
 };
 
@@ -128,8 +174,13 @@ export const eliaCarosello: Slide[] = [
   },
   {
     file: "media/elia/scena-01.png",
-    frase: "Si aspettava Dio nella forza, nel rumore, nelle cose grandi.",
+    frase: "Il Signore non arriva sempre con gesti grandi.",
     inquadratura: { x: 0.5, y: 0.6, zoom: 1 },
+  },
+  {
+    file: "media/elia/scena-02.png",
+    frase: "A volte passa nelle cose più semplici e sottili.",
+    inquadratura: { x: 0.55, y: 0.5, zoom: 1 },
   },
   {
     file: "media/elia/riferimento-elia.png",

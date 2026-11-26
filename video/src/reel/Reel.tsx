@@ -12,6 +12,7 @@ import {
 import {
   ALTEZZA,
   camera,
+  frame as aFrame,
   carrello,
   CHIUSURA,
   DISSOLVENZA,
@@ -52,6 +53,7 @@ const Scena: React.FC<{ scena: ScenaMontata; anticipo: number }> = ({ scena, ant
 
 export const Reel: React.FC<ReelProps> = ({
   voce,
+  voci,
   durata,
   scene,
   parole,
@@ -95,7 +97,18 @@ export const Reel: React.FC<ReelProps> = ({
       <AbsoluteFill style={{ alignItems: "center", paddingTop: MARCHIO_TOP_Y * ALTEZZA }}>
         <Marchio altezza={MARCHIO_ALTEZZA} />
       </AbsoluteFill>
-      <Audio src={staticFile(voce)} />
+      {voci ? (
+        voci.map((v, i) => (
+          <Sequence key={i} from={aFrame(v.da)} layout="none">
+            <Audio
+              src={staticFile(v.file)}
+              trimAfter={v.taglio !== undefined ? aFrame(v.taglio) : undefined}
+            />
+          </Sequence>
+        ))
+      ) : (
+        <Audio src={staticFile(voce)} />
+      )}
       {sottofondo ? (
         <Audio src={staticFile(sottofondo.file)} volume={sottofondo.volume} loop />
       ) : null}
